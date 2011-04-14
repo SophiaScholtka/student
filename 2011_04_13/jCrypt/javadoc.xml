@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc
+        	access="protected"
+        	additionalparam="
+        	-charset utf-8
+        	-encoding windows-1252
+        	-docencoding utf-8
+        	-header &lt;b&gt;jCrypt&lt;/b&gt;&amp;nbsp;1.1
+        	-link http://java.sun.com/j2se/1.6.0/docs/api
+        	-noqualifier all
+        	-windowtitle &quot;jCrypt - Programmierumgebung für das Kryptologie-Praktikum&quot;
+        	-version"
+        	author="true"
+        	classpath="jCrypt.jar"
+        	destdir="../doc/javadoc"
+        	doctitle="jCrypt - Programmierumgebung für das Kryptologie-Praktikum&lt;p&gt;&lt;a href=&quot;http://www.tu-braunschweig.de/iti&quot;&gt;&lt;img src=&quot;../misc/logo_iti.png&quot; border=&quot;0&quot;&gt;&lt;/a&gt;&lt;/p&gt;Technische Universität Braunschweig"
+        	nodeprecated="false"
+        	nodeprecatedlist="false"
+        	noindex="false"
+        	nonavbar="false"
+        	notree="false"
+        	overview="../doc/misc/overview_student.html"
+        	packagenames="task4,task5,task3,de.tubs.cs.iti.jcrypt.chiffre,task1,task0,task2"
+        	source="1.5"
+        	sourcepath="../../staff/jCrypt/src;../03_IDEA/src;../01_Vigenere/src;../04_ElGamal/src;../02_RunningKey/src;../00_Caesar/src;../05_Fingerprint/src"
+        	splitindex="false"
+        	stylesheetfile="../doc/misc/stylesheet.css"
+        	use="true"
+        	version="true"/>
+    </target>
+</project>

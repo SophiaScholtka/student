@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/jCrypt/jCrypt.jar"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="de.tubs.cs.iti.jcrypt.chiffre.Launcher"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-execute task0.Caesar&#13;&#10;-action break&#13;&#10;-cleartext ../00_Caesar/programmierer_break.txt&#13;&#10;-ciphertext ../00_Caesar/programmierer_enc.txt&#13;&#10;-key ../00_Caesar/key251_break.txt&#13;&#10;-alphabet ../alphabet/cp1252.alph"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="00_Caesar"/>
+</launchConfiguration>

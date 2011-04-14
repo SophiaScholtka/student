@@ -1,0 +1,4 @@
+# Alphabet DEFAULT91
+# Modulus des Alphabets: 91
+bySection
+a-z A-Z äöü ÄÖÜ ß sp 0-9 pm ret *

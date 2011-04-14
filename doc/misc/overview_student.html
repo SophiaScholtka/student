@@ -1,0 +1,184 @@
+<html>
+<body>
+jCrypt ist im Rahmen einer Studienarbeit im Wintersemester 2009/2010 und den
+ersten Wochen des Sommersemesters 2010 entstanden.
+<h3><a name="install">Hinweise zur Einrichtung der Programmierumgebung</h3>
+<p>
+<ol>
+<li>Entpacken Sie das Archiv jCrypt_1.1_student.tar.gz bzw. das Archiv
+jCrypt_1.1_student.zip in ein beliebiges Verzeichnis (im folgenden mit student
+bezeichnet).</li>
+<li>Starten Sie Eclipse.</li>
+<li>Wählen Sie im Workspace Launcher (File &rarr; Switch Workspace{... | &rarr;
+Other...}) als Workspace das Verzeichnis student aus und bestätigen Sie mit
+&lt;OK&gt;.</li>
+<li>Wählen Sie im Import-Dialogfenster (File &rarr; Import...) als Quelle die
+Kategorie General/Existing Projects into Workspace aus und bestätigen Sie mit
+&lt;Next&gt;. Geben Sie als Root Directory das Verzeichnis student an und
+schließen Sie den Import mit &lt;Finish&gt; ab. Die Quelltextdateien sollten im
+Anschluß an den Import automatisch fehlerfrei kompiliert werden (jCrypt ist
+entworfen für Java 1.5).</li>
+<li>Alle Dateien von jCrypt sind kodiert mit UTF-8 (jCrypt_1.1_student.tar.gz)
+oder CP1252 (jCrypt_1.1_student.zip). Damit diese Dateien in Eclipse richtig
+dargestellt werden, muß im Preferences-Dialogfenster (Window &rarr;
+Preferences[...]) in der Kategorie General/Workspace das Text File Encoding
+entsprechend eingestellt sein. Ggf. ist dort auch der Text File Line Delimiter
+zu ändern. Möchten Sie die jCrypt-Dateien in eine andere Kodierung konvertieren,
+probieren Sie vielleicht <a
+href="http://www.gnu.org/software/libiconv">libiconv</a>.</li>
+<li>In <a href="{@docRoot}/../../jCrypt/jCrypt.properties">jCrypt.properties</a>
+sind vier Encodings einzustellen. Unter Linux könnte UTF-8, unter Microsoft
+Windows CP1252 eine gute Wahl sein. Bitte beachten Sie, daß Eclipse auch eine
+eigene Konsolenkodierung benutzt. Diese kann zu jeder Run Configuration (Run
+&rarr; Run[ Configurations]...) in der Kategorie Java Application auf der
+Karteikarte mit dem Reiter Common im Bereich Console Encoding geändert
+werden.</li>
+<li>Testen Sie die Programmierumgebung mit der Run Configuration 90
+CharacterMapping programmierer.alph. Sie sollten etwa folgende (hier deutlich
+gekürzte) Ausgabe erhalten:
+<pre style="background-color:black; color:white; border:3pt black solid">
+[map]
+· =  10 &gt; 20
+· =  13 &gt; 19
+  =  32 &gt;  5
+! =  33 &gt; 69
+# =  35 &gt; 88
+[...]
+Ü = 220 &gt; 67
+ß = 223 &gt; 41
+ä = 228 &gt; 32
+ö = 246 &gt; 57
+ü = 252 &gt; 36
+[/map]
+[remap]
+ 0 &gt;  69 = E
+ 1 &gt;  99 = c
+ 2 &gt; 104 = h
+ 3 &gt; 116 = t
+ 4 &gt; 101 = e
+[...]
+84 &gt;  81 = Q
+85 &gt;  56 = 8
+86 &gt; 177 = ±
+87 &gt;  52 = 4
+88 &gt;  35 = #
+[/remap]
+[alphabet]
+explicit
+Echte ProgamidnASCL
+VlZ,ÄpuwsfMävz(ü-F).ßbDO10I=BNRWq»k«öy'HT629JjÜG!UKY&gt;&lt;/37;5:x?XQ8±4#
+[/alphabet]
+Modulus des Alphabets: 89
+</pre>
+</li>
+</ol>
+</p>
+<h3>Die Verzeichnisstruktur von jCrypt</h3>
+<p>Die <a href="{@docRoot}/../../">Verzeichnisstruktur</a> ist unterteilt in
+Verzeichnisse, die den einzelnen Praktikumsaufgaben zugeordnet sind (diese
+beginnen mit den Ziffern 00 bis 05) und die folgenden
+jCrypt-Systemverzeichnisse:
+<dl>
+<dt><a href="{@docRoot}/../../alphabet/">alphabet</a></dt>
+<dd>Standardverzeichnis für benutzerdefinierte Alphabete.</dd>
+<dt><a href="{@docRoot}/../../batch/">batch</a></dt>
+<dd>Batch-Dateien für Microsoft Windows, die demonstrieren sollen, wie man
+jCrypt auch von der Eingabeaufforderung nutzen kann.</dd>
+<dt><a href="{@docRoot}/../../doc/">doc</a></dt>
+<dd>Dokumentation von jCrypt (Javadoc).</dd>
+<dt><a href="{@docRoot}/../../jCrypt/">jCrypt</a></dt>
+<dd>Core-Files, Launch Configurations und Umgebungseigenschaften von
+jCrypt.</dd>
+<dt><a href="{@docRoot}/../../shell/">shell</a></dt>
+<dd>Shell-Skripte für Linux, die demonstrieren sollen, wie man jCrypt auch von
+der Command Line nutzen kann.</dd>
+<dt><a href="{@docRoot}/../../table/">table</a></dt>
+<dd>Standardverzeichnis für Häufigkeitstabellen.</dd>
+<dt><a href="{@docRoot}/../../text/">text</a></dt>
+<dd>Standardverzeichnis für ausgewählte Textdateien:
+<p>
+<table cellpadding="5" cellspacing="0" border="1" rules="all" frame="box">
+<thead>
+<tr>
+<th class="txt">Textdatei</th>
+<th class="num"># Zeichen</th>
+<th class="txt">Alphabet-Datei</th>
+<th class="num">Modulus</th>
+<th class="txt">Bemerkungen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="{@docRoot}/../../text/cp1252.txt">cp1252.txt</a></td>
+<td align="right">251</td>
+<td><a href="{@docRoot}/../../alphabet/cp1252.alph">cp1252.alph</a></td>
+<td align="right">251</td>
+<td>Zeichenkodierung Windows-1252</td>
+</tr>
+<tr>
+<td><a href="{@docRoot}/../../text/rennen.txt">rennen.txt</a></td>
+<td align="right">1.920</td>
+<td><a href="{@docRoot}/../../alphabet/rennen.alph">rennen.alph</a></td>
+<td align="right">59</td>
+<td>Das Wettrudern</td>
+</tr>
+<tr>
+<td><a href="{@docRoot}/../../text/trapa.txt">trapa.txt</a></td>
+<td align="right">2.291</td>
+<td><a href="{@docRoot}/../../alphabet/trapa.alph">trapa.alph</a></td>
+<td align="right">59</td>
+<td>Pressekonferenz Giovanni Trapattoni</td>
+</tr>
+<tr>
+<td><a href="{@docRoot}/../../text/sprachen.txt">sprachen.txt</a></td>
+<td align="right">5.543</td>
+<td><a href="{@docRoot}/../../alphabet/sprachen.alph">sprachen.alph</a></td>
+<td align="right">71</td>
+<td>Jan Roß: Tote Sprachen</td>
+</tr>
+<tr>
+<td><a href="{@docRoot}/../../text/weizenbaum.txt">weizenbaum.txt</a></td>
+<td align="right">13.812</td>
+<td><a href="{@docRoot}/../../alphabet/weizenbaum.alph">weizenbaum.alph</a></td>
+<td align="right">73</td>
+<td>Joseph Weizenbaum: Der zwanghafte Programmierer</td>
+</tr>
+<tr>
+<td><a href="{@docRoot}/../../text/programmierer.txt">programmierer.txt</a></td>
+<td align="right">23.769</td>
+<td><a href="{@docRoot}/../../alphabet/programmierer.alph">
+programmierer.alph</a></td>
+<td align="right">89</td>
+<td>Echte Programmierer meiden PASCAL</td>
+</tr>
+<tr>
+<td><a href="{@docRoot}/../../text/verwandlung.txt">verwandlung.txt</a></td>
+<td align="right">122.780</td>
+<td><a href="{@docRoot}/../../alphabet/verwandlung.alph">
+verwandlung.alph</a></td>
+<td align="right">69</td>
+<td>Franz Kafka: Die Verwandlung</td>
+</tr>
+<tr>
+<td><a href="{@docRoot}/../../text/gripsholm.txt">gripsholm.txt</a></td>
+<td align="right">236.518</td>
+<td><a href="{@docRoot}/../../alphabet/gripsholm.alph">gripsholm.alph</a></td>
+<td align="right">87</td>
+<td>Kurt Tucholsky: Schloß Gripsholm</td>
+</tr>
+<tr>
+<td class="txt"><a href="{@docRoot}/../../text/prozess.txt">prozess.txt</a></td>
+<td align="right">456.380</td>
+<td><a href="{@docRoot}/../../alphabet/prozess.alph">prozess.alph</a></td>
+<td align="right">84</td>
+<td>Franz Kafka: Der Prozeß</td>
+</tr>
+</tbody>
+</table>
+</p>
+</dd>
+</dl>
+</p>
+@author Martin Klußmann
+</body>
+</html>

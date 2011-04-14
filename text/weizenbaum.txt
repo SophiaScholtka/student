@@ -1,0 +1,198 @@
+Der zwanghafte Programmierer
+
+Joseph Weizenbaum
+
+Überall, wo man Rechenzentren eingerichtet hat, d.h. an zahllosen Stellen in
+den USA wie in fast allen Industrieländern der Welt, kann man aufgeweckte
+junge Männer mit zerzaustem Haar beobachten, die oft mit tief eingesunkenen,
+brennenden Augen vor dem Bedienungspult sitzen; ihre Arme sind angewinkelt,
+und sie warten nur darauf, daß ihre Finger - zum Losschlagen bereit - auf die
+Knöpfe und Tasten zuschießen können, auf die sie genauso gebannt starren wie
+ein Spieler auf die rollenden Würfel. Nicht ganz so erstarrt sitzen sie oft an
+Tischen, die mit Computerausdrucken übersät sind, und brüten darüber wie
+Gelehrte, die von kabbalistischen Schriften besessen sind. Sie arbeiten bis
+zum Umfallen, zwanzig, dreißig Stunden an einem Stück. Wenn möglich, lassen
+sie sich ihr Essen bringen: Kaffee, Cola und belegte Brötchen. Wenn es sich
+einrichten läßt, schlafen sie sogar auf einer Liege neben dem Computer. Aber
+höchstens ein paar Stunden - dann geht es zurück zum Pult oder zum Drucker.
+Ihre verknautschten Anzüge, ihre ungewaschenen und unrasierten Gesichter und
+ihr ungekämmtes Haar bezeugen, wie sehr sie ihren Körper vernachlässigen und
+die Welt um sich herum vergessen. Zumindest solange sie derart gefangen sind,
+existieren sie nur durch und für den Computer. Das sind Computerfetischisten,
+zwanghafte Programmierer. Sie sind ein internationales Phänomen.
+
+Wie kann man einen zwanghaften von einem schwer arbeitenden Berufsprogrammierer
+unterscheiden, der lediglich hoch motiviert ist? Zunächst durch die Tatsache,
+daß der gewöhnliche Berufsprogrammierer sich dem Problem widmet, das gelöst
+werden soll, während der zwanghafte Programmierer es hauptsächlich als Mittel
+zu dem Zweck betrachtet, eine Interaktion mit dem Computer herzustellen. Der
+normale Programmierer diskutiert in der Regel sowohl sein inhaltliches als
+auch sein technisches Programmierproblem mit anderen. Normalerweise leistet er
+ausgedehnte Vorarbeiten, wie z.B. das Erstellen von Flußdiagrammen, bevor er
+mit dem Computer selbst arbeitet. Seine eigentliche Rechenzeit am Computer ist
+relativ kurz. Es kann sogar vorkommen, daß er die Bedienung anderen überläßt.
+Sein Programm entwickelt er langsam und systematisch. Funktioniert irgendetwas
+nicht, so überlegt er sorgfältig, wo die Ursachen dafür liegen könnten, und
+entwickelt Testprogramme, um den Fehler zu finden. Hier kann er den Probelauf
+wiederum von anderen fahren lassen. Während er auf die Ergebnisse wartet, kann
+er sich durchaus anderen Bereichen seiner Arbeit zuwenden, z.B. aufschreiben,
+was bereits alles erledigt ist. Wenn er das in Angriff genommene Programm
+schließlich fertiggestellt hat, kann er eine eingehende Beschreibung davon
+verfertigen und seine Aufmerksamkeit anderen Dingen zuwenden. Der Fachmann
+betrachtet das Programmieren als Mittel zum Zweck und nicht als Selbstzweck.
+Seine Befriedigung bezieht er aus der Lösung eines inhaltlichen Problems und
+nicht daraus, dem Computer seinen Willen aufgezwungen zu haben.
+
+Der zwanghafte Programmierer ist gewöhnlich ein brillanter Techniker, der
+außerdem jedes Detail des Computers kennt, mit dem er arbeitet, dessen
+periphere Ausstattung, sein Operationssystem, etc. In Rechenzentren wird er
+gern gesehen, da er das System kennt und in der Lage ist, binnen kurzem kleine
+Unterprogramme zu schreiben; er schafft das in ein bis zwei Sitzungen von
+jeweils etwa zwanzig Stunden. Es kann vorkommen, daß das Rechenzentrum mit der
+Zeit einige seiner Systeme verwendet. Aber da man den zwanghaften
+Programmierer unter keinen Umständen dazu bringen kann, etwas anderes zu tun
+als zu programmieren, schreibt er seine Programme fast nie auf, sobald er
+nicht mehr damit arbeitet. Deshalb kann es soweit kommen, daß ein
+Rechenzentrum sich auf ihn verlassen muß, wenn es um die Erklärung der
+Zweckmäßigkeit und die Beibehaltung der Systeme geht, die er geschrieben hat
+und deren Struktur er allein versteht. Seine Stellung gleicht der eines
+Bankangestellten, der zwar nicht viel für die Bank tut, aber als einziger die
+Kombination des Tresorschlüssels kennt und nur deshalb nicht entlassen wird.
+Sein Hauptinteresse gilt deshalb nicht kleinen Programmen, sondern riesigen,
+ehrgeizigen Programmsystemen. In den meisten Fällen haben die Systeme, die er
+aufbauen will und an denen er fieberhaft einen, zwei oder drei Monate
+arbeitet, grandiose, aber äußerst ungenau formulierte Ziele. Einige Beispiele
+für diese ehrgeizigen Pläne sind: neue Computersprachen zur Verbesserung der
+Kommunikation zwischen Mensch und Maschine; ein generelles System, dem man
+beibringen, jede Art von Brettspiel zu spielen, oder ein System, das es
+Computerfachleuten erleichtern soll, Supersysteme zu entwickeln (das letztere
+ist ein Lieblingsprojekt). Es ist für viele dieser Vorhaben charakteristisch,
+daß der Programmierer lange Zeit hindurch die Überzeugung aufrechterhalten
+kann, daß dazu kein anderes Wissen als das über Computer, Programmiersprachen
+etc. erforderlich sei. Und über dieses Wissen verfügt er natürlich im
+Überfluß. Tatsächlich ist der Zeitpunkt, zu dem das ganze Projekt aufgegeben
+wird, oft genau dann erreicht, wenn es aufhört, Nabelschau zu sein, d.h., wenn
+man das Programmieren unterbrechen und Wissen von außerhalb der Computerwelt
+heranziehen müßte.
+
+Anders als der Fachmann kann der zwanghafte Programmierer sich keinen anderen
+Aufgaben widmen, selbst wenn sie eng mit seinem Programm zusammenhängen, wenn
+er einmal den Computer nicht bedient. Er kann es kaum ertragen, nicht an der
+Maschine zu sitzen. Zwingen ihn aber dennoch irgendwelche Umstände zu einer
+Trennung von seinem Gerät, so nimmt er wenigstens seine Ausdrucke mit. Er
+studiert sie und spricht mit jedem darüber, der ihm zuhört - obwohl ihm
+natürlich keiner folgen kann. Solange er seinen Zwängen ausgesetzt ist, kann
+er in der Tat von nichts anderem mehr reden als von seinem Programm. Aber
+wirklich »glücklich« ist er nur, wenn er am Schaltpult sitzt. Dann unterhält
+er sich nur noch mit dem Computer. Wir werden noch sehen, über was sie sich
+unterhalten.
+
+Der zwanghafte Programmierer verbringt soviel Zeit wie irgend möglich damit,
+an einem seiner großen Projekte zu arbeiten. Allerdings benutzt er nicht das
+Wort »arbeiten«, sondern »hacken« (hack). Hacken bedeutet laut Lexikon »etwas
+unregelmäßiges zerteilen, ohne Können oder eigentlichen Zweck; etwas durch
+wiederholte Schläge mit einem scharfen Instrument zerstückeln«. Wir sagten
+schon, daß der zwanghafte Programmierer oder Hacker, wie er sich selbst nennt,
+normalerweise ein brillanter Techniker ist. Es sieht deshalb so aus, als sei
+er nicht ganz so »ohne Können«, wie es in der Definition steht. Aber die
+Definition trifft in einem weiteren Sinne als dem zu, der sich lediglich auf
+die Technik bezieht; der Hacker ist nicht imstande, sich ein klar definiertes
+langfristiges Ziel zu setzen und einen Plan zu dessen Verwirklichung
+aufzustellen, denn er verfügt nur über Technik, nicht über Wissen. Er hat
+nichts, woraus er eine Analyse oder Synthese herstellen könnte; kurz, er hat
+nichts, worüber er eine Theorie entwickeln könnte. Darum ist sein Können
+ziellos, ja körperlos. Es hat zu nichts eine Verbindung als zu dem Instrument,
+auf dem es angewandt werden kann. Sein Können gleicht dem eines Mönchs, der
+Bibeln kopiert und Analphabet ist, aber trotzdem ein erstklassiger Kalligraph.
+Seine grandiosen Projekte müssen deshalb Illusionen bleiben, ja geradezu
+größtenwahnsinnige Illusionen. Er wird das eine große System konstruieren, in
+das bald all die anderen Experten ihre Systeme einbauen werden.
+
+(Es muß gesagt werden, daß nicht alle Hacker pathologische
+Zwangsprogrammierer sind. In der Tat, gäbe es nicht die - nach ihren eigenen
+Worten - höchst kreative Arbeit von Leuten, die den stolzen Titel »Hacker« für
+sich beanspruchen, so hätten wir heute kaum die modernsten Simultanrechner,
+elektronische Übersetzer, Zeichner etc.)
+
+Programmiersysteme können selbstverständlich ohne Plan und ohne jedes Wissen
+oder wenigstens Verständnis der dabei beteiligten weitverzweigten Probleme
+erstellt werden, genauso, wie man auf diese Weise Häuser, Städte, Staudämme
+und nationale Volkswirtschaften zurechthacken kann. Wenn ein derart zustande
+gekommenes System jedoch zu wachsen beginnt, wird es auch zunehmend instabil.
+Wenn eine seine Subfunktionen unvorhergesehenerweise ausfällt, kann der
+sichtbare Schaden vielleicht behoben werden. Aber da es keine allgemeine
+Theorie des Gesamtsystems gibt, kann das System selbst nur ein mehr oder
+weniger chaotisches Aggregat von Subsystemen sein, deren gegenseitiger Einfluß
+auf das Verhalten nur Stück für Stück und experimentell herausgefunden werden
+kann. Der Hacker verbringt einen Teil seiner Zeit am Schaltpult damit, die von
+ihm entwickelte Struktur mit neuen Subsystemen zu pflastern - er nennt sie
+»neue Features« - und den Rest der Zeit mit Versuchen, herauszufinden, in
+welcher Weise sich bereits installierte Substrukturen falsch verhalten. Das
+ist es, worüber er sich mit dem Computer unterhält.
+
+Die psychologische Situation, in der sich ein derart engagierter, zwanghafter
+Programmierer befindet, ist durch zwei Tatsachen definiert, die offensichtlich
+in Widerspruch zueinander stehen: erstens weiß er, daß der Computer alles
+machen muß, was er von ihm verlangt, und zweitens enthüllt der Computer
+ständig und unwiderlegbar die an ihm begangenen Fehler. Der Ingenieur kann
+sich mit der Wahrheit abfinden, daß es einige Dinge gibt, die er nicht kennt.
+Aber der Programmierer bewegt sich in einer Welt, die ganz und gar sein
+Machwerk ist. Der Computer fordert seine Macht heraus, nicht sein Wissen.
+
+Tatsächlich erreicht die fieberhafte Erregung des zwanghaften Programmierers
+ihren Höhepunkt, wenn er einem äußerst widerspenstigen Fehler auf der Spur
+ist; wenn eigentlich alles funktionieren müßte, aber der Computer all seinen
+Bemühungen Hohn spricht und sich mysteriös, d.h. scheinbar unerklärlich
+verhält. Spätestens zu diesem Zeitpunkt zeigt sich, daß das vom Programmierer
+selbst geschaffene System nunmehr ein Eigenleben führt und ohne Frage seiner
+Kontrolle entglitten ist. Dann scheint auch die Vorstellung äußerst relevant
+und realitätsgerecht, daß man den Computer »alles machen lassen kann«. Denn
+unter den gegebenen Umständen ist ja das Artefakt, das sich falsch verhält, in
+Wirklichkeit die ureigenste Schöpfung des Programmierers. Sein Fehlverhalten
+kann, wie gesagt, nur eine Folge dessen sein, was der Programmierer getan hat.
+Und was er getan hat, kann er wahrscheinlich gedanklich nachvollziehen,
+auseinandernehmen und wieder zusammensetzen, damit es seinen Zwecken besser
+dient. Dementsprechend nähern sich seine Stimmung und Aktivität der Raserei,
+wenn er glaubt, kurz vor der Entdeckung des Fehlers zu stehen. Sollte seine
+Rechenzeit in diesem Moment fast aufgebraucht sein, so geht er mit seinem
+Programm ein gewaltiges Risiko ein, wenn er in Minuten oder sogar Sekunden
+eine wesentliche Änderung nach der anderen vornimmt, ohne wenigstens
+aufzuschreiben, was er tut; und dabei bittet er die ganze Zeit um noch eine
+und noch eine Rechenminute. Unter solchen Umständen kann er die Ergebnisse
+wochenlanger Arbeit schnell und fast irreparabel vernichten. Sollte er dagegen
+einen gut versteckten Fehler finden, der wirklich für den größten Teil des
+Fehlverhaltens des Programms verantwortlich ist, so kennt sein Jubel keine
+Grenzen. Es ist schon ein Erlebnis zu beobachten, wie ein zuvor todkrankes
+Programm jetzt zu neuem Leben erwacht. Wenn ein schwerer Fehler gefunden und
+behoben wurde, verhalten sich viele verschiedene Teile des Programms, die
+vorher nur unverständliche Zahlenreihen ausspuckten, plötzlich ganz zahm und
+liefern genau die erwarteten Ergebnisse. Der Diagnostiker hat allen Grund zur
+Freude und auch zu Stolz, wenn der Fehler im System gravierend war.
+
+Aber der Stolz und die gehobene Stimmung des zwanghaften Programmierers sind
+nur von kurzer Dauer. Sein Erfolg besteht darin, daß er dem Computer gezeigt
+hat, wer der Herr ist. Und nachdem er bewiesen hat, daß er den Computer zu
+solchen Leistungen trimmen kann, fängt er unverzüglich an, noch mehr aus ihm
+herauszuholen. Zuerst »verbessert« er das System, etwa indem er es schneller
+laufen läßt, »neue Features« hinzugibt oder das Verfahren verbessert, nach dem
+Daten ein- oder ausgegeben werden können. Wenn das so entstandene Programm
+dann modifiziert wird, brechen unweigerlich einige seiner Subsysteme zusammen;
+insgesamt bilden sie alle ein amorphes Konglomerat von Prozessen, deren
+wechselseitige Interaktionen praktisch zufällig ablaufen. Seine scheinbar
+hingebungsvollen Versuche, die eigene Schöpfung zu verbessern und zu steigern,
+kommen eher einer Attacke gleich, deren einzige Konsequenz darin bestehen
+kann, den Kampf mit dem Computer erneut aufzunehmen. Sollte er - etwa durch
+administrative Entscheidung - an der Sabotage seines Werks gehindert werden,
+wird er zusehends depressiv, macht ein beleidigtes Gesicht, zeigt keinerlei
+Interesse mehr an seiner Umwelt etc. Einzig eine neue Gelegenheit, am Computer
+zu rechnen, kann seine Lebensgeister zurückrufen.
+
+Es muß betont werden, daß das von uns gezeichnete Porträt an sämtlichen
+Computeranlagen der ganzen Welt leicht zu entdecken ist. Es handelt sich um
+eine Art Psychopathologie, die zwar weit weniger komplex als etwa die milderen
+Formen von Schizophrenie oder Paranoia ist. Andererseits stellt es jedoch die
+extrem weit fortgeschrittene Form einer Störung dar, von der große Teile
+unserer Gesellschaft betroffen sind.
+
+[Aus:Joseph Weizenbaum, »Die Macht der Computer und die Ohnmacht der Vernunft«,
+Frankfurt a.M. 1977]

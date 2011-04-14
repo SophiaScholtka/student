@@ -1,0 +1,122 @@
+Modulus 26: A-Z
+----------
+
+tab26_1
+=======
+
+o Einzelwahrscheinlichkeiten
+o alle Nicht-ASCII-Buchstaben (wie Satzzeichen, Leerzeichen,
+  Zahlen, Umlaute, etc.) wurden überlesen
+o zugrundeliegender Text:  224826 Buchstaben
+
+
+tab26_2
+=======
+
+o Paarwahrscheinlichkeiten
+o alle Nicht-ASCII-Buchstaben (wie Satzzeichen, Leerzeichen,
+  Zahlen, Umlaute, etc.) wurden überlesen
+o zugrundeliegender Text:  224826 Buchstaben
+
+
+tab26_3
+=======
+
+o Tripelwahrscheinlichkeiten
+o alle Nicht-ASCII-Buchstaben (wie Satzzeichen, Leerzeichen,
+  Zahlen, Umlaute, etc.) wurden überlesen
+o zugrundeliegender Text:  224826 Buchstaben
+
+
+-----------------------------------------------------------------------------
+
+Modulus 27: A-Z,*
+----------
+
+tab27_1
+=======
+
+o Einzelwahrscheinlichkeiten
+o alle Nicht-ASCII-Buchstaben wurden auf '*' abgebildet
+o zugrundeliegender Text: 281052 Buchstaben
+
+
+tab27_2
+=======
+
+o Paarwahrscheinlichkeiten
+o alle Nicht-ASCII-Buchstaben wurden auf '*' abgebildet
+o zugrundeliegender Text: 281052 Buchstaben
+
+
+tab27_3
+=======
+
+o Tripelwahrscheinlichkeiten
+o alle Nicht-ASCII-Buchstaben wurden auf '*' abgebildet
+o zugrundeliegender Text: 281052 Buchstaben
+
+
+-----------------------------------------------------------------------------
+
+Modulus 30: A-Z,ÄÖÜß
+----------
+
+tab30_1
+=======
+
+o Einzelwahrscheinlichkeiten
+o mit Umlauten 
+o alle Nicht-ASCII-Buchstaben und Nicht-Umlaute wurden überlesen
+o zugrundeliegender Text: 220558 Buchstaben
+
+
+tab30_2
+=======
+
+o Paarwahrscheinlichkeiten
+o mit Umlauten
+o alle Nicht-ASCII-Buchstaben und Nicht-Umlaute wurden überlesen
+o zugrundeliegender Text: 220558 Buchstaben
+
+
+tab30_3
+=======
+
+o Tripelwahrscheinlichkeiten
+o mit Umlauten
+o alle Nicht-ASCII-Buchstaben und Nicht-Umlaute wurden überlesen
+o zugrundeliegender Text: 220558 Buchstaben
+
+
+-----------------------------------------------------------------------------
+
+Modulus 31: A-Z,äöüß,*
+----------
+
+tab31_1
+=======
+
+o Einzelwahrscheinlichkeiten
+o mit Umlauten
+o alle Nicht-ASCII-Buchstaben und Nicht-Umlaute wurden auf '*' abgebildet
+o zugrundeliegender Text: 276784 Buchstaben
+
+
+tab31_2
+=======
+
+o Paarwahrscheinlichkeiten
+o mit Umlauten
+o alle Nicht-ASCII-Buchstaben und Nicht-Umlaute wurden auf '*' abgebildet
+o zugrundeliegender Text: 276784 Buchstaben
+
+
+tab31_3
+=======
+
+o Tripelwahrscheinlichkeiten
+o mit Umlauten
+o alle Nicht-ASCII-Buchstaben und Nicht-Umlaute wurden auf '*' abgebildet
+o zugrundeliegender Text: 276784 Buchstaben
+

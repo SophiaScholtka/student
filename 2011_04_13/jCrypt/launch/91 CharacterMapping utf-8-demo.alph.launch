@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/jCrypt/jCrypt.jar"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.debug.ui.ATTR_CONSOLE_ENCODING" value="UTF-8"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="de.tubs.cs.iti.jcrypt.chiffre.CharacterMapping"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="../alphabet/utf-8-demo.alph"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jCrypt"/>
+</launchConfiguration>
