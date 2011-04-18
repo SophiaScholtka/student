@@ -445,12 +445,23 @@ public class Vigenere extends Cipher {
 	    String symbol;
 	    for(String s : cipher) {
 	    	for(int i = 0;i<s.length();i++) {
-		    	//symbol = String. s.charAt(i);
+		    	symbol = String.valueOf(s.charAt(i));
+		    	int iFound = 0;
 		    	for(int j = 0;j< chars.size();j++) {
-		        
+		    		if(symbol.equals(chars.get(j))) {
+		    			iFound++;
+		    		}
+		    	}
+		    	if(iFound == 0) {
+		    		chars.add(symbol);
 		    	}
 	    	}
 	    }
+	    
+	    //"# Dieses Alphabet enthält alle Zeichen aus 'programmierer.txt'.";
+	    //"# Modulus des Alphabets: 89";
+	    //"explicit";
+	    //Zeichen
 	    
 
 		// Creates nGrams for the encrypted text
