@@ -53,7 +53,7 @@ public class Vigenere extends Cipher {
    * Der Writer, der den Klartext schreiben soll.
    */
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
-		
+		//test
     try {
       //Koinzidenzindex
       int nBig = 0; //length of ciphertext
