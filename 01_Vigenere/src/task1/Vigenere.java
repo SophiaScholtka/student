@@ -13,11 +13,19 @@ package task1;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.Console;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import de.tubs.cs.iti.jcrypt.chiffre.CharacterMapping;
 import de.tubs.cs.iti.jcrypt.chiffre.Cipher;
+import de.tubs.cs.iti.jcrypt.chiffre.FrequencyTables;
+import de.tubs.cs.iti.jcrypt.chiffre.NGram;
 
 //import java.util.StringTokenizer;
 
@@ -30,7 +38,9 @@ import de.tubs.cs.iti.jcrypt.chiffre.Cipher;
 public class Vigenere extends Cipher {
 	private int[] shifts;
 	private int keylength;
-
+	
+	private int shift;
+	
   /**
    * Analysiert den durch den Reader <code>ciphertext</code> gegebenen
    * Chiffretext, bricht die Chiffre bzw. unterstützt das Brechen der Chiffre
@@ -43,7 +53,105 @@ public class Vigenere extends Cipher {
    * Der Writer, der den Klartext schreiben soll.
    */
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
-	  //tEST
+		
+    try {
+      //Koinzidenzindex
+      int nBig = 0; //length of ciphertext
+      String line;
+      int countLines = 0;
+      //Get length of ciphertext (maybe not exactly accurate)
+      ArrayList<String> chiffre = new ArrayList<String>(); //chiffre as list
+      while ((line = ciphertext.readLine()) != null) {
+    	  countLines++;
+    	  nBig = nBig + line.length();
+    	  chiffre.add(line);
+//    	  System.out.println("länge: " + line.length());
+//    	  System.out.println(line);
+    	  
+      }
+      //calculate sum of frequencies
+      double[][] unigramArray = FrequencyTables.getNGramsAsArray(1, charMap);
+      float fSum = 0;
+      float iF = 0;
+      for(int i = 0;i< nBig;i++) {
+    	  iF = 0; //TODO Frequency of the i-th character in the chiffre
+    	  fSum = fSum + iF * (iF - 1);
+      }
+      //calculate coincidence index
+      float ic = fSum / (nBig * (nBig - 1));
+
+      //CAESAR
+      /*
+      ArrayList<NGram> nGrams = FrequencyTables.getNGramsAsList(1, charMap);
+      // Bestimme das häufigste Zeichen aus der zugehörigen Unigramm-Tabelle.
+      System.out.println("Häufigstes Zeichen in der Unigramm-Tabelle: "
+          + nGrams.get(0).getCharacters());
+      // Bestimme das häufigste Zeichen des Chiffretextes.
+      // 'character' ist die Integer-Repräsentation eines Zeichens.
+      int character;
+      // 'number' zählt alle Zeichen im Chiffretext.
+      int number = 0;
+      // 'quantities' enthält zu allen aufgetretenen Zeichen (keys der Hashmap)
+      // deren zugehörige Anzahlen (values der Hashmap).
+      HashMap<Integer, Integer> quantities = new HashMap<Integer, Integer>();
+      // Lese zeichenweise aus der Chiffretextdatei, bis das Dateiende erreicht
+      // ist.
+      while ((character = ciphertext.read()) != -1) {
+        number++;
+        // Bilde 'character' auf dessen interne Darstellung ab.
+        character = charMap.mapChar(character);
+        // Erhöhe die Anzahl für dieses Zeichen bzw. lege einen neuen Eintrag
+        // für dieses Zeichen an.
+        if (quantities.containsKey(character)) {
+          quantities.put(character, quantities.get(character) + 1);
+        } else {
+          quantities.put(character, 1);
+        }
+      }
+      ciphertext.close();
+      // Suche das häufigste Zeichen in 'quantities'.
+      // 'currKey' ist der aktuell betrachtete Schlüssel der Hashmap (ein
+      // Zeichen des Chiffretextalphabets).
+      int currKey = -1;
+      // Der Wert zum aktuellen Schlüssel (die Anzahl, mit der 'currKey' im
+      // Chiffretext auftrat).
+      int currValue = -1;
+      // Die bisher größte Anzahl.
+      int greatest = -1;
+      // Das bisher häufigste Zeichen.
+      int mostFrequented = -1;
+      Iterator<Integer> it = quantities.keySet().iterator();
+      while (it.hasNext()) {
+        currKey = it.next();
+        currValue = quantities.get(currKey);
+        if (currValue > greatest) {
+          greatest = currValue;
+          mostFrequented = currKey;
+        }
+      }
+      // Das häufigste Zeichen 'mostFrequented' des Chiffretextes muß vor der
+      // Ausgabe noch in Dateikodierung konvertiert werden.
+      System.out.println("Häufigstes Zeichen im Chiffretext: "
+          + (char) charMap.remapChar(mostFrequented));
+
+      // Berechne die im Chiffretext verwendete Verschiebung.
+      int computedShift = mostFrequented
+          - charMap.mapChar(Integer.parseInt(nGrams.get(0).getIntegers()));
+      if (computedShift < 0) {
+        computedShift += modulus;
+      }
+      shift = computedShift;
+      System.out.println("Schlüssel ermittelt.");
+      System.out.println("Modulus: " + modulus);
+      System.out.println("Verschiebung: " + shift);
+
+      */
+    } catch (IOException e) {
+      System.err.println("Abbruch: Fehler beim Lesen aus der "
+          + "Chiffretextdatei.");
+      e.printStackTrace();
+      System.exit(1);
+    }
   }
 
   /**
@@ -70,7 +178,7 @@ public class Vigenere extends Cipher {
       boolean characterSkipped = false;
       // Lese zeichenweise aus der Klartextdatei, bis das Dateiende erreicht
       // ist. Der Buchstabe a wird z.B. als ein Wert von 97 gelesen.
-      int counter=1;
+      int counter=0;
       while ((character = ciphertext.read()) != -1) {
         // Bilde 'character' auf dessen interne Darstellung ab, d.h. auf einen
         // Wert der Menge {0, 1, ..., Modulus - 1}. Ist z.B. a der erste
@@ -329,4 +437,47 @@ public class Vigenere extends Cipher {
       System.exit(1);
     }
   }
+  
+  private void createFrequencyTables(String[] cipher) {
+
+		//Create alphabet
+	    ArrayList<String> chars = new ArrayList<String>();
+	    String symbol;
+	    for(String s : cipher) {
+	    	for(int i = 0;i<s.length();i++) {
+		    	//symbol = String. s.charAt(i);
+		    	for(int j = 0;j< chars.size();j++) {
+		        
+		    	}
+	    	}
+	    }
+	    
+
+		// Creates nGrams for the encrypted text
+		//nGram on an special encoded text
+		String[] frequencyTablesInput = new String[4];
+		//TODOL BufferedReader for alphabet path
+		frequencyTablesInput[0] = "../alphabet/programmierer_enc.alph";
+		//TODOL BufferedReader for encoded text file path
+		frequencyTablesInput[1] = "programmierer_enc.txt";
+		//TODOL BufferedReader for size of maximal n-Grams (>2, cause <=2 could be random)
+		frequencyTablesInput[2] = "4";
+		//TODOL BufferedReader for amount of watched nGrams
+		frequencyTablesInput[3] = "5";
+		//Create frequency tables
+		try {
+			int maxN = Integer.parseInt(frequencyTablesInput[2]);
+			PrintStream ps = System.out; // for bringing back old output
+			for(int i = 1;i<=maxN;i++) {
+				frequencyTablesInput[2] = ""+i;
+				System.setOut(new PrintStream(new FileOutputStream("../table/" + i + "-grams_programmierer_enc.alph.tab")));
+				//sets the default output stream to a file while the frequency table is generated
+				FrequencyTables.main(frequencyTablesInput);
+				System.setOut(new PrintStream(ps)); // output back to normal
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+  }
+  
 }
