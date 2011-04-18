@@ -53,32 +53,28 @@ public class Vigenere extends Cipher {
    * Der Writer, der den Klartext schreiben soll.
    */
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
-		//test
     try {
       //Koinzidenzindex
-      int nBig = 0; //length of ciphertext
       String line;
-      int countLines = 0;
-      //Get length of ciphertext (maybe not exactly accurate)
-      ArrayList<String> chiffre = new ArrayList<String>(); //chiffre as list
+      String chiffre = ""; //chiphertext as one long String
       while ((line = ciphertext.readLine()) != null) {
-    	  countLines++;
-    	  nBig = nBig + line.length();
-    	  chiffre.add(line);
+    	  chiffre.concat(line);
 //    	  System.out.println("länge: " + line.length());
 //    	  System.out.println(line);
     	  
       }
+      char[] chiffchars = chiffre.toCharArray();
       //calculate sum of frequencies
       double[][] unigramArray = FrequencyTables.getNGramsAsArray(1, charMap);
       float fSum = 0;
       float iF = 0;
-      for(int i = 0;i< nBig;i++) {
-    	  iF = 0; //TODO Frequency of the i-th character in the chiffre
+      for(int i = 0;i< chiffchars.length;i++) {
+    	  iF = 0;
+    	  
     	  fSum = fSum + iF * (iF - 1);
       }
       //calculate coincidence index
-      float ic = fSum / (nBig * (nBig - 1));
+      float ic = fSum / (chiffchars.length * (chiffchars.length - 1));
 
       //CAESAR
       /*
