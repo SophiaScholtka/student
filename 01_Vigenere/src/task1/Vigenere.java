@@ -388,7 +388,7 @@ public class Vigenere extends Cipher {
   
   private float calcCoincidenceIndex(BufferedReader ciphertext) {
 	  float back = -1.0f;
-	  String text = bufferedReaderToString(chiphertext);
+	  String text = bufferedReaderToString(ciphertext);
 	  
 	return back;
   }
