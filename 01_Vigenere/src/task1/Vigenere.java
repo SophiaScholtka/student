@@ -451,10 +451,18 @@ public class Vigenere extends Cipher {
   }
   
   private float calcCoincidenceIndex(String text) {
-	  float back = -1.0f;
+	  float d = -1.0f;
+	  float N = (float) text.length();
 	  createFrequencyTables("generatedAlphabet.alph", text, 1, 1, modulus);
-	  readFrequencyTable("generated" + "1" + "-grams.alph.tab");
-	return back;
+	  String[][] table = readFrequencyTable("generated" + "1" + "-grams.alph.tab");
+	  int n = table.length;
+	  float IC = 0;
+	  for(int i=0;i<n;i++){
+		  IC=IC+Float.parseFloat(table[i][1])*(Float.parseFloat(table[i][1])-1);
+	  }
+	  IC=IC/(N*(N-1));
+	  d=(N*(IC-1.0f/n))/((N-1)*IC-N/n+IC);
+	return d;
   }
   
   private float calcPeriod(float ic) {
