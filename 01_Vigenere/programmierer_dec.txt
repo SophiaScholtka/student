@@ -1,362 +1,814 @@
-Echte Programmierer meiden PASCAL
-
-
-Vor langer Zeit, in der goldenen Ära der Computer, war es noch einfach, die
-Männer von den Memmen zu trennen (mitunter auch Echte Männer und Müsli-Fresser
-genannt). Echte Männer programmierten Computer, und Müsli-Fresser ließen es
-bleiben. Ein echter Computer-Programmierer sagte Dinge wie DO 10 I=0,10 oder
-ABEND, und der Rest der Welt quengelte »Computer sind mir zu kompliziert«
-oder »Ich kann zu Computern keine gefühlsmäßige Bindung aufbauen - sie sind zu
-unpersönlich«. Dabei zeigt schon Remy Eyssen's Buch »Echte Männer mögen kein
-Müsli« (Heine TB 6290), daß echte Männer zu nichts und niemandem eine
-gefühlsmäßige Bindung aufbauen, und daß sie auch keine Angst haben,
-unpersönlich zu sein.
-Aber die Zeiten ändern sich. Heute stehen wir einer Welt gegenüber, in der
-kleine alte Damen vollcomputerisierte Mikrowellenherde kaufen können, in der
-12 Jahre alte Dreikäsehochs gestandene Männer bei ASTEROIDS und PACMAN
-sattmachen, und in der jeder seinen eigenen Heimcomputer kaufen und sogar
-verstehen kann. Der Echte Programmierer ist gefährdet, von Studenten mit einem
-igITT 2020 (deutsche Version des ABFALL II, A.d.Ü.) im Gepäck ersetzt zu werden!
-
-Es gibt allerdings einige Unterschiede zwischen dem typischen PACMAN-spielenden
-Gymnasiasten und einem Echten Programmierer. Die Kenntnis dieser Unterschiede
-wird den Heranwachsenden ein Ziel geben, nach dem sie streben können - ein
-Vorbild, eine Vaterfigur. Außerdem schützt sie die Echten Programmierer vor der
-Arbeitslosigkeit.
-
-Der einfachste Weg, um einen Echten Programmierer zu erkennen, führt über die
-von ihm benutzte Programmiersprache. Echte Programmierer benutzen FORTRAN.
-Müsli-Fresser benutzen Pascal. Niklaus Wirth, der Schöpfer von Pascal, wurde
-einmal gefragt, wie man seinen Namen ausspreche. »You can either call me by
-name, pronouncing it >Veert<, or call me by value, >worth<«, antwortete
-er. Diese Bemerkung zeigt sofort, daß Wirth ein Müsli-Fresser ist. Der einzige
-Parameterübergabemechanismus, den Echte Programmierer akzeptieren, ist
-call-by-value-return (call-by-result, A.d.ü.), wie er in den IBM/370 Fortran-G
-und -H-Compilern implementiert ist. Echte Programmierer brauchen schließlich
-keine abstrakten Konzepte; sie sind vollkommen glücklich mit einem
-Lochkartenstanzer, einem Fortran-IV-Compiler und einem Bier. Echte Programmierer
-erledigen Listenverarbeitung, Zeichenketten-Manipulationen, Abrechnungswesen
-(wenn überhaupt) und künstliche Intelligenz in FORTRAN. Was sie mit FORTRAN
-nicht machen können, machen sie mit Assembler; was sie mit Assembler nicht
-machen können, lassen sie verächtlich liegen.
-
-Akademische Computerspezialisten sind in den letzten Jahren aufs Abstellgleis
-der strukturierten Programmierung geraten. Sie behaupten, daß Programme
-verständlicher werden, wenn bestimmte Sprachkonstrukte und Programmiertechniken
-benutzt werden. Sie können sich natürlich nicht einigen, welche Konstrukte am
-besten geeignet sind, und die Beispiele, an denen sie ihren speziellen
-Standpunkt aufzeigen wollen, passen ausnahmslos auf eine einzige Seite
-irgendeines obskuren Journals. Als ich aus der Schule kam, dachte ich, ich sei
-der beste Programmierer der Welt. Ich konnte ein unschlagbares TIC-TAC-TOE-Spiel
-schreiben, beherrschte 5 verschiedene Programmiersprachen und schrieb
-fehlerfreie 1000-Zeilen-Programme. Dann kam ich in die Wirklichkeit. Meine erste
-Aufgabe bestand darin, ein 200000-Zeilen-FORTRAN-Programm zu lesen, zu verstehen
-und um den Faktor 2 zu beschleunigen. Jeder Echte Programmierer wird einem
-versichern, daß die gesamte strukturierte Programmierung der Welt in einem
-solchen Fall nicht hilft - hier braucht man wirklich Talent.
-
-Einige Beobachtungen zum Thema Echte Programmierer und strukturierte
-Programmierung:
-
-- Echte Programmierer haben keine Angst vor GOTOs.
-- Echte Programmierer schreiben 5 Seiten lange DO-Schleifen, ohne durcheinander
-  zu geraten.
-- Echte Programmierer lieben arithmetische IF-Statements (die mit den 3
-  Ausgängen, A.d.Ü.), weil sie den Code interessanter machen.
-- Echte Programmierer schreiben selbstmodifizierende Programme, speziell wenn
-  sie damit in einer kleinen Schleife 20 Nanosekunden einsparen können.
-- Echte Programmier brauchen keine Kommentare, das Programm ist
-  selbstdokumentierend.
-- Da FORTRAN strukturierte IF-, REPEAT...UNTIL- oder CASE- Anweisungen nicht
-  kennt, braucht sich der Echte Programmierer nicht zu sorgen, daß er sie nicht
-  benutzt. Außerdem kann man sie nötigenfalls über Assigned GOTOs (Zuweisung
-  eines Sprunglabels auf eine Variable, A.d.ü.) simulieren.
-
-Auch Datenstrukturen waren in der letzten Zeit in der Diskussion. Abstrakte
-Datentypen, Records, Pointer, Listen und Zeichenketten sind in gewissen Kreisen
-populär geworden. Wirth, der Müsli-Fresser, verfasste sogar ein ganzes Buch
-(»Algorithmen und Datenstrukturen«, Teubner 1975), in dem er behauptete, daß man
-Programme schreiben könne, die auf Datenstrukturen aufbauen, statt es umgekehrt
-zu machen. Wie jeder Echte Programmierer weiß, gibt es nur eine wirklich
-nützliche Datenstruktur, das Array. Zeichenketten, Listen, Records und Mengen
-sind allesamt Sonderfälle von Arrays und können auch so behandelt werden, ohne
-dadurch die Sprache zu verkomplizieren. Das Schlimmste an den ganzen schönen
-Typen ist außerdem, daß man sie deklarieren muß, während Echte
-Programmiersprachen, wie man weiß, den Typ anhand des ersten Buchstabens eines
-maximal 6 Zeichen langen Bezeichners implizit festlegen.
-
-Welches Betriebssystem der Echte Programmierer benutzt? CP/M? Gott bewahre! Das
-ist doch im Grunde ein Spielzeug-Betriebssystem. Selbst kleine alte Damen und
-Hauptschüler können CP/M benutzen und verstehen. UNIX ist natürlich schon viel
-komplizierter: Der typische UNIX-Hacker weiß nie, wie das PRINT-Kommando diese
-Woche heißt - aber wenn man es genau nimmt, ist UNIX auch nur ein verherrlichtes
-Telespiel. Niemand arbeitet auf UNIX-System an ernstzunehmenden Dingen: man
-schickt kleine Witzchen über USENET rund um die Welt, oder schreibt ein neues
-Adventure-Spiel oder Forschungsberichte.
-Nein, der Echte Programmierer benutzt OS/370. Ein guter Programmierer kann die
-Beschreibung des Fehlers IJK305I in seinem JCL (Job Control Language)-Manual
-finden und verstehen. Ein großartiger Programmierer kann JCL schreiben, ohne je
-das Manual zu sehen. Ein wahrhaft außerordentlich guter Programmierer kann
-Fehler in einem 6-Megabyte-Hexdump finden, ohne einen Taschenrechner zu
-benutzen.
-
-OS/370 ist wirklich ein bemerkenswertes Betriebssystem. Mit einem einzigen
-falsch plazierten Leerzeichen kann man die gesamte Arbeit mehrerer Tage
-zerstören, was die Wachsamkeit im Programmierteam ungemein fördert. Der beste
-Weg zum System ist der Kartenstanzer. Zwar behaupten einige Leute, es gäbe ein
-Timesharing-System unter OS/370, aber nach sorgfältigen Nachforschungen bin ich
-zu dem Schluß gekommen, daß sie sich irren.
-Welche Werkzeuge kann ein Echter Programmierer benutzen? Nun, theoretisch könnte
-er seine Programme über die Maschinenkonsole eingeben und laufen lassen. In den
-frühen Tagen der Computerei, als Computer noch Maschinenkonsolen hatten, wurde
-dies auch gelegentlich getan. Der typische Programmierer wußte den
-System-Urlader Bit für Bit auswendig und tastete ihn ein, sobald er von seinem
-Programm zerstört worden war. Damals war Speicher auch noch Speicher - der war
-nicht einfach leer, wenn der Strom ausfiel. Hauptspeicher von heute hingegen
-vergessen entweder Dinge, die sie behalten sollen, oder halten Informationen,
-die schon lange weg sein sollten. Aber zurück zum Thema. Die Legende sagt, daß
-Seymour Cray, der Erfinder des Cray-I-Supercomputers und der meisten anderen
-Rechner von Control Data, selbst das erste Betriebssystem für die CDC 7600 an
-der Maschinenkonsole eingetastet hat, als sie das erste Mal eingeschaltet wurde.
-Cray ist selbstverständlich ein echter Programmierer.
-
-Einer der Programmierer, die ich am meisten bewundere, arbeitet als
-Systemprogrammierer für Texas Instruments. Eines Tages erhielt er ein
-Ferngespräch von einem Benutzer, dessen System mitten in einer wichtigen Arbeit
-abgestürzt war. Der Typ reparierte dann den Schaden übers Telefon. Er brachte
-den Benutzer dazu, an der Maschinenkonsole Disk-I/O-Instruktionen einzutasten,
-Systemtabellen in Hexadezimal zu reparieren und Registerinhalte über's Telefon
-durchzugeben. Die Moral von der Geschichte: Obwohl ein echter Programmierer
-normalerweise Kartenlocher und Schnelldrucker benutzt, kommt er im Notfall auch
-mit Maschinenkonsole und Telefon aus.
-
-In einigen Firmen besteht die Programmeingabe allerdings nicht mehr aus 10
-schlangestehenden Ingenieuren, die auf einen 029-Locher warten. In meiner Firma
-zum Beispiel steht kein einziger Kartenlocher. Der Echte Programmierer muß in
-diesem Fall seine Arbeit mit einem Texteditor erledigen. Auf den meisten
-Rechnern stehen verschiedene Editoren zur Verfügung, und der Echte Programmierer
-muß aufpassen, daß er einen erwischt, der seinen persönlichen Stil wiedergibt.
-Viele Leute glauben, daß die besten Editoren der Welt im Xerox Palo Alto
-Research Center geschrieben wurden und auf Alto- und Dorado-Computern laufen.
-Unglücklicherweise würde jedoch kein Echter Programmierer einen Computer mit
-einem Betriebssystem benutzen, das Smalltalk (Geplapper, A.d.Ü.) heißt, und
-sicherlich auch nicht über eine Maus mit einem Rechner kommunizieren.
-Einige Konzepte der Xerox-Editoren sind mittlerweile in Editoren eingeflossen,
-die unter sinnvoller benannten Betriebssystemen arbeiten, so wie EMACS und VI.
-Das Problem mit diesen Editoren ist, daß Echte Programmierer das Prinzip
-»Du kriegst, was du siehst« für schlecht halten. Der Echte Programmierer will
-einen »Du hast es so gewollt, da hast du's«-Editor, einen, der kompliziert ist,
-kryptisch, leistungsfähig, gnadenlos und gefährlich. TECO, um genau zu sein.
-
-Es wurde beobachtet, daß TECO-Kommandofolgen dem Leitungsrauschen ähnlicher sind
-als lesbarem Text. Eins der unterhaltsameren Spiele, die mit TECO möglich sind,
-besteht darin, den eigenen Namen als Kommando einzugeben und zu raten, was dann
-passiert. So ungefähr jeder mögliche Tippfehler kann dank TECO das gerade
-editierte Programm zerstören, oder schlimmer noch, kann kleine mysteriöse Fehler
-in einstmals funktionierende Unterprogramme einbringen.
-Aus diesem Grund editieren Echte Programmierer nur sehr widerwillig Programme,
-die schon fast laufen. Sie finden es viel einfacher, den binären Objektcode
-direkt zu ändern, für gewöhnlich mit einem wundervollen Programm, das SUPERZAP
-heißt (auf Nicht-IBM-Rechnern entsprechend anders). Dies funktioniert so gut,
-daß viele laufende Programme auf IBM-Systemen keine Ähnlichkeit mit dem
-ursprünglichen FORTRAN-Quellprogramm haben. In einigen Fällen ist nicht einmal
-mehr das Quellprogramm vorhanden. Wenn dann der Zeitpunkt gekommen ist, ein
-Programm zu ändern, würde kein Mananger auch nur daran denken, einem geringeren
-als einem Echten Programmierer diese Arbeit zu übertragen - kein
-Müsli-fressender strukturierter Programmierer wüßte auch nur, wo er mit der
-Arbeit anfangen sollte. Man nennt das Arbeitssicherungsmaßnahme.
-
-Hier eine wichtige Liste der wichtigsten Programmierhilfen, die der Echte
-Programmierer nicht benutzt:
-
-- FORTRAN-Präprozessoren wie MORTRAN oder RATFOR. Diese Haute Cuisine der
-  Programmierung eignet sich hervorragend, um Müsli zu produzieren.
-- Quellcodeorientierte Debugger: Echte Programmierer lesen Hexdumps.
-- Compiler, die Code für Array-Indexprüfung zur Laufzeit erzeugen: Sie
-  ersticken jede Kreativität, zerstören die meisten der interessanteren
-  Anwendungen der EQUIVALENCE-Vereinbarung, und machen Änderungen des
-  Betriebssystems mittels negativer Indizes unmöglich. Und, schlimmer noch,
-  solcher Code ist ineffizient.
-- Programm-Pflege-Systeme: Ein Echter Programmierer hält seine Software als
-  Kartenstapel unter Verschluß, denn dies zeigt, daß der Besitzer seine
-  wichtigen Programme nicht unbewacht lassen kann.
-
-Wo der typische Echte Programmierer arbeitet? Welche Art von Programmen derart
-talentierter Individuen würdig ist? Nun, man kann sicher sein, daß man nie einen
-Echten Programmierer beim Schreiben von Buchhaltungsprogrammen in COBOL
-erwischen wird, oder gar beim Sortieren der Abonnentenadressen des SPIEGEL.
-Nein, ein Echter Programmierer braucht Aufgaben von weltbewegender Bedeutung.
-
-Echte Programmierer arbeiten für das Los Alamos National Laboratory und
-schreiben dort Atomkriegs-Simulationen auf Cray-I-Supercomputern, oder sie
-arbeiten bei der National Security Agency und entschlüsseln russische
-Funksprüche. Nur weil tausende Echter Programmierer für die NASA gearbeitet
-haben, waren »unsere Jungs« eher auf dem Mond als die Kosmonauten. Die
-Computer im Space Shuttle wurden von Echten Programmierern programmiert, und
-auch die Betriebssysteme der Cruise Missiles der Firma BOEING wurden von diesen
-echten Professionals entworfen.
-
-Einige der ehrfurchteinflößendsten Echten Programmierern arbeiten im Jet
-Propulsion Laboratory in Kalifornien. Viele von ihnen kennen das gesamte
-Betriebssystem der Pioneer- und Voyager-Sonden auswendig. Mit einer Kombination
-von großen, bodengebundenen FORTRAN-Programmen und kleinen, von den Sonden
-mitgeführten Assembler-Programmen vollbringen sie unglaubliche Kunststücke der
-Navigation und Improvisation. So treffen sie nur 10 Kilometer große Fenster nahe
-Saturn nach 6 Jahren Flug durch den Weltraum, oder reparieren bzw. umgehen
-defekte Sensoren, Sender oder Batterien. Angeblich soll es einem Echten
-Programmierer gelungen sein, in ein paar hundert Byte unbenutzten Speichers
-innerhalb der Voyager-Sonde ein Mustererkennungsprogramm zu pressen, das einen
-neuen Mond des Jupiters suchte, fand und fotografierte.
-
-Für die Galileo-Sonde ist vorgesehen, daß sie auf ihrem Weg zum Jupiter entlang
-einer schwerkraftgelenkten Bahn am Mars vorbeizieht. Diese Bahn führt in einer
-Entfernung von 80±3 km an der Marsoberfläche vorbei. Kein Mensch würde diese
-Art der Navigation einem Pascal-Programm oder gar -Programmierer anvertrauen.
-
-Viele der Echten Programmierer dieser Welt arbeiten für die amerikanische
-Regierung, meist für das Verteidigungsministerium. So soll es sein. In letzter
-Zeit erscheinen dunkle Wolken am Horizont der Echten Programmierer. Es scheint,
-als hätten einige einflußreiche Müsli-Fresser im Verteidigungsministerium
-entschieden, daß in Zukunft alle Verteidigungsprogramme in so einer Art von
-großer, vereinheitlichter Programmiersprache names ADA geschrieben werden
-müßten. Lange Zeit schien es, als läge ADAs Bestimmung im Verstoß gegen alle
-Regeln der Echten Programmierung. Es ist eine Sprache mit Strukturen,
-Datentypen, strenger Typenbindung und Semikolons. Kurz, sie ist wie geschaffen,
-um die Kreativität des typischen Echten Programmierers zu verkrüppeln.
-
-Glücklicherweise hat die jetzt vom DoD (Department of Defense) ausgewählte
-Sprache noch genügend interessante Eigenschaften, um dem Echten Programmierer
-eine Annäherung zu ermöglichen: Sie ist unglaublich komplex, sie enthält
-Möglichkeiten, um mit dem Betriebssystem herumzumachen, und Edgar Dijkstra mag
-sie nicht. Dijkstra ist, wie man wissen sollte, der Autor von »GOTOs Considered
-Harmful«, einem Meilenstein der Programmiermethodologie, der von
-Pascal-Programmierern und Müsli-Fressern gleichermaßen bewundert wird. Und
-außerdem, ein zu allem entschlossener Echter Programmierer kann in jeder Sprache
-FORTRAN-Programme schreiben.
-
-Der Echte Programmierer kann allerdings auch Kompromisse in Bezug auf seine
-Prinzipien eingehen und an etwas geringeren Aufgaben als der Vernichtung des
-Lebens arbeiten, sofern er dafür entsprechend bezahlt wird. Viele Echte
-Programmierer schreiben Telespiele für Atari, allerdings spielen sie nicht
-damit. Ein Echter Programmierer weiß, wie er die Maschine jedesmal schlagen
-kann, und damit ist es keine Herausforderung mehr. Jeder bei Lucas Film ist ein
-Echter Programmierer, denn es wäre doch verrückt, das Geld von 50 Millionen
-Star-Wars-Fans auszuschlagen.
-
-Der Anteil der Echten Programmierer im Bereich der Computer Graphics ist etwas
-niedriger als anderswo, was wahrscheinlich daran liegt, daß noch niemand
-irgendeinen Nutzen der Computer Graphics entdeckt hat. Andererseits werden
-Computer Graphics vornehmlich in FORTRAN abgehandelt, daher gibt es einige
-Leute, die so das Schreiben von COBOL-Programmen vermeiden.
-
-Im Allgemeinen spielt der Echte Programmierer, wie er arbeitet - mit Computern.
-Er ist ständig darüber erheitert, daß sein Arbeitgeber ihn tatsächlich für etwas
-bezahlt, was er nur so zum Spaß ebenso tun würde - allerdings achtet er darauf,
-diese Meinung nicht zu laut zu äußern. Gelegentlich kommt der Echte
-Programmierer auch aus seinem Büro heraus, um sich ein wenig frische Luft und
-ein oder zwei Bierchen zu genehmigen. Hier daher einige Hinweise, wie man den
-Echten Programmierer außerhalb des Computerraums erkennt:
-
-- Auf Parties stehen Echte Programmierer in einer Ecke und diskutieren über
-  Sicherheitsmechanismen von Betriebssystemen und wie man daran
-  herumprogrammiert.
-- Bei Fußballspielen vergleicht der Echte Programmierer die Ergebnisse mit
-  seinen auf grünliniertem Leprollo-Papier gedruckten
-  Computer-Simulationsergebnissen.
-- Am Strand zeichnet der Echte Programmierer Flußdiagramme in den Sand.
-- Ein Echter Programmierer geht in die Disco, um sich die Lichtorgel anzusehen.
-- Bei Begräbnissen sagt der Echte Programmierer typischerweise: »Armer
-  Hans-Helmut. Er war mit seinem Sortierprogramm schon fast fertig, als ihn der
-  Herzinfarkt erwischt hat«.
-- Im Supermarkt besteht der Echte Programmierer darauf, seine Bierdosen selber
-  über das Fenster des Strichcodelesers zu schieben, weil er keinem Kassierer
-  zutraut, dies beim ersten Versuch richtig zu machen.
-
-In welcher Umgebung der Echte Programmierer am besten funktioniert? Nun, dies
-ist eine sehr wichtige Frage für die Manager von Echten Programmierern. Wenn man
-bedenkt, wie teuer es ist, einen von ihnen in Betrieb zu halten, dann sollte man
-ihn oder sie in eine optimale Arbeitsumgebung versetzen.
-Der typische Echte Programmierer lebt vor einem Computerterminal. Rund um dieses
-Terminal liegen Ausdrucke von jedem Programm, an dem er je gearbeitet hat, sie
-stapeln sich grob chronologisch geordnet auf jeder ebenen Fläche des Büros. Im
-Zimmer verteilt finden sich über ein Dutzend mit kaltem Kaffee mehr oder minder
-gefüllte Tassen. Gelegentlich schwimmen Zigarettenkippen darin herum, in einigen
-Fällen auch Reste von Orangenschalen. Irgendwo liegen Kopien des OS JCL Manuals
-und der »Principles of Operation« an einer besonders interessanten Stelle
-aufgeschlagen, außer bei extrem guten Leuten. An der Wand klebt ein
-Schnelldrucker-Kalender mit Snoopy drauf aus dem Jahre 1969. Über den Boden
-verteilt liegen Reste der Verpackungen von gefüllten Keksen (der Typ, der schon
-in der Fabrik so furztrocken gebacken wird, daß er auch bei längerem Liegen im
-Automaten nicht schlechter wird). Schließlich, in der linken oberen Schublade
-des Schreibtischs, unter der Schachtel mit den Muntermachern, liegt eine
-Schablone für Flußdiagramme, die sein Vorgänger dort vergessen hat. Echte
-Programmierer schreiben Programme und keine Dokumentation, das überläßt man den
-Typen von der Wartung.
-
-Der Echte Programmierer ist in der Lage, 30, 40, ja sogar 50 Stunden in einem
-Rutsch zu arbeiten, und das unter hohem Zeitdruck. Genaugenommen mag er es so am
-liebsten. Schlechte Antwortzeiten regen den Echten Programmierer nicht auf - sie
-geben ihm eine Chance, zwischen zwei Kommandos ein bißchen Schlaf zu ergattern.
-Wenn die Planung nicht genügend Zeitdruck bereithält, dann tendiert der Echte
-Programmierer dazu, seine Arbeit herausfordernder zu machen, indem er sich die
-ersten neun Wochen mit einem kleinen, aber sehr interessanten Teil des Problems
-befaßt, um dann in der letzten Woche seine Aufgabe in zwei oder drei
-50-Stunden-Marathonsitzungen zu beenden. Dies beeindruckt nicht nur den Manager,
-sondern schafft gleichzeitig eine hervorragende Entschuldigung für das Fehlen
-der Dokumentation. Und überhaupt: Kein Echter Programmierer arbeitet von 9 bis
-5, außer denen von der Nachtschicht. Echte Programmierer tragen keine Schlipse.
-Echte Programmierer tragen keine hochhackigen Schuhe. Echte Programmierer kommen
-zur Arbeit, wenn andere zum Mittagessen gehen. Ein Echter Programmierer vergißt
-vielleicht den Vornamen seiner Angetrauten, aber niemals den Inhalt der gesamten
-ASCII- (bzw. EBCDIC-) Tabelle. Echte Programmierer können nicht kochen. Da
-Supermärkte um 3 Uhr morgens selten geöffnet haben, müssen sie sowieso von
-Kaffee und Keksen leben.
-
-Die Zukunft betrachtend machen sich eine Reihe von Echten Programmierern Sorgen,
-daß die jüngste Programmierergeneration nicht mehr mit der gleichen
-Lebensperspektive aufwächst wie sie selbst. Viele der Jüngeren haben noch nie
-einen Computer mit Maschinenkonsole gesehen. Kaum ein Schulabgänger kann heute
-noch hexadezimal rechnen, ohne einen Taschenrechner zu benutzen. Die Studenten
-von heute sind weich - geschützt vor den Realitäten der Programmierung durch
-symbolische Debugger, Texteditoren, die Klammern zählen, und
-benutzerfreundliche Betriebssysteme. Und das schlimmste ist, einige dieser
-angeblichen Computer-Spezialisten kommen zu Rang und Namen, ohne je FORTRAN zu
-lernen! Sind wir dazu verdammt, eine Industrie von UNIX-Hackern und
-Pascal-Programmierern zu werden?
-
-Nun, aus meine Erfahrung heraus glaube ich, behaupten zu dürfen, daß das
-Schicksal den Echten Programmierern wohlgesonnen ist. Weder OS/370 noch FORTRAN
-zeigen irgendwelche Symptome des Aussterbens, trotz aller Anstrengungen der
-Pascal-Programmierer. Selbst subtilere Tricks wie das Hinzufügen strukturierter
-Schleifen zu FORTRAN sind fehlgeschlagen. Sicher, einige Computerhersteller
-liefern FORTRAN-77-Compiler, aber jeder einzelne von ihnen läßt sich über eine
-einzige Compiler-Option in einen FORTRAN-66-Compiler verwandeln - mit
-DO-Schleifen, wie von Gott geschaffen.
-
-Selbst UNIX scheint für den Echten Programmierer nicht mehr so schlecht zu sein
-wie früher. Die neueste UNIX-Version hat das Potential eines Betriebssystems,
-das eines Echten Programmierers würdig ist. Sie hat zwei verschiedene, leicht
-inkompatible Benutzerschnittstellen, einen geheimnisvollen und komplizierten
-Teletype-Treiber und virtuellen Speicher. Und wenn der Echte Programmierer die
-Strukturierung ignoriert, kann er sich sogar mit C anfreunden. Schließlich gibt
-es keine Typenbindung, Bezeichner sind sieben (Zehn? Acht?) Zeichen lang, und
-man hat Zeiger als Bonus. Das ist, als hätte man die besten Teile von FORTRAN
-und Assembler vereinigt, von den kreativeren Möglichkeiten des #define ganz zu
-schweigen.
-
-Nein, die Zukunft ist nicht völlig schlecht. So hat sich in der vergangenen
-Jahren die populäre Presse sogar über die clevere neue Brut von
-Computer-Schraten und -Hackern geäußert, die Plätze wie Stanford und MIT
-zugunsten der Wirklichkeit verlassen haben. Allen Anzeichen nach lebt der Geist
-der Echten Programmierung weiter in diesen jungen Männern und Frauen. Und
-solange es schlecht beschriebene Ziele, bizarre Fehler und unrealistische
-Zeitpläne gibt, solange wird es Echte Programmierer geben, die bereit sind,
-einzuspringen und das Problem zu lösen, und die sich die Dokumentation für
-später aufheben.
-
-Lang lebe FORTRAN!
-
-
-Quelle: DATAMATION 7/83, übersetzt durch Bernd Leeds
-http://www.datamation.com/PlugIn/humor/classics/pascal.html
-
+Ljimd6Qknns:ltj
+qlsällj#du0IzZDtKe<Uvsäkho·dy0Sdpu4ßpoäclsäfvm#dufgß2s:ßkfkßJpfoBu
+q'0p·y0
+r6ohbo0
+hug:bo(äcpf<L ogdy0onu0#du0Fdtn
+m6AnßAs
+mufgß!nbsBomdy0:tjiäDjimd6NTmufkßBo#ßTÄlkp=yqltldy·dubgmA-3ßLdasl0FZuo
+q6qknns:ltj
+qAfgßJpfoBu
+q'0nmk0Fözmb)Ms
+rzfkßsj
+Üloädz?klj?du,äDpoädjimdy0vntqnsls7Oyp·qhnfhls
+q6t:fAfäCpo·d6xbd6EHß81äH/14070hcls<zIFGC'0nmk0#dy0KdzuäclsäVlmmßxv
+mnfesl09BvnitAfkßzjgc6nbq6Anßrpfosjshlsm»ep#dy09HjiäjhogßGväBvnitAfkm6l
+hufäflgVgstfZ5j·d6Cbmkvgf6bneibndu07ßzj
+ßzjgc6An#BoidytUmsj±g:,äChc
+h6A
+hnuärjihm6S
+lF0xxzt
+m?täABdaß;F±gAfäL ogdy0fänfgßrfbmeNVrsj.ß!I
+hufäSI0 1»16.6e:Ü6f±gAfäL ogdy0st6obboulßBo#ßuj
+lho#dt0
+huf<flgVgstfZ5j·d6Cbmkvgf6bneibndu(ätueäch ärpfä·Bdaßrfbml0tmntmßob?du(<tuq
+qzügkpdaßGvärljg9eB?dy0#hl0Sdpu
+m6ögclsgßzj±g«0AdBu
+ßzu
+gloävpsädpo
+q6X
+kA0·dnfgöifk.6jgßkfk#rm
+hufä·su
+ßKbfdu0onsm±ntqnslsbrpfksl0Fhrshvlmedui
+qkfäjhvdu0däuo
+m'0bm6e
+qe2ÄßQbaql0:kAfäCyfbj t
+gvdar6h
+rAbgclo
+ßTögmlsäaljäzZUxQVJwR6vgc6QtBTBG#zbmstb±glo4ßBo#ßpoäclsäile
+q6t
+hufgßlj·dufgßOfbljpfoBu
+q6l:tmfgßBo#ßzp··yodytmdofgßrbgm«0wdy0xbou
+ßWshfybflpfkdy0brA0·dmöaqkfm.6whm6Tmtkfgsloälpuädpo
+lej·HäUä173öß!e
+tAt±gl0Odytbnu0#dz0tAMBEK6JB.6B3c«ß3(6jfßNfiZjlädyt
+sGuäyB0pdye
+m±<Dz0·hiuä·sm
+qkjgfz0
+huj·d6Vgslslboj
+cl0svpt±gloäclnäsFqbrji
+m6QtBTBG)zqbdsfgclo<FFng·zj:rAfgßBo#ßljgdt0xbou
+m6Qknns:ltj
+qls3ßKj
+ßRfgmAobr6ebdzfkßöomdyt±gpf#dexbqk0#du0Adybgvhdarlo#du0
+hu0Shlmäflc
+m'0g·jiäclnärpfärAs
+aloäj0ogdu07ßljg#üpkapm#.6fbml0O·Afkephnq«0tt5fkclnärjiVsGuärpfäcpfäDjimdu0Iqvhk·tnbdyfkßCpkßkfk#Hs?dpulkvtbfrfbs«<Clsädpo·jilsl0Pdn(ätt0
+hufgßLdasloäOyp·qhnfhls
+q6Anßlsdduo
+m'0öosmß1c
+q6ebdewhm6jal6c
+mBussl0Iqvhk·tnbdytiqhdad«0xbou
+ßWshfybflpfkdy0?duvmyloäEVSMQHO3#TÄlkp=yqltldy0?duvmyloäOht±·s,äMple·BtäVpsmg'0#dy0LboüielsäuvoäOht±·s(ävBs#defbmtbeßnfqhhm.6xbd6n:m6t
+hufgßUbfdu0:tztiqldad«09Xvväbhoädpuady0±·smäll0?xeo:ll(äoypgnBo±huhähA0)Ulfks
+(äny0±·smäll0?x6w:kBf4ß#xhqAi-»'0:mAxhqAfmdefk96EbdzfäAln
+qrvgf6A
+hnuärvghqA(äch äVpsmg6fbm6NVrsj7Eyflrlsähzu3ßKfkßljgyph
+#Wbk·tfmdyÄ?dyh:aln
+bobghznnr'0#du0xbou
+ßWshfybflpfkdy0:jGfispfkdu(ähzu<bhme)iz7uhmnd<s
+sBsgß!d:ks=?x<s
+rBmm.6B3c«Ä3('0phl0
+q6jgßkfgßPCF<.8ößMpksybg)Nnmk07G<Dhlwjedyoähtqedtfgspfks6jls«0xbou
+ßWshfybflpfkdy0?qhv±gloärjiehl ehji<jljgd6b?rAs:jAfgßRpgylqmd·0lhl0lhueäuvmejvnfdu0·k1ddkpdaßtjmßljgdtEnjid·yu
+mzu:mGfk.6fbmlnäEvsmqho7Hü=vntqbklsätueädpo
+l6Cbdy,äDjimd6Qknns:ltj
+qls<dym
+cph
+m6MbrAfguls:qifbsBo·.6ä
+hji
+mrfmslo7LhoboBm:sppgdu(äzis
+boonmntpdzfg#!x
+mu0Valsa·Bqm(6vgc6lVmzuehji
+ßPomdsmbflosßpoäEVSMQHO3ßÄblßzj
+ßtjmßMPKSYBG#uj±gA0f·ji
+m6lUmufg.6n:bofgßzj
+ßtjmßHtldtcedy:ävhtärpfälpuäzzt
+lim
+q6obbou<lhdadu0däuo
+m'0e·zt
+m6tbd6w
+q dassj±g6mbdnfg9etjhe
+lpt±gl0vntqnslslolAb·sjlsloärpo#ßpoäcloäklussloäIhikdu0:tmtäzitmdsm·kljl#kfkßzuktrunqpfksloäOyp·qhnfhlsnmn0·dybmdu,äRpfäali:twu
+m'0#·50Iqvhk·tn
+#CfkrAögcsj±glsävls#du(ävlogßiflspnfsl0Loyb±grpgrAsnjAfätueäOyp·qhnfhlsmdjighrfg#ifgtAAmßDfkclo3ßZj
+ßrügmloärpdaßubmöymbbo0ghjimßljghnfg.6x
+kji
+ßRpgrAsnjAfä·t?dzu
+m6h
+dphgdA0lhue4ßBo#ßkj
+ßIfbrwj
+kl(ä·u0#dufgßzj
+ßpikdu0lolAbdsm
+meTm·ueitulmßhvylj·du0pnsm
+m'0i·zt
+m6bnrubalzmhr6bne6fbml0
+huAbfl0Ldpu
+#ps·due
+huflßvcljBs
+m6Khtyo:kz,äzstähjiä·BtäclsäRjinkl0d·t(ächdasl0bbo(ähjiärlj<clsäaltmd6Qknns:ltj
+qlsäclsäVlmm96J±g6lhmuu
+ßljgßBolbom:fibkdz0MHJ=MzJ=MNL=Lopfe#zdaqlj?du(äali
+qyt±gAfä46w
+qzdahle
+ml0Iqvhk·tnbdytiqhdadu0nmk0lbosbdidom
+qms
+hl0ü 717Yljedu=Iqvhk·tn
+96E:mu0d·t0bbo0bm6ebd6Xbqrmbbol
+hA,äLljgd6fkrAf<zBg··ifäaltm·ueächsbm'0
+hu0Ä 71ö <ä
+hsfg)MPKSYBG)Wshfybfl6Anßsfldu(äyB0odytmdofg#Bo#ßBnäcloäEhlmny0ÄßGväalt±gsfnmph
+m«0CdkfkßLdasl0Iqvhk·tnbdyfkßDjkc6fbmln<ulslhji
+qu(äch äcpfäflt:lAfärAsnjAvkhlsmd6Qknns:ltj
+qBo·ßkfkßÄfes6jgßljgdtlnsdadu0y·smämpdas6ibkmuä)6ibdy0?qhv±gA0f·u0phylehjiäShm
+mA,<#LjghnfäAlp?·jimtuh
+m6Anl6UadtbäDjimd6Qknns:ltj
+qlsätueärAsnjAvkhlsmdeQknns:ltj
+qBo·;e7ßLdasl0Iqvhk·tnbdyfkßob?du0ddpo
+ßHo·rA0ony0zNäPl9e=äDjimd6Qknns:ltj
+qlsärjikdpc
+m66äRljmdu0e·uh
+ßKP7Rjiedpg
+m'0hgufäcBs±gljg·ue
+qe0äyB0·dybmdu,<)6F±gAfäOyp·qhnfhls
+q6mbdifgßhsbson
+spt±gl0BE<Tm·Affduulß!ebd6nbs6e
+m64<ß6Bnrnögflo4ßH,#94,6.6x
+hs0lhl0#du0vnkfähuu
+qltl·uu
+q6n:bofg9e=äDjimd6Qknns:ltj
+qlsärjikdpc
+m6t
+kitmlvebepAbdyfgcl0Iqvhk·tn
+.6tidGj
+ks0pduo<ß6tbd6e:lpuähu0
+hufkßrm
+hufgßZdakljd63ößUbgnzfdtue
+m6fbmzq:qloäj0ogdu,<)6F±gAfäOyp·qhnfhlsäaybnbofgßrfbml0Dntn
+mAbkd'0#·z0Iqvhk·tnähzu<ß6t
+kitmcvlnllomhls
+mk,<)6E:ßMPKSYBGßzuktrunqpfksl0BE<(äQLQxzä,39öOMHS=änkfkßJBLD<0tmDfbrBo·du0ghjim#60dduom.6ck·Bdas6tbbo0#dy0xbou
+ßWshfybflpfkdy0ghjimßGvärvs·du(äch ädy0lhl0ghjim#60?duvmyA,äzB 
+qkffßrbgm6n:m6tbd6oUsph
+mmbekz0Valsäzztbfuf#ßNPMNz05YBx
+hzvgfe0ädpo
+r6TiqBo·khc
+kz0:tm0
+hufäUhsb·im
+.6B3c«Ä3(6tblBmbdyfg9ettjiäChu
+mzuktrunqloävhs
+m6jgßkfkßsfmyAfgßßfbs6jgßkfkßKjljBtlhvo3ßHclsybdslw·AfgsFq
+m'0Kdjpkcz(äOvjgsls4ßSjlsloätueäYlj±gloddAu
+m6tbmk0bm6h
+vptldu0DqljlduinwveZy0·dDpkclo3ßÄjkso(äclsäL1teh<Gkdzt
+q'0odyg:rzu
+ßzp··y0
+hu0··uA
+r6Cnbo5=Hm·nyjmgtfgßBo#ßKbmdutmqBlmtyfg»'0MdBcgdy0ü8-66.6jgßkffßlsäali:twu
+sl(äch älho<Oyp·qhnfd6t±gyfbaloäj0ogd'0#hl0:tm0w·AfgrAsnjAvkdu0:tmc:tlo4ßzu:sA0
+r6vffll
+gyu<yB0f·ji
+m«0Phl0cdkfkßLdasl0Iqvhk·tnbdyfkßDfbÜ'0·hiuädz0gty0
+hufävpsdkpda#uÄmysj±gl0w·AfgrAsnjAvk.6e:r6Bkqhz3ßßfbbofgjlumdu(äKptmdu(äQldhqktätueäLlo·dulhueä·sm
+rhnmßZpgclsZsm
+ßCpgßHsk·Ftätueäj0ogdu0:tjiärv0?dobgclmmßDfkclo4ßvigdee:cBs±g6ebd6Tiqhdad6AnßCfkjvnikpAbdyfg96E:r6T±gsjflzu
+ßhoäcloäfhosdu0lboügduMxwfgßptmßhvZdye
+l'0#·50f·u0lhl0#drm:qpfkdu0ft5(äv ikdueäDjimdeQknns:ltj
+qzqk·ji
+m'0phl0f·u0pdp 4ßkfgßäzißhoa·ueäcltädytmdu0utjilshc
+mz0
+hufl#tbqhtbeß)0Sdpdadu0e·uh
+m6C
+ylj±gufkr6jfosjshA0dzuednfg9ePdsdadz0udAsbditlxzu
+l6e
+q6F±gAfäOyp·qhnfhls
+q6c
+mBussb0vON'ßNpms6c
+vhikd±0w·zbrA0#njiäht0zqBo#d6fbm6TihlmsdBh7AlukhlclrFtmdt,äRlm?rA0dkljgd6besl0w·tfgßBo##ObnoAt±g1m
+q6lUmufgßJQ=L6c
+mBusdu0nmk0odytmdofg96VGHÖ0brA0g·AÄkkpdaßzdanu0ohlm<jvnikpAbdyu
+qa0wdy0mxwjlbofäTUJQ)Ob±jlsävljZßuj
+.6xbd6e:r6QKHUU7Jvnf·uehßkj
+rlPnji
+ßofbÜA07ßhc
+q6x
+mu0f·u0
+r6h
+mhvämpnfs'0brA0NMPYä·BdaßuvkßljgßCfkglskkpdaslt<Slm
+rwj
+k«0Ghln:mk0:qifbsluä·BgäTUJQ)Zzlslnä·u0
+qutmyBo
+gtfgcloäCpo·du?älho<rjibbruäjsfbml0PhAA±gloäöifkßöTxMLUäqBo#ßBnäcpfäVlmm.6p#dy0lbos
+hiuädpoämlv
+reB#ulomtyf7Rwj
+k6p#dy0ynyt±gBo·rifkhjimd«Gdpo4ßkfkßLdasl0Iqvhk·tnbdyfkßifgtAAmßVT=2-13ßLjgßnvmdy0Iqvhk·tnbdyfkßrbgm6ebdeC
+rjikdpcnmn0#dz0ydom
+qz0BIR4ö4P0bm6t
+huffßQDEß!Kha6DhmAshk6M:mnv:fl-7Lhon·shue
+m6vgc6w
+qzu
+glo3ßLjgßnshÜhsmhnfkßWshfybflpfkdy0d·uoäIJMärjikdpc
+m'0hgufäil#·z0F·uv:k6Anßzfadu,äDpoävhikghgmßhvZdypkclomkpdaßnvmdy0Iqvhk·tnbdyfkßrbgmeG
+gsfkßpoädpo
+l677Llh:aFu
+)OfqcBnißmjgclo4ßvigd6fbmloäSht±glokdjigdy0stec
+mBusdu,<#VT=2-1ähzuävpsdkpdaßljgßiffdyl
+mzx
+qAflßIfmqpf?rzzlsln3ßTjmßljgdt0
+huAbflo<ehmlbo0ikhAbdyu
+m6M
+dyA
+hji
+m6l:mu0f·u0#hl0·dzbfsl0tqifbs6n
+gyfkdy0M·nf<ylsls0s
+m'0p·z0#hl0P·jil·tl
+hA0bl6Qknns:ltj
+qAf:l6vgfln
+hu0äye
+qA,äClsäaltmdeX
+f6Anl6TrrAffßptmßkfkßRbkslolshosdy,äYDbkßifa·Bqmdu0
+huj·d6M
+tAf4ßltäf c
+ßljg#äjfdzi:qpo·)Zzlslnätuu
+q6PL<.8ö.6b?dy0g·jiärvs·e mmhnfgßUb±gmpkrjinmnfgßijgßpda#GväclnäRjiet50·drpfllo4ßkbZßzj
+ßzj±g6jkqlo3#ÄfebofäVlsdylv·d6l:mu0
+hu0xbou
+q6Qknns:ltj
+qlsäalonsGfg:6Onm'0mglpkdAjlbo0däuomdefkßzfbml0Iqvhk·tn
+ß1c
+q6ebd6N:rjibmlodnuthkl0
+huh
+aloätueäkhvdu0e·zt
+m«0Bm6e
+megköofgßäb·du0#dy0vntqnsls
+h'0:kz0vntqnslsämvdaßTblbojgdulhmzpedu0a·Au
+m'0ptye
+#kj
+r6bnbo0·dsf·duuehjiäflu:m«0wdy0mxwjlbofäOyp·qhnfhls
+q6xnÜAfäclo<RFtmdt=Nqsb#dy0uhA0öy0uhA0:tzx
+mkj·ßBo#ßAblslu
+ßpigßljg.6thahm#ßlsäuvoärljgdtIqvhk·tnäylsls0smßDpkcloävhs3ßKbf·stävhsäRwfbbofkßhv±g6ohbo0Lolj±glsä)6e
+q6x:qeobbouädpo·jiäklfk.6x
+mu0#dy0Lsypfßhvlepfe96I:twulolj±glsäuvoäglvmd6ibmnf·duodyh
+rzfgßlomvle
+q6Ebmnf4ßkj
+ßzj
+ßifa·su
+m6thksfg.6p#dy0a·su
+m6Jgevsf·Ajhmlo4#kj
+ßzdanu0e·uh
+ßDf·ßzfbm6thksu
+m«0talsäyBsVbr0stt0Mgln:96Ebd6M
+flo#d6t:fA(äch <RlzfnBsäBybr.6e
+q6Fkepo#dy0#dz0vqhz7H<Tnols±ntqnslslßBo#ßkfkßtfbrAfgßho#dyfg#Yf±gufkßCpgßJpgsypeßKbm·'0ldscls6e:r6fkrAfäAlukhlclrFtmdt0öy0#hl0vCJ00571ä·u#dy0F·zdahufgjvolnsfädpo·dAblsluäghu4ßhmlßzj
+ßkblßlslsl0F·s0
+huh
+rji:kAfmßDvkcl,<BybrßptmßzfeazuodytmZueehjiädpoädjimdy0Iqvhk·tnbdyfk9exhufkßkfkßWshfybflpfkdy(äcpfähjiä·t0fdptmdu0?dDvgcls
+.6bkaljmdA0:kzLxzu
+lwshfybflpfkdy0öy0MdEblßPolsyvfduul96FbmltäShh
+r6fkgpfes6fkßljg#Mfkmnfloyö±g6whm6fbmlnäAlonsGfk.6e
+rzfgßZzlslnälpumdu0bm6fbmlsävpdasph
+m6Bkaljm#hc·dzuVqGuävhs3ßKfkßäzißyfi·yj
+qAfächogßkfgßZda·kfgß1c
+qz0Mdsfnu,äDy0?qhdasl#du0uduvmylsächAn.6bgßkfkßTblbojgdulhmzped6Ebrr=B<V=BmzuktrubnufgßljgyBu:rAfg.eTrrAffshc
+ksfgßpoäGly:clAblhmäyB0kdwbkhls
+m6vgc6S
+fptmdyjgghmmd6Ä?dy!lßäfedmpg#kvkboAnflc
+m«0whl0FnybeßCpgßkfkßNflboj±gAf«ßVcpnomädpoädjimdy0Iqvhk·tnbdyfk#upklhm
+qDfbrl0D·yu
+msp±glsätueäRjigdsm#qBdddy0?duvmyA(äjvnfs6fkßpnäMvu·smä·Bda#tjmßTblbojgdulhmzped6vgc6U
+klghm6bnr«<Hu0
+huj·du0yhyn
+m6c
+rAfas6ebd6Qknns:ltfbmnb?d6bekls#huhlßuj±gA0fdosä·Btä07lbom:mnflsli
+mkfgßPo·duj
+tyfg.6ebd6bne6fbmloä 9.7Kvdady0p·yu
+m«0Bm6n
+hufkßMjklhstt0udptihlmärAfas6l
+hu0
+huAbflsäJhsmdumhbofk96E
+q6F±gAfäOyp·qhnfhls
+q6nnÜ6jg#kj
+rlnäEhmeßzfbml0tqifbs6nbs6fbmlnäSlymdkjmny0
+qsf#hnfg96Bne6e
+m6n
+hzu
+meS
+boo
+qu0lsli
+m6w
+qzdahle
+ml0xcpuhqloäyBsäUlsönvgf'0nmk0#dy0xbou
+ßWshfybflpfkdyft50:tmq:rzfg.6e:Ü6fkßljgdu0
+qDjlbou4ßkfkßzfbmloäolsläumbbofgßZubk6xbdkfkfpcm9eWbdsfäKlvmd6he·Bc
+m'0#·50#hl0?dzu
+m6F#hApkdu0#dy0Pdsuäht0QdypqßWben6BesvKdzf:qjiäBlomdy0·dzdaqpf?du0ptye
+m6vgc6bne6Besv=ätueäCvs:cv=vntqnslsgßsbnelo3#öo·k1ddkpdadyx
+hzfäv1s#d6k
+cvdaßrfbm6F±gAfkßWshfybflpfkdy0
+hufgßJpfoBu
+q6nbsefbmlnäAlukhlclrFtmdt0?duvmylo4ßkblßZn:ksu:kr05Flqe·wq
+q'0t9k,Y9>0adp m.6vgcetbbofkkpdaßhv±g6obbouäöifkßljgd6N:tz0fhA0
+huffßYf±gufkßrpflBobypfkdu,<Dpobfl0DnuA
+oAfäclsäWlshw<F#hApkdu0lhueälpumklspdpm
+ßpoäDkjmnyfgßljgflgenzt
+m'#hl0nmAfkßzjgmCpeklsäalo:muu
+m6C
+syj
+aztrrAffdu0:qifbslo4ßzpävpfäDTBvR6vgc6WB9eE:r6Qknim
+l6nbs6ebdzfgßLebsvs
+m6jls'0#·50xbou
+ßWshfybflpfkdy0#·z0Iqposhw9CB0dqpf·rA(ävhtäcB0lhlils:0öy0lbom
+bouäghmmdu,äClsäDjimd6Qknns:ltj
+qlsävpme#ljgdu09CB0a·zuädz0ln6h
+vvmes'0#·6i:rA0#t?t.)Lebsvs4ßljgdu(äclsäjvnikpAbdyuähzu4#rsroAjlbo(äkljlsBo·rmöahn(äfub#dumhr6vgc6h
+e ikkpda96UxBV(ätt0·dubnßGvärljg9exr6xnqkfäalp?·jimdA(äch äSLDH)Rpflho#nmpefloäclnäKljmtuhlqhvlbofgß igkpdady0lhue<·stäklt?·yffßäfqs«0xhutäclsätuu
+qobeszbfdyfgßZqbdsf4ßkj
+ßtjmßäFvN6nUfsj±g6tbmk(<altmdouächsbm'0#du0
+hnfgdu0G·tfgßhmlßRpflho#n6fbmGv·difgßBo#ßGväqhu
+m'0p·z0#·uo<ohtlhlsm96ThßBo·dmöaq6k
+clsäl0hehji
+ßäjiomfaklsäjhogßkbgj6UxBV0#·z0·dyb#def#hAj
+qAfäOyp·qhnfßGfkrAükdu(änkfkßzdakpnfdy0gnji4ßrbgm6ledpo
+ßtzlslsbäzfäEliedybm6fbmzuf·stäeBodsppghls
+mkfäTuu
+qwshfybfll0
+huckhuh
+m«ttz0#hlt
+l6Hktueädkjmhls
+m6F±gAfäOyp·qhnfhls
+q6onq6t
+gy0phkfkvpmehn0Iqvhk·tn
+.eebd6t±gvoäehtmßsbnelo3ßZj
+ßmjgcloädz0ohlmädpo·ji
+q'0#du0?huökdu0Haqfdsjp#deebqllmßGväZue
+qu(äe1säflxUgumbbo0fhA0
+huffßDvgclsonsm
+m6Qknns:lt(ächtäRöQxQßBI#ofbÜA05·BgäMpdas<JuL<S
+boo
+qu0
+mAtiqldadueä·ue
+qz-3ßKj
+r6gnmrubnuj
+qA0ln6hns'#·50ohlm
+ßsbnelo#d6Qknns:ltfä·BgäHIN7RFtmdtfgßrfbml0Wgumbbol
+hA0fhA0#dtnqzqköuhehji
+m6GHQäStM<Rndsmiqvhk·tnäghc
+m«0Bm6fbmph
+m6GTksfgßptmßuj±gA0
+hun:ken
+gy0#·z0Jtlmeoyp·qhnfßCpkgho#du,äVlogßkbgm6e
+q6ä
+hAqnmruäfllhltfgßptm.6fbmeQknns:lt0st6ögclsg.6xVqkfäjljgßTbg·uh
+q6bnbo0gty0#·ybgßkfgjlo4ßljgdt0·dyjgfls
+meber6fbmlnäDjimdu0Iqvhk·tnbdyfkßkj
+rl0tqifbs6Anß1c
+qAs:floä)6l
+huFözmb)ms
+rzfgclsärAsnjAvkhlsmdy0Iqvhk·tnbdyfkßDÄZsl0:tjiämBs4ßDpädy0fhA0#dytqifbs6bgeho·du0lnsmmd«0F·u0gduomßkblßHs?dpulrpdadyvgfzn:Üuball,<#Oj
+q6fbml0phjimhnfäKptmd6e
+q6xbboubfzu
+m6Qknns:ltj
+qojeelo4ßkj
+ßkfkßLdaslIqvhk·tnbdyfkßuj±gA0?duvmyA?<#<0yNYUKzU=Iq qknGflrvs
+m6xbd6NHQäStM6p#dy0KzäGHQ«0whlt
+ßObnsl0vtptbml0#dyäßWshfybflpfktuhädphgdA0lhjiäglsonys:flo#.6vfßTÄlkp0st6qknkvshls
+m«7ßXv
+ksdhclpkhlomhlsmd6E
+aBh·dy?äDjimd6Qknns:ltj
+qlsäklt
+m6I
+wkvfoz,<)6Dhlwjedy(äcpfäBve
+ßmÄkßHsk·F=BmkfqoyÄtuhäyBsäKhvyljmßlssdBh
+ma0Lhläßlslspdddu0cdkfäJyf:spwbs u4ßGfkrAükdu0#hl0fdptmdu0#dy0bmAfkdzt:mAfkduäßHopduenmnfgßkfkßLRNHüBEDUDx)üfkdpo?·yvgf'0nmk0f·ji
+m6Ögclsnmnfgßkfl#60udAsbditlxzu
+lz0fhAu
+kz0gdnbmhCfkßPo#hGflßBofänmbbo,äTue4ßzdakpnfdy0gnji4#60lnsdady0vnkfähzuähufepAbduu3#<0Iqvhk·tn7Omm
+fl=Lxzu
+ll?äDpoäDjimdy0Iqvhk·tnbdyfkßoöes6t
+hufäRvgmvhs
+ßhml#60D·yu
+mzu:olmätuu
+q6W
+qzdakB 4ßkfgm6ebdz0sdphm.6e:Ü6e
+q6C
+rpusdy0ldpo
+#60phjimhnfgßWshfybfll0ghjimßBo?dDb±gA0e·zt
+m6l:mu,<#ÄpäclsäsFqbrji
+ßLdasl0Iqvhk·tnbdyfkßhs?dpu
+sb0Pdsdad6Bks6whm6Qknns:ltfgßkfk·yu<shm
+mAj
+qAfkßPo#hCj#tloäv1s#hn0brA±äMBo4ßtbgßrbgm6tbbofkßzfbm'0#·50f·u0ghl0
+hufg#LdasloäOyp·qhnfhls
+q6c
+ht0Lbos
+hifgßCpgßIv±gobesBo·rwshfybflloähu0vNIPE#lsphzdadu0phye4ßve
+q6h:q6c
+ht0LnyubdyfgßkfkßHchmufgslo:cyflrloäcltäRWJxFLM3#Ufbm'0
+hu0xbou
+q6Qknns:ltj
+qlsäaybnbouäzBg··ifgßCpgßDfesifpdnfgclsäAle
+tAvgf«<Djimd6Qknns:ltj
+qlsä·yc
+hAfgßmÄkßkblßSplßHm:lvtäMhubnubeßSb?nybmnyzätue<rjikdpc
+m6ehqA0tsvndqpf·r<TblBm:sppgdu0:tm0vqhz7H<Tnols±ntqnslsg.6p#dy0lhl:qifbsloäaljäclsäMhubnubeßZf±tyjmx6B·dudrßBo#ßlomrjieözt
+ku0ktztbrji
+#Mvgjzqköji
+96Onq6x
+hs0m·Bt
+mkfäDjimdy0Iqvhk·tnbdyfkßmÄkßkj
+ßUBLz6h
+·yc
+hAfm#ob?du(ävhs
+m6«nmzfkd6Knmnt.ßli
+q6bne6e
+l6Nhmk0:kz0#hl0Dnznhmhvmdu,äCpf<BvnitAfkßpnäRwb±d6TatAued6xnqkfgßCpgßLdasloäOyp·qhnfhls
+qu0iqvhk·tnbdyu4ßBo##hv±g6ebd6C
+syj
+aztrrAffd6e
+q6Dktpt
+ßTjlrpm
+r6e
+q6GbqtbäAVFBMN0ptye
+m6whm6ebdzfg#ldasloäOypdztbnuber6fgsDpkelo3#eFbmph
+ßkfkßlikeBs±gAfbmmmUÜlo#rAfgßLdasloäOyp·qhnfhls
+qu0:qifbsloäht0CdAIqvqnkzjhm6M:avs:svsrßpoäJhmbevsghlo3ßüj
+kl0onu0bgufgßrfgmloächtäflt:lAf<AlukhlclrFtmdt0#dy0Ihvo
+dy=ätueäUvz:fls7Rvo#du0:tzx
+mkj·96Nbs6fbmlsäJvn?hubmhvo<uvoäfypZdu(äave
+mnf?tue
+mloäEVSMQHO7Oyp·qhnfdu0nmk0dkljgdu(äuvoäcloäRvo#dufhAh
+e1iksloäzzt
+lim
+q<Qknns:ltfgßCpekisbmnfgßzj
+ßBo·khv?kpdad6Lnmzuls1ddd6e
+qeO:uph:sppgßBo#ßPniqvwbrhubnu,äRv0mqlgdu0lhl0gty0ü 6Lbkvn
+slsäfypZd6G
+mzu
+q6o:glL·Avkm6o:bo0 ßQbaqloäEsv·ßkvkbo0#du0Pdsuk·Bn4ßve
+q6s
+ohsbdyfgßiAp96vffli
+mee
+ellmd6T
+mzpkdu(äRlo#dy0hclsäAhumdyj
+m«0tmnf?kpdaßzpek6flßljgdt0xbou
+meQknns:ltj
+qlsäflmnmnfgßzfbm'0bm6fbm6q:·y0atue
+qA0uxAfätuc
+mBussloäRwfbbofkrejgmlsa·scäclsäUvz:fls7Rvo#d6fbm6NnrAfkdyl
+muvgfzqknns:lt0st6qkdzt
+m'0#·z0
+hufg#ufndu0FnueäcltäIBqbslslßzv±gAf4ßmbgc6vgc6ghsvhk·mj
+qAf3#eGVq6ebd6H:kpm
+n<Thmkfähzuäuvs·dzfadu(äch ärpfä·Bgähos
+l6X
+f6Anl6Knopu
+q6fgssbgfefbmlsärjipdylk·mu·dsfgjAfgßIbam6bfßTbkr6whqifbypfas«0whlt
+ßIbam6gVgyuähu0
+hufk#Lomelsgtuhäuvoä77#Ößrnä·u0#dy0F·ythalsk dad6whqifb96L
+hu0Fdut±g6xVqkfäcpfldeBks6e
+q6O:uph:sppgßljgdt0I·zd:k<Qknns:lt0hclsäfhsä)Wshfybflpfkdy0:mCfksybndu,<#üj
+kl0#dy0xbou
+m6Qknns:ltj
+qlsäcpfldy0Pdsuä·yc
+hAfgßmÄkßkj
+ßhn
+qpl:mpt±glKdnj
+qBo·.6n
+hzuäe1sächtäUlsmdpebfBo·rtjghzu
+qpvf96Thßzpek6flßzfbm«0Bm6m
+sGu
+qeä
+hA0
+qzdadpo
+m6enmrm
+ßÄpejloä·t0AnyjsnuuäclsäDjimdu0Iqvhk·tnbdyfk96Flßzdadpom.eber6iTsAfgßljghnfädpokB kdpdad6NVrsj7Eyflrlsäht0Odyu
+hkj·tuhllpobrAfkhBn<duulboj
+clo4ßkbZßpoäYBlnmmuä·sm
+ßüfkslj#hnvgfzqknns:ltfähu0ln6fbmlsäzyuäuvo<fypZdy(äuls
+hui
+hAmbbou
+q6Qknns:ltj
+qzqk·ji
+ßubfdz0tCH0·dzdaqpf?du0pdye
+menVÜAfg96M:mnfäYljmßzdahloädz(ä·stäk h
+ßHEtr6C
+rAjflBo·ßpnäUlslsv äflh
+m6beklKdnfem6e
+q6F±gAfgßWshfybflpfktuh3ßLtähzuädpo
+ßZqk·ji
+ßtjmßZuktrunqlo4#Kbmduurolo4ßzukduh
+q6Urolo?huenmn0nmk0Ldtjdnspgr«0DtyA4ßzj
+ßptmßDj
+ßnflbobelo4#BnäcpfäJyf:spwbs uäcltäsFqbrji
+m6F±gAfgßWshfybflpfkdytäyB0odylköwq
+ku,<#NmVbrmbbofkvljld6i:s6ebd6k
+sGuäuvnäCvEä,Kfi·yufduuänm0wdmfgrl-ä·Bt·dDöakAf<Rws:bofämvdaßnfgönfgc6jgsls
+rzbgsl0xhnfgrji:eAfg.6vfßkffßLdasloäOyp·qhnfhls
+qefbml0tmuöadyvgf6Anßlsfänmbbofg;6Tbd6jls6vgfsbnasj±g6lhlwm
+w'0lhl0
+mAiTkAFänmbbol
+hAfg.6vfßtjmßkffßIfmqpf?rzzlslnäglsnlGvf·ji
+m'0nmk0xcnbkßKjcjzuk·6n:fetbd6obbou3ßKjcjzuk·6jls'0phl0f·u0phzt
+m6thksu
+.6e
+q6Bnsvsäuvoä=NPMNz0vnutbcls
+ceI:qtgnk:(ädpo
+l6N
+hsfgrAfbm6e
+q6Qknns:ltj
+qtfmgvehkvhbd'0#dy0onuI·zd:k<Qknns:ltj
+qlsgßBo#ßTÄlkp=yqltldyoäfsfbbofklh 
+m6c
+vBo#dyuävps#96VgcebnÜls#dt(ädpoäyB0:ksffßlomrjienzt
+mlsäDjimdy0Iqvhk·tnbdyfkßrbgm6jgßqf#dy0Loyb±glyNYUKzU=Iqvhk·tn
+ßzdaqlj?du,<#KfkßLdasl0Iqvhk·tnbdyfkßrbgm6bekls#huhlßhv±g6Lhlwshlptld6jgßIfstn0:tm0ldpo
+#WsbmGjihloädpo·dofgßBo#ßhoädAx:r6h
+qpo·dyfgßHvfhc
+m6ber6e
+q6W
+quj±gAvgf6e
+reM
+alolßhs?dpu
+m'0lnmfkm6fkßkböy0
+mAtiqldadueäalA:gsuävps#96WbdsfäDjimdeQknns:ltj
+qlsärjikdpc
+m6U
+kltihlm
+ßmÄkßHu:qp(ä·sm
+qkjgfz0lopfedu0lhl0ghjim#kbfhA,äDpoäDjimdy0Iqvhk·tnbdyfkßDfbÜ'0phl0
+q6ebd6N:rjibml0cdkfllhmärjie·nfg#rbgm'0nmk0#·tjmßptmßltäjljgd6I
+qhvlevs#dyvgf6n
+gy,äIle
+q6c
+h6MnbhtäEpmfßptmßljg#LdaslsäOyp·qhnfhls
+q'0#duoädz0pZyfäcvdaßCfkq1dds'0#·z0zdseäuvoä470Fhsmbnufg#Zu:q<X:qz=y·utä·Btstzdakhh
+m«<Clsäzuu
+hs0#dy0xbou
+m6Qknns:ltj
+qlsäht0udyfbbo0#dy0vntqnslsäFybigpdlßptmßlup·zghlekhnfkßhmlßho#dytpn'0p·z0p·oslbofbmsj±g6e:qhoäkpf·s'0#·50gnjiämpff·ue<hyh
+mkfbmloäMBusdu0#dy0vntqnslsäFybigpdlßlomcldds6i:s«0tmkfkdyt
+hAtävls#duvntqnslsäFybigpdlßCpkmlifkpdaßpoäEVSMQHOä·ih
+gho#dsu4ßkbady0·hiuädz0
+huj·deM
+tAf4ßkj
+ßzpächtäRjikdpc
+m6whm6DHAVM7Oyp·qhnfdu0odyn
+hkfg9eBl6Beknffdpo
+m6tihlmmßkfkßLdasl0Iqvhk·tnbdyfk.6xbd6fkßhs?dpu
+s6=älpuäBvnitAfkm«xq6jls6tmZuebf6e:q1c
+q6fkgljmdyu4ßkbZßzfbm6Bkaljmflc
+q6jam6u:szö±gsj±g6gVq6fmvht<alA:gsu4ßDblßlsämBsärv0stt0Loh ädifgrv0mtu0pöye
+ß<0:ksfkcpo·r6b±gAfmßlsächs:tm(<cpfld6N
+huvgf6obbouäyB0e·BuäyB0Tt5fkm«0zdsf·duuehjiäjvnfs6e
+q6F±gAf<Oyp·qhnfhls
+q6bnbo0:tz0ldpo
+l6CVqv0adybnr'0nl6tbbo0
+hu0pduj·ßmsbrji
+ßSvs6vgcefbm6p#dy0svljäApfkbofgßGväflo
+gtj·du,äGpfkßkbady0
+huj·d6IbmDfbrl(ävpfälhoäclo<Djimdu0Iqvhk·tnbdyfkßhvZdyi:ki0#dz0vntqnslsk·Bnlßlsdduom;e7ßHvßWbkspflßzu
+gloäDjimd6Qknns:ltj
+qlsähu0
+hufkßLddd6vgc6ebrrvmhls
+m6Ä?dyäßZj±glsadpulllda·ujllloäuvoäAlukhlclrFtmdtfgßBo#ßDj
+ßtbgßkbk·uäßofkttqknns:ltj
+qA,<)6C
+h6GnÜibekzqbdsfgßCfkfsfbbouäclsäDjimd6Qknns:ltj
+qlsäcpfäDyh
+aujlrl0fhAäßzfbmloä·BgäfyÄgkpobdyu
+l6M
+oypekv=I·wj
+q6h
+cyv±jAfg#60vntqnsls7Rpnnkhubnut
+qnf?mptldu,<)6BfßZuk·ueäylj±gufmßkfkßLdasl0Iqvhk·tnbdyfkßMmnÜkj:fybfll0bm6e
+m6T:mk,<)6Fbm6F±gAfkßWshfybflpfkdy0·douähu0#hl0whzdh.6vfßzj±g6ebd6Mbbouhqnfeßhostzfadu,<)6C
+h6C
+fyö?mptldu0l·nuäclsäDjimd6Qknns:ltj
+qlsäsFqbrji
+qDfbrl?ä=HsfdyäßObgr<I
+ktvm96FkßDbkßtjmßzfbmlnäRvsmhlsiqvhk·tnärjihm6g:rA0dyubf'0:kz0bgu0#dyäßOfkypo·ylmßlsphzdas6i:s:,<)6JfßZvidyn:qruäaltmdouäclsäDjimd6Qknns:ltj
+qlsächs:tm(ärljgd6Cbdyehrloärlm?dyäß1c
+q6e:r6G
+mzu
+q6e
+r6Tmqpdabve
+klt
+qz0st6t±gpf?du(ävljeßlsäjljgdt0D·ztbdyfk#60stAs:tA(äcpflßifbl6fkrAfgßüfkrBdaßyj±gAj·ßGvälhdadu,<#Poävlm±glsäTth
+aBo·ßkfkßLdasl0Iqvhk·tnbdyfkßhnäaltmdu0tulmhvobdyu'ßUvg.6ebdzbrA0
+hufärlikßDj±gAj·d6Gk·nfäe1säcpfäLho:flsäuvoäDjimdu0Iqvhk·tnbdyfkm«0Pduoälho<ale
+mru4ßDj
+ßAfndy0
+r6jls'0
+hufgßCpgßpigdu0bm6C
+syj
+a6Anßobeslo4ßkbgm6thksu
+ßtbg#pigßve
+q6tbd6jgßljgd6pispn:kl0tqifbszvfflcnmn0odyt
+sGfg9eE
+q6uropt±gl0xbou
+ßWshfybflpfkdy0ediuäuvsädpo
+l6Dhlwvmdyu
+qtjg·s,äQBo#ßBnäcpfldzMdynbmhmäkpf·du0ttzektjl
+ßCpgßqf#dt0Iqvhk·tn4ßhoäclnädy0cd6h
+·yc
+hAfmßobm.6tbdetm·wfem6tbbo0·qvcäboshmvmhfpt±g6h
+nyegdA0:tm0cdkfkßlc
+mloäEsö±gl0#dz0uöypl96Jf#ßjfllsäulsmdpmmßmjgcloärpdaß1c
+q6fbm6EnsGfgc6nbs6l:kAffßRbelfällikßve
+q6nbmkfk#nfösmmd6U:rzfg96H
+klh
+mAmbbo0lboxbltfgßßj··yfmslodhwq
+m6e:qpoäglsnl'0bm6fbmph
+meGTksfgßhv±g6S
+rAfäuvoäNybgflolbobedu,äHyh
+mkxhßsj
+floäJvqbdu0#dz0HR6KvK6N:mBberevgc6e
+q6«Iqpo±hwm
+r6pßVq
+qhubnu'ä·u0
+hufkßiflnue
+qz0bmAfkdzt:mAfgßZu
+ksf<·Bg·dzdakhh
+m'0:t5fkßifbßlymqlnäfBu
+m6M
+tAfg96BgßkfkßÄbgc6lediuädpo<Rjigdsm#qBdddy=D·sfgclsälpuäRuphoF0#qhvßhvlßkffßQbaql0ü8).3ß4c
+q6e
+m6Chclo<ulsmdpmmßsj
+floäQltmd6e
+q6W
+qwb±jBo·du0onu0·dmÄekAfgßRfdrloä,kfkßäzi.6e
+q6t±gvo<hu0#dy0y·isbj6thßmvkyAshbrfgßnf?·jl
+m6xbqk(äch ädy0:tjiäaljäk o·dyffßSj
+floähtttApf·Afgßuj±gA0lbom
+bou
+q6xbqk-3ßZdakpfZkpda.6jgßkfkßsjgjloänifkdu0Lbov?khe
+#kflßZdaqlj?spt±gz(ätuu
+q6e
+q6T±ghdaslmälpuäcloäLBomdyn:bofkm'0ehlhmßljgdeT±ghcenufäe1säEsvZcpb·qhnfd'0#hl0ldpoäUvs·Zuh
+q6ehqA0odyh
+rzfgßobm96F±gAf<Oyp·qhnfhls
+q6t±gyfbaloäOyp·qhnfd6vgc6l
+hufäCvlnllom·Ajhm'0#·z0ValseZ5uälhoäclo<SFq
+m6whm6e
+q6X:qAvgf«<ClsäDjimd6Qknns:ltj
+qlsähzuähu0#dy0E·nf4ß.14ß,14ßqbärvh:q66ößZunmkfgßpoädpo
+leSnszdaßGvä·yc
+hAfg.6vgc6e:r6vgslsägvi
+l6ä
+hAektjl3ßNfg·Bh
+mvnfdu0f·n0
+q6flßzpä·tehlclslo3ßZdakldasl0tmAxhqAA
+hAfgßyf·du0#du0xbou
+m6Qknns:ltj
+qlsämpdas6bne6=ärpf<flc
+m6jal6fbml0vgho±d'0svpt±gloäyDfbßRpflho#nz0
+hu0?h5dadu0Lbom:e6Anßls··Au
+qu,<Vlogßkj
+ßWm:mBo·ßuj±gA0·duÄ·dueäYljmcyv±j6c
+qljmg mm.6e:mu0mduebdyuäclsäDjimdeQknns:ltj
+qlsächAn.6t
+hufäzyc
+hA0adybnrmpkclsgclsäyB0f·ji
+m'0bmkffßlsärpdaßkj
+#lslsloämlvgßÄp±gloälpuädpo
+l6ledpo
+m'0:alsärlikßpomdyflrhomdu0MdpmäcltäOyp?klnl#if·5u4ßBnächogßpoäclsäklussloäVvdad6t
+hufäzBg··ifähu0svljänkfkßks
+he6ö)Zunmkfg)Tbk·AihmzjmyBo·du0st6c
+due
+m«0whltäalfbmksnbruämpdas6onq6e
+m6N:mhh
+q'lnue
+qu0lbobeA0·klj±gGfbsphädpo
+ßofkuvsk·nfgcl0xmAt±gBm#hnvgf6gVq6e:r6G
+gsfg#kfkßKpdttfgshubnu,äTueäöifkghvisa0DdpoäDjimdy0Iqvhk·tnbdyfkßhs?dpu
+s6whm6.äapt<4'0:t5fkßkfgdu0onu0#dy0G·jimrjibbou3ßLdasl0Iqvhk·tnbdyfkßAs:floäjljgd6T±gsjirl,<Djimd6Qknns:ltj
+qlsäsyb·du0ddpo
+ßop±gob±jph
+m6T±gBi
+96F±gAfäOyp·qhnfhls
+q6lhltfg#GvkßHs?dpu4ßDfgm6bgcls
+ßGvfßTjmshh
+rzfgßnfadu,äDpoäDjimdy0Iqvhk·tnbdyfkßCfkfp m#Cj
+ksfbbouäcloäUvsg·tfgßzfbmlsäzuh
+sybnslo4ßhc
+q6obdtber6e
+m6Jgghmmßkfkßnfl·tu
+meBLBPJ7ß!csv«0xAJEBB<-äShc
+ksf3ßLdasl0Iqvhk·tnbdyfkßrügmloämpdas6lhbofg96E:#ZvidynTqru
+ßBnä26Vaq6nhqnfgr6t
+kAfgßnfUemo
+s6i:alo4ßtÄlrloärpfärvxbdzpäuvo<Jhgdl0nmk0Ddrt
+m6m
+alo3#eEbd6änjBos6c
+syb±gAfgc6n:bofgßzj±g6fbml0Kdpi
+ßCpgßLdasloäOyp·qhnfhls
+qu0Lnyh
+m'#·50#hl0cöuhlsl0Iqvhk·tnbdyfkflo
+qhubnu0ghjimßtfaq6nbs6e
+q6hedpdaduEdifgrwfkrwfdspw
+ßhvv darA0phl0lhl0ldscls«0Ohlm
+ßkfkßQÄgfls
+m6i:aloämvdaßuj
+#ljgdu0vntqnslsälpuäLht±gpo
+mrpgrvm
+ßnfldofg96L:tt0
+hu0Lbove·ihTmnfkßrbgm6i
+tAf<mvdaßofq·kfshtbeßyf±gufg.6paml0
+hufgßäblbofgqldamlsäyB0?duvmylo3ßKj
+ßZunclomduonu0adBu
+ßzjgc6x
+hjiä)6h
+rjiVsGuäuvsäcloäQlbehAömdu0#dy0Iqvhk·tnbdyvgf6enqji<rFn?nsjlbofäClcnfnfk.6U
+wAf#hApkdu(äcpfäJsbfllsgßGöaklo4ßBo##ifgtAA
+qms
+tueehji
+ßIfmqpf?rzzlsln
+96Vgc6e:r6t±gsjflzu
+ßptm.6fbmph
+ßkj
+rls<·uh
+asj±gloäBvnitAfk)Zq
+ypbehzu
+m6lhltfgßGväQho·ßBo#ßUbfdu(änoo
+ßqfäEVSMQHOäyBedyo
+m±0LhueävpsächAnßCfkchnfs'0
+hufäHuenrAsbd6whm6VGHÖ=A·jl
+qu0nmkI·zd:k<Qknns:ltj
+qlsgßGvävls#du±<#Uvg.6bnr6n
+hufäDyg:gyvgf6i
+qhvlßnm:tifähji4ßifa·Bqmdu0st6eVqmfg.6e:Ü6e:reT±gpddrhmäcloäDjimdu0Iqvhk·tnbdyfkm6xhgsh
+rvogdu0brA,äVle
+q6PL<.8ößup±g6GHQäStMeA
+hnfgßps·duepdsdad6Trlwuhll0#dz0ttztmdyc
+mz(äsypmy6beklsäzutmqlo·tuh
+m6e
+qeQ:rjbe)Wshfybflpfkdy,äRlm?rA0ltiubkls
+ßäsbbrtävpfächtäGpostmÄ·du0lsyvdsBsbdyu
+qeT±gsfbeloäyB0yNYUKzU0lhueäelieflt±gsb·du,äRpdady(ädpobfl0vntqnslsadytmdsm
+qembdmfkm6GHQäStM<80)Jpfopm
+q'0:alsäile
+q6fbmGfeml0onu0bgufgßsöZs6tbbo0Valsädpo
+#ljgyph
+ßJpfopm
+q<Pisppgßpoädpo
+m6GHQäStM<7 )Jpfopm
+q6w
+qDbgclmgß<0fhAwN<T±gsfbelo4ßDj
+ßCpgßNpms6h
+rji:emfg9eLdscls6VGHÖ0lbofbmA0öy0#du0xbou
+m6Qknns:ltj
+qlsämpdas6n
+gy0ln6t±gsf±gA0st6t
+huphl0q1i
+q«0whl0gdBflsl0NMPY7UlslhvoäghuächtäOvu
+mAj:k6fbmltäAlukhlclrFtmdtt4#kblßljgdz0xbou
+m6Qknns:ltj
+qlslßDÄkcphähzu3ßZj
+ßobmßGx
+h6w
+qzdahle
+ml(äklj±gAbmrpfohubasfäAlonsGfkrjighAulslmedu(ädpo
+m6h
+gljfmptonsm
+m6vgc6lhlwmbypfkslo<Slm
+sFq
+)äs
+hifkßBo#ßCjksBfekloäRwfbbofk96Vgc6x
+mu0#dy0xbou
+ßWshfybflpfkdy0#hlLsyvdsBsbdyvgf6j·mvsbdyu4ßrbgm6fkßzj±g6thfhsälpuäB6bgeyfnmkfg96T±gsj
+Üsj±g6hbaA
+r6l
+hufäSFq
+mijgcBo·.6C
+ylj±gufkßzjgc6tbdifgß!ä
+gu±äzjim:>0Sdpdadu0e·uh4ßBo##tbgßobmßßfbflsä·stäAvonr«0w·z0brA(ä·stäg umd6n:m6ebd6c
+rAfgßäfbkl0onu0yNYUKzUnmk0trzffasfkßCfkdpobfA(äuvoäcloäjyf:spw
+qloäL0hehjiddpu
+m6e
+r6
+#dmjgd6h:mG0stet±gDfbflo3#eO
+hu(äcpfäYBlnmmuähzuämpdas6wUksj·ßzdakldas«0Ln6i:s6tbbo0bm6e
+q6w
+qnbgflo
+meK:gyfgßkj
+ßwpitsökd6Qkdzt
+ßzp··y0Valsäcpfäbsfodyfämlv
+ßIsns6whmeDhlwvmdy=Lbos:sloätueä)Ob±jlsgßnfTt5fks'0#hl0Ik usd6xbd6Tm·ughqk0nmk0FHästnvgrAfgßkfkßÄjkjsj±grfbs6w
+qsblrloäghc
+m«0tksfgßHosdpdadu0g·jiäklcmßkfkßNfbrA#dy0xbou
+m6Qknns:ltj
+qBo·ßDfbslsähu0#hlt
+m6knmnfgßTögmlsgßBo#ßMs:tlo3ßöo##zpe·uh
+ßltärjiedjimßiflbosbdifgd6äbdsf4ßijs·ys
+ßMfaklsätueätus
+·sjlspt±glSdpuik o
+ßnj?s'0lnsbgfl0phyeädz0xbou
+ßWshfybflpfkdy0·difg.6ebd6c
+qljmßzjgc'
+huAnrwsbmnfgßBo#ßkblßWshasffßGväk0t
+m'0nmk0#hl0lhjiäcpfäCvlnllom·Ajhm6gVqetiZAfkßhvglc
+m«<Kho·ßsf?d6GHQäStM±<#Xv
+ksf«ßKBMzTBMHVOä69Ö.6Ä?dyt
+sGuäcBs±g6C
+queäKlf#reimsw?=<Dxp9kbm·tbmhvo3bvn=Osv·Hu;attpk<jm:rzj±rq:rjbe9oufke
