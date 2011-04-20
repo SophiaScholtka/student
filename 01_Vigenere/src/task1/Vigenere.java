@@ -438,13 +438,19 @@ public class Vigenere extends Cipher {
 	} catch (IOException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
-	} finally {
-		return back;
-	}
+	} 
+	return back;
   }
   
   private float calcPeriod(float ic) {
 	  return 0.0f;
   }
   
+  private String bufferedReaderToString(BufferedReader text) {
+	  String back  ="";
+	  
+	  
+	  
+	  return back;
+  }
 }
