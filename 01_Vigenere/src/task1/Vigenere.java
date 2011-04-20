@@ -65,7 +65,7 @@ public class Vigenere extends Cipher {
 	  int maxResults = 5;
 	  
 	  generateAlphabet(cipher,alph);
-	  createFrequencyTables(cipher,alph,textfile,minN,maxN,maxResults);
+	  createFrequencyTables(alph,textfile,minN,maxN,maxResults);
   }
 
   /**
