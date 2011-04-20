@@ -64,7 +64,7 @@ public class Vigenere extends Cipher {
 	  int maxResults = 5;
 	  
 	  generateAlphabet(cipher,alph);
-	  createFrequencyTables(cipher,alph,textfile,minN,maxN,maxResults);
+	  createFrequencyTables(alph,textfile,minN,maxN,maxResults);
   }
 
   /**
@@ -351,7 +351,7 @@ public class Vigenere extends Cipher {
     }
   }
   
-  private void createFrequencyTables(String cipher,String alph, String textfile, int minN, int maxN, int maxResults) {
+  private void createFrequencyTables(String alph, String textfile, int minN, int maxN, int maxResults) {
 	  	//Controls the input of min and max N
 	  	if(minN <= 0) { minN = 1; }
 	  	if(maxN <= 0) { maxN = 1; }
