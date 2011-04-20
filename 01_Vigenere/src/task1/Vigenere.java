@@ -56,6 +56,7 @@ public class Vigenere extends Cipher {
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
 	  //TODOL This values need to be read in later
 	  String cipher = "ciphertext-blahblubb";
+	  cipher = bufferedReaderToString(ciphertext);
 	  String alph = "generatedAlphabet.alph";
 	  String textfile = "programmierer_enc.txt";
 	  int minN = 1;
@@ -351,7 +352,14 @@ public class Vigenere extends Cipher {
   }
   
   private void createFrequencyTables(String cipher,String alph, String textfile, int minN, int maxN, int maxResults) {
-
+	  	//Controls the input of min and max N
+	  	if(minN <= 0) { minN = 1; }
+	  	if(maxN <= 0) { maxN = 1; }
+	  	if(maxN < minN) { 
+	  		int iTemp = minN;
+	  		minN = maxN;
+	  		maxN = iTemp;
+	  	}
 	  
 		// Creates nGrams for the encrypted text
 		//nGram on an special encoded text
@@ -366,7 +374,7 @@ public class Vigenere extends Cipher {
 		try {
 			//int maxN = Integer.parseInt(frequencyTablesInput[2]);
 			PrintStream ps = System.out; // for bringing back old output
-			for(int i = 1;i<=maxN;i++) {
+			for(int i = minN;i<=maxN;i++) {
 				frequencyTablesInput[2] = ""+i;
 				System.setOut(new PrintStream(new FileOutputStream("generated" + i + "-grams.alph.tab")));
 				//sets the default output stream to a file while the frequency table is generated
@@ -404,7 +412,6 @@ public class Vigenere extends Cipher {
 	      float ic = fSum / (chiffchars.length * (chiffchars.length - 1));
 		  
 	} catch (IOException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	} 
 	return back;
@@ -422,7 +429,6 @@ public class Vigenere extends Cipher {
 			back.concat(line);
 		}
 	} catch (IOException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
 	return back;
