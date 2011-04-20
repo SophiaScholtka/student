@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Console;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -351,7 +352,7 @@ public class Vigenere extends Cipher {
     }
   }
   
-  private void createFrequencyTables(String cipher,String alph, String textfile, int minN, int maxN, int maxResults) {
+  private void createFrequencyTables(String alph, String textfile, int minN, int maxN, int maxResults) {
 	  	//Controls the input of min and max N
 	  	if(minN <= 0) { minN = 1; }
 	  	if(maxN <= 0) { maxN = 1; }
@@ -386,10 +387,47 @@ public class Vigenere extends Cipher {
 		}
   }
   
+  private String[][] readFrequencyTable(String filename){
+	  String[][] table;
+	  String helper = "";
+	  try{
+		  BufferedReader file = new BufferedReader(new FileReader(filename));
+		  String line;
+		  int linecount=0;
+			while ((line = file.readLine()) != null) {
+					helper.concat(line);
+					helper.concat("\n");
+					linecount++;
+				}
+			table = new String[linecount][2];
+			int j;
+			for(int i=0;i<linecount;i++){
+				j=helper.indexOf(' ');
+				table[i][1]=helper.substring(0, j-1);
+				helper=helper.substring(j);
+				j=helper.indexOf(' ');
+				table[i][2]=helper.substring(0, j-1);
+				j=helper.indexOf("\n");
+				helper=helper.substring(j);
+			}
+		return table;
+	  } catch (IOException e2) {
+			e2.printStackTrace();
+	  }
+	  return null;
+  }
+  
   private float calcCoincidenceIndex(BufferedReader ciphertext) {
 	  float back = -1.0f;
 	  String text = bufferedReaderToString(ciphertext);
-	  
+	  back = calcCoincidenceIndex(text);
+	return back;
+  }
+  
+  private float calcCoincidenceIndex(String text) {
+	  float back = -1.0f;
+	  createFrequencyTables("generatedAlphabet.alph", text, 1, 1, modulus);
+	  readFrequencyTable("generated" + "1" + "-grams.alph.tab");
 	return back;
   }
   
