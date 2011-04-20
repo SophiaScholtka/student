@@ -14,11 +14,13 @@ package task1;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Console;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.Reader;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,12 +58,15 @@ public class Vigenere extends Cipher {
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
 	  //TODOL This values need to be read in later
 	  String cipher = "ciphertext-blahblubb";
-	  cipher = bufferedReaderToString(ciphertext);
 	  String alph = "generatedAlphabet.alph";
 	  String textfile = "programmierer_enc.txt";
 	  int minN = 1;
 	  int maxN = 4;
 	  int maxResults = 5;
+	  
+	  //Read text
+	  BufferedReader textInput = readFromFile(textfile);
+	  cipher = bufferedReaderToString(textInput);
 	  
 	  generateAlphabet(cipher,alph);
 	  createFrequencyTables(alph,textfile,minN,maxN,maxResults);
@@ -466,8 +471,10 @@ public class Vigenere extends Cipher {
 	String line;
 	try{
 		while ((line = text.readLine()) != null) {
+			System.out.println(">>>>BufferedReaderToString Loop: " + line);
 			back.concat(line);
 		}
+		System.out.println(">>>>BufferedReaderToString Return: " + back);
 	} catch (IOException e) {
 		e.printStackTrace();
 	}
@@ -475,14 +482,12 @@ public class Vigenere extends Cipher {
   }
   
   private void generateAlphabet(String text,String pathAlph){
-
 		//Create alphabet
 	    ArrayList<String> chars = new ArrayList<String>();
 	    String symbol;
 	    for(int i = 0; i<text.length();i++) {
 	    	symbol = String.valueOf(text.charAt(i));
 	    	int iFound = 0;
-	    	System.out.println(">>>>>>>" + symbol);
 	    	for(int j = 0;j< chars.size();j++) {
 	    		if(symbol.equals(chars.get(j))) {
 	    			iFound++;
@@ -548,6 +553,16 @@ public class Vigenere extends Cipher {
 	  }
 	  
 	  return back;
+  }
+  
+  private BufferedReader readFromFile(String file) {
+	  BufferedReader textInput = null;
+	try {
+		textInput = new BufferedReader(new FileReader(file));
+	} catch (FileNotFoundException e) {
+		e.printStackTrace();
+	}
+	  return textInput;
   }
 
 }
