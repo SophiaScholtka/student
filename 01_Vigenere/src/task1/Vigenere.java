@@ -411,34 +411,8 @@ public class Vigenere extends Cipher {
   
   private float calcCoincidenceIndex(BufferedReader ciphertext) {
 	  float back = -1.0f;
-	try {
-	      //Koinzidenzindex
-	      String line;
-	      String chiffre = ""; //chiphertext as one long String
-	      while ((line = ciphertext.readLine()) != null) {
-	    	  chiffre.concat(line);
-//	    	  System.out.println("länge: " + line.length());
-//	    	  System.out.println(line);
-	    	  
-	      }
-	      createFrequencyTables(chiffre);
-	      char[] chiffchars = chiffre.toCharArray();
-	      //calculate sum of frequencies
-	      double[][] unigramArray = FrequencyTables.getNGramsAsArray(1, charMap);
-	      float fSum = 0;
-	      float iF = 0;
-	      for(int i = 0;i< chiffchars.length;i++) {
-	    	  iF = 0;
-	    	  
-	    	  fSum = fSum + iF * (iF - 1);
-	      }
-	      //calculate coincidence index
-	      float ic = fSum / (chiffchars.length * (chiffchars.length - 1));
-		  
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} 
+	  String text = bufferedReaderToString(chiphertext);
+	  
 	return back;
   }
   
@@ -454,7 +428,6 @@ public class Vigenere extends Cipher {
 			back.concat(line);
 		}
 	} catch (IOException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
 	return back;
