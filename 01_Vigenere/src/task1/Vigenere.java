@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Console;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -53,101 +54,7 @@ public class Vigenere extends Cipher {
    * Der Writer, der den Klartext schreiben soll.
    */
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
-    try {
-      //Koinzidenzindex
-      String line;
-      String chiffre = ""; //chiphertext as one long String
-      while ((line = ciphertext.readLine()) != null) {
-    	  chiffre.concat(line);
-//    	  System.out.println("länge: " + line.length());
-//    	  System.out.println(line);
-    	  
-      }
-      char[] chiffchars = chiffre.toCharArray();
-      //calculate sum of frequencies
-      double[][] unigramArray = FrequencyTables.getNGramsAsArray(1, charMap);
-      float fSum = 0;
-      float iF = 0;
-      for(int i = 0;i< chiffchars.length;i++) {
-    	  iF = 0;
-    	  
-    	  fSum = fSum + iF * (iF - 1);
-      }
-      //calculate coincidence index
-      float ic = fSum / (chiffchars.length * (chiffchars.length - 1));
-
-      //CAESAR
-      /*
-      ArrayList<NGram> nGrams = FrequencyTables.getNGramsAsList(1, charMap);
-      // Bestimme das häufigste Zeichen aus der zugehörigen Unigramm-Tabelle.
-      System.out.println("Häufigstes Zeichen in der Unigramm-Tabelle: "
-          + nGrams.get(0).getCharacters());
-      // Bestimme das häufigste Zeichen des Chiffretextes.
-      // 'character' ist die Integer-Repräsentation eines Zeichens.
-      int character;
-      // 'number' zählt alle Zeichen im Chiffretext.
-      int number = 0;
-      // 'quantities' enthält zu allen aufgetretenen Zeichen (keys der Hashmap)
-      // deren zugehörige Anzahlen (values der Hashmap).
-      HashMap<Integer, Integer> quantities = new HashMap<Integer, Integer>();
-      // Lese zeichenweise aus der Chiffretextdatei, bis das Dateiende erreicht
-      // ist.
-      while ((character = ciphertext.read()) != -1) {
-        number++;
-        // Bilde 'character' auf dessen interne Darstellung ab.
-        character = charMap.mapChar(character);
-        // Erhöhe die Anzahl für dieses Zeichen bzw. lege einen neuen Eintrag
-        // für dieses Zeichen an.
-        if (quantities.containsKey(character)) {
-          quantities.put(character, quantities.get(character) + 1);
-        } else {
-          quantities.put(character, 1);
-        }
-      }
-      ciphertext.close();
-      // Suche das häufigste Zeichen in 'quantities'.
-      // 'currKey' ist der aktuell betrachtete Schlüssel der Hashmap (ein
-      // Zeichen des Chiffretextalphabets).
-      int currKey = -1;
-      // Der Wert zum aktuellen Schlüssel (die Anzahl, mit der 'currKey' im
-      // Chiffretext auftrat).
-      int currValue = -1;
-      // Die bisher größte Anzahl.
-      int greatest = -1;
-      // Das bisher häufigste Zeichen.
-      int mostFrequented = -1;
-      Iterator<Integer> it = quantities.keySet().iterator();
-      while (it.hasNext()) {
-        currKey = it.next();
-        currValue = quantities.get(currKey);
-        if (currValue > greatest) {
-          greatest = currValue;
-          mostFrequented = currKey;
-        }
-      }
-      // Das häufigste Zeichen 'mostFrequented' des Chiffretextes muß vor der
-      // Ausgabe noch in Dateikodierung konvertiert werden.
-      System.out.println("Häufigstes Zeichen im Chiffretext: "
-          + (char) charMap.remapChar(mostFrequented));
-
-      // Berechne die im Chiffretext verwendete Verschiebung.
-      int computedShift = mostFrequented
-          - charMap.mapChar(Integer.parseInt(nGrams.get(0).getIntegers()));
-      if (computedShift < 0) {
-        computedShift += modulus;
-      }
-      shift = computedShift;
-      System.out.println("Schlüssel ermittelt.");
-      System.out.println("Modulus: " + modulus);
-      System.out.println("Verschiebung: " + shift);
-
-      */
-    } catch (IOException e) {
-      System.err.println("Abbruch: Fehler beim Lesen aus der "
-          + "Chiffretextdatei.");
-      e.printStackTrace();
-      System.exit(1);
-    }
+	  createFrequencyTables("s");
   }
 
   /**
@@ -434,30 +341,45 @@ public class Vigenere extends Cipher {
     }
   }
   
-  private void createFrequencyTables(String[] cipher) {
+  private void createFrequencyTables(String cipher) {
 
 		//Create alphabet
 	    ArrayList<String> chars = new ArrayList<String>();
 	    String symbol;
-	    for(String s : cipher) {
-	    	for(int i = 0;i<s.length();i++) {
-		    	symbol = String.valueOf(s.charAt(i));
-		    	int iFound = 0;
-		    	for(int j = 0;j< chars.size();j++) {
-		    		if(symbol.equals(chars.get(j))) {
-		    			iFound++;
-		    		}
-		    	}
-		    	if(iFound == 0) {
-		    		chars.add(symbol);
-		    	}
+	    for(int i = 0; i<cipher.length();i++) {
+	    	symbol = String.valueOf(cipher.charAt(i));
+	    	System.out.println(">>>>" + symbol);
+	    	int iFound = 0;
+	    	for(int j = 0;j< chars.size();j++) {
+	    		if(symbol.equals(chars.get(j))) {
+	    			iFound++;
+	    		}
+	    	}
+	    	if(iFound == 0) {
+	    		chars.add(symbol);
 	    	}
 	    }
-	    
-	    //"# Dieses Alphabet enthält alle Zeichen aus 'programmierer.txt'.";
-	    //"# Modulus des Alphabets: 89";
-	    //"explicit";
-	    //Zeichen
+
+	    BufferedWriter out;
+	    symbol = "";
+		try {
+			out = new BufferedWriter(new FileWriter("test.alph"));
+		    out.write("# Dieses Alphabet enthält alle Zeichen aus 'programmierer.txt'.");
+		    out.newLine();
+		    out.write("# Modulus des Alphabets: " + chars.size());
+		    out.newLine();
+		    out.write("explicit");
+		    out.newLine();
+		    for (int i = 0; i < chars.size(); i++) {
+				symbol = symbol + chars.get(i);
+			}
+		    out.write("ende");
+		    //Zeichen
+		    out.write(symbol);
+		    out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	    
 
 		// Creates nGrams for the encrypted text
@@ -485,6 +407,44 @@ public class Vigenere extends Cipher {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+  }
+  
+  private float calcCoincidenceIndex(BufferedReader ciphertext) {
+	  float back = -1.0f;
+	try {
+	      //Koinzidenzindex
+	      String line;
+	      String chiffre = ""; //chiphertext as one long String
+	      while ((line = ciphertext.readLine()) != null) {
+	    	  chiffre.concat(line);
+//	    	  System.out.println("länge: " + line.length());
+//	    	  System.out.println(line);
+	    	  
+	      }
+	      createFrequencyTables(chiffre);
+	      char[] chiffchars = chiffre.toCharArray();
+	      //calculate sum of frequencies
+	      double[][] unigramArray = FrequencyTables.getNGramsAsArray(1, charMap);
+	      float fSum = 0;
+	      float iF = 0;
+	      for(int i = 0;i< chiffchars.length;i++) {
+	    	  iF = 0;
+	    	  
+	    	  fSum = fSum + iF * (iF - 1);
+	      }
+	      //calculate coincidence index
+	      float ic = fSum / (chiffchars.length * (chiffchars.length - 1));
+		  
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} finally {
+		return back;
+	}
+  }
+  
+  private float calcPeriod(float ic) {
+	  return 0.0f;
   }
   
 }
