@@ -390,6 +390,7 @@ public class Vigenere extends Cipher {
   
   private String[][] readFrequencyTable(String filename){
 	  String[][] table;
+	  String[][] help;
 	  String helper = "";
 	  try{
 		  BufferedReader file = new BufferedReader(new FileReader(filename));
@@ -400,7 +401,7 @@ public class Vigenere extends Cipher {
 					helper.concat("\n");
 					linecount++;
 				}
-			table = new String[linecount][3];
+			help = new String[linecount][3];
 			int eol,e0,e1;
 			int i,j;
 			i=0;
@@ -421,12 +422,19 @@ public class Vigenere extends Cipher {
 						continue;
 					}
 				}
-				table[i][0]=helper.substring(0,e0);
-				table[i][1]=helper.substring(e0+1,e1);
-				table[i][2]=helper.substring(e1+1,eol);
+				help[i][0]=helper.substring(0,e0);
+				help[i][1]=helper.substring(e0+1,e1);
+				help[i][2]=helper.substring(e1+1,eol);
 				helper=helper.substring(eol+1);
-				System.out.println(table[i][0] + " " + table[i][1] + " " + table[i][2]);
+//				System.out.println(help[i][0] + " " + help[i][1] + " " + help[i][2]);
 				i++;
+			}
+			linecount=i-1;
+			table = new String[linecount][3];
+			for(i=0;i<=linecount;i++){
+				table[i][0]=help[i][0];
+				table[i][1]=help[i][1];
+				table[i][2]=help[i][2];
 			}
 		return table;
 	  } catch (IOException e2) {
