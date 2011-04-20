@@ -42,9 +42,7 @@ public class Vigenere extends Cipher {
 	private int[] shifts;
 	private int keylength;
 	
-	private int shift;
-	
-  /**
+	/**
    * Analysiert den durch den Reader <code>ciphertext</code> gegebenen
    * Chiffretext, bricht die Chiffre bzw. unterstützt das Brechen der Chiffre
    * (ggf. interaktiv) und schreibt den Klartext mit dem Writer
@@ -95,7 +93,7 @@ public class Vigenere extends Cipher {
       boolean characterSkipped = false;
       // Lese zeichenweise aus der Klartextdatei, bis das Dateiende erreicht
       // ist. Der Buchstabe a wird z.B. als ein Wert von 97 gelesen.
-      int counter=0;
+      int counter=1;
       while ((character = ciphertext.read()) != -1) {
         // Bilde 'character' auf dessen interne Darstellung ab, d.h. auf einen
         // Wert der Menge {0, 1, ..., Modulus - 1}. Ist z.B. a der erste
@@ -107,7 +105,7 @@ public class Vigenere extends Cipher {
           // abgebildet werden. Die folgende Quellcode-Zeile stellt den Kern der
           // Caesar-Chiffrierung dar: Addiere zu (der internen Darstellung von)
           // 'character' zyklisch den 'shift' hinzu.
-          character = (character - shifts[counter]+modulus) % modulus;
+          character = (character - shifts[counter] + modulus) % modulus;
           // Das nun chiffrierte Zeichen wird von der internen Darstellung in
           // die Dateikodierung konvertiert. Ist z.B. 1 das Ergebnis der
           // Verschlüsselung (also die interne Darstellung für b), so wird dies
@@ -392,6 +390,7 @@ public class Vigenere extends Cipher {
   
   private String[][] readFrequencyTable(String filename){
 	  String[][] table;
+	  String[][] help;
 	  String helper = "";
 	  try{
 		  BufferedReader file = new BufferedReader(new FileReader(filename));
@@ -402,7 +401,7 @@ public class Vigenere extends Cipher {
 					helper.concat("\n");
 					linecount++;
 				}
-			table = new String[linecount][3];
+			help = new String[linecount][3];
 			int eol,e0,e1;
 			int i,j;
 			i=0;
@@ -423,12 +422,19 @@ public class Vigenere extends Cipher {
 						continue;
 					}
 				}
-				table[i][0]=helper.substring(0,e0);
-				table[i][1]=helper.substring(e0+1,e1);
-				table[i][2]=helper.substring(e1+1,eol);
+				help[i][0]=helper.substring(0,e0);
+				help[i][1]=helper.substring(e0+1,e1);
+				help[i][2]=helper.substring(e1+1,eol);
 				helper=helper.substring(eol+1);
-				System.out.println(table[i][0] + " " + table[i][1] + " " + table[i][2]);
+//				System.out.println(help[i][0] + " " + help[i][1] + " " + help[i][2]);
 				i++;
+			}
+			linecount=i-1;
+			table = new String[linecount][3];
+			for(i=0;i<=linecount;i++){
+				table[i][0]=help[i][0];
+				table[i][1]=help[i][1];
+				table[i][2]=help[i][2];
 			}
 		return table;
 	  } catch (IOException e2) {
