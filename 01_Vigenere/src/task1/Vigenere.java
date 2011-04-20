@@ -447,10 +447,16 @@ public class Vigenere extends Cipher {
   }
   
   private String bufferedReaderToString(BufferedReader text) {
-	  String back  ="";
-	  
-	  
-	  
-	  return back;
+	String back  ="";
+	String line;
+	try{
+		while ((line = text.readLine()) != null) {
+			back.concat(line);
+		}
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	return back;
   }
 }
