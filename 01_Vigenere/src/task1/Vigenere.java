@@ -54,7 +54,17 @@ public class Vigenere extends Cipher {
    * Der Writer, der den Klartext schreiben soll.
    */
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
-	  createFrequencyTables("s");
+	  //TODOL This values need to be read in later
+	  String cipher = "ciphertext-blahblubb";
+	  cipher = bufferedReaderToString(ciphertext);
+	  String alph = "generatedAlphabet.alph";
+	  String textfile = "programmierer_enc.txt";
+	  int minN = 1;
+	  int maxN = 4;
+	  int maxResults = 5;
+	  
+	  generateAlphabet(cipher,alph);
+	  createFrequencyTables(cipher,alph,textfile,minN,maxN,maxResults);
   }
 
   /**
@@ -341,65 +351,32 @@ public class Vigenere extends Cipher {
     }
   }
   
-  private void createFrequencyTables(String cipher) {
-
-		//Create alphabet
-	    ArrayList<String> chars = new ArrayList<String>();
-	    String symbol;
-	    for(int i = 0; i<cipher.length();i++) {
-	    	symbol = String.valueOf(cipher.charAt(i));
-	    	System.out.println(">>>>" + symbol);
-	    	int iFound = 0;
-	    	for(int j = 0;j< chars.size();j++) {
-	    		if(symbol.equals(chars.get(j))) {
-	    			iFound++;
-	    		}
-	    	}
-	    	if(iFound == 0) {
-	    		chars.add(symbol);
-	    	}
-	    }
-
-	    BufferedWriter out;
-	    symbol = "";
-		try {
-			out = new BufferedWriter(new FileWriter("test.alph"));
-		    out.write("# Dieses Alphabet enthält alle Zeichen aus 'programmierer.txt'.");
-		    out.newLine();
-		    out.write("# Modulus des Alphabets: " + chars.size());
-		    out.newLine();
-		    out.write("explicit");
-		    out.newLine();
-		    for (int i = 0; i < chars.size(); i++) {
-				symbol = symbol + chars.get(i);
-			}
-		    out.write("ende");
-		    //Zeichen
-		    out.write(symbol);
-		    out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	    
-
+  private void createFrequencyTables(String cipher,String alph, String textfile, int minN, int maxN, int maxResults) {
+	  	//Controls the input of min and max N
+	  	if(minN <= 0) { minN = 1; }
+	  	if(maxN <= 0) { maxN = 1; }
+	  	if(maxN < minN) { 
+	  		int iTemp = minN;
+	  		minN = maxN;
+	  		maxN = iTemp;
+	  	}
+	  
 		// Creates nGrams for the encrypted text
 		//nGram on an special encoded text
+		//String array for frequencytables.main
 		String[] frequencyTablesInput = new String[4];
-		//TODOL BufferedReader for alphabet path
-		frequencyTablesInput[0] = "../alphabet/programmierer_enc.alph";
-		//TODOL BufferedReader for encoded text file path
-		frequencyTablesInput[1] = "programmierer_enc.txt";
-		//TODOL BufferedReader for size of maximal n-Grams (>2, cause <=2 could be random)
-		frequencyTablesInput[2] = "4";
-		//TODOL BufferedReader for amount of watched nGrams
-		frequencyTablesInput[3] = "5";
+		frequencyTablesInput[0] = alph;
+		frequencyTablesInput[1] = textfile;
+		frequencyTablesInput[2] = "" + maxN;
+		frequencyTablesInput[3] = "" + maxResults;
+		
 		//Create frequency tables
 		try {
-			int maxN = Integer.parseInt(frequencyTablesInput[2]);
+			//int maxN = Integer.parseInt(frequencyTablesInput[2]);
 			PrintStream ps = System.out; // for bringing back old output
-			for(int i = 1;i<=maxN;i++) {
+			for(int i = minN;i<=maxN;i++) {
 				frequencyTablesInput[2] = ""+i;
-				System.setOut(new PrintStream(new FileOutputStream("../table/" + i + "-grams_programmierer_enc.alph.tab")));
+				System.setOut(new PrintStream(new FileOutputStream("generated" + i + "-grams.alph.tab")));
 				//sets the default output stream to a file while the frequency table is generated
 				FrequencyTables.main(frequencyTablesInput);
 				System.setOut(new PrintStream(ps)); // output back to normal
@@ -431,5 +408,44 @@ public class Vigenere extends Cipher {
 		e.printStackTrace();
 	}
 	return back;
+  }
+  
+  private void generateAlphabet(String text,String pathAlph){
+
+		//Create alphabet
+	    ArrayList<String> chars = new ArrayList<String>();
+	    String symbol;
+	    for(int i = 0; i<text.length();i++) {
+	    	symbol = String.valueOf(text.charAt(i));
+	    	int iFound = 0;
+	    	for(int j = 0;j< chars.size();j++) {
+	    		if(symbol.equals(chars.get(j))) {
+	    			iFound++;
+	    		}
+	    	}
+	    	if(iFound == 0) {
+	    		chars.add(symbol);
+	    	}
+	    }
+
+	    BufferedWriter out;
+	    symbol = "";
+		try {
+			out = new BufferedWriter(new FileWriter(pathAlph));
+		    out.write("# Dieses Alphabet enthält alle Zeichen aus der gegebenen Datei.");
+		    out.newLine();
+		    out.write("# (Geschätzter) Modulus des Alphabets: " + chars.size());
+		    out.newLine();
+		    out.write("explicit");
+		    out.newLine();
+		    for (int i = 0; i < chars.size(); i++) {
+				symbol = symbol + chars.get(i);
+			}
+		    //Zeichen
+		    out.write(symbol);
+		    out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
   }
 }
