@@ -399,16 +399,33 @@ public class Vigenere extends Cipher {
 					helper.concat("\n");
 					linecount++;
 				}
-			table = new String[linecount][2];
-			int j;
-			for(int i=0;i<linecount;i++){
-				j=helper.indexOf(' ');
-				table[i][1]=helper.substring(0, j-1);
-				helper=helper.substring(j);
-				j=helper.indexOf(' ');
-				table[i][2]=helper.substring(0, j-1);
-				j=helper.indexOf("\n");
-				helper=helper.substring(j);
+			table = new String[linecount][3];
+			int eol,e0,e1;
+			int i,j;
+			i=0;
+			while(i<linecount){
+				if (helper.length() <=0) break;
+				eol = helper.indexOf("\n");
+				j=eol-1;
+				while(Character.isDigit(helper.charAt(j)) || helper.charAt(j)=='_'){
+				j--;}
+				e1=j;
+				j--;
+				while(Character.isDigit(helper.charAt(j)) || helper.charAt(j)=='.'){j--;}
+				e0=j;
+				//System.out.println("eol="+eol+" e1="+e1+" e0="+e0);
+				if(e0<0 || e1<=e0+1 || eol<=e1+1){
+					if (eol>=0) {
+						helper=helper.substring(eol+1); 
+						continue;
+					}
+				}
+				table[i][0]=helper.substring(0,e0);
+				table[i][1]=helper.substring(e0+1,e1);
+				table[i][2]=helper.substring(e1+1,eol);
+				helper=helper.substring(eol+1);
+				System.out.println(table[i][0] + " " + table[i][1] + " " + table[i][2]);
+				i++;
 			}
 		return table;
 	  } catch (IOException e2) {
