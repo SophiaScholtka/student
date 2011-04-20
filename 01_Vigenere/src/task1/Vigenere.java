@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -65,6 +66,8 @@ public class Vigenere extends Cipher {
 	  
 	  generateAlphabet(cipher,alph);
 	  createFrequencyTables(alph,textfile,minN,maxN,maxResults);
+	    
+	  int period = calcPossiblePeriod(cipher, "trennendesNGram");
   }
 
   /**
@@ -367,7 +370,7 @@ public class Vigenere extends Cipher {
 		String[] frequencyTablesInput = new String[4];
 		frequencyTablesInput[0] = alph;
 		frequencyTablesInput[1] = textfile;
-		frequencyTablesInput[2] = "" + maxN;
+		frequencyTablesInput[2] = "" + minN;
 		frequencyTablesInput[3] = "" + maxResults;
 		
 		//Create frequency tables
@@ -418,6 +421,7 @@ public class Vigenere extends Cipher {
 	    for(int i = 0; i<text.length();i++) {
 	    	symbol = String.valueOf(text.charAt(i));
 	    	int iFound = 0;
+	    	System.out.println(">>>>>>>" + symbol);
 	    	for(int j = 0;j< chars.size();j++) {
 	    		if(symbol.equals(chars.get(j))) {
 	    			iFound++;
@@ -448,4 +452,36 @@ public class Vigenere extends Cipher {
 			e.printStackTrace();
 		}
   }
+  
+  public int getGCD(int a, int b)
+  {
+     if (b==0) return a;
+     return getGCD(b,a%b);
+  }
+  
+  private int calcPossiblePeriod(String text, String ngram) {
+	  int back = 0;
+	  
+	  //splitts text by the chosen ngram
+	  String[] subStrings = text.split(ngram);
+	  //gets periods between repeated ngram (first and last one are ignored)
+	  int[] subLengths = new int[subStrings.length];
+	  for(int i = 1; i<subStrings.length-1;i++) {
+		  subLengths[i] = subStrings[i].length() + ngram.length();
+	  }
+	  //gets ggt() of all periods
+	  int gcd = 0;
+	  int newGCD = 0;
+	  for(int i = 1;i<subLengths.length-1;i++) {
+		  newGCD = getGCD(subLengths[i], subLengths[(i+1)%(subLengths.length-1)]);
+		  if(i == 1) { gcd = newGCD ; }
+		  if(gcd != newGCD) {
+			  break;
+		  }
+		  gcd = newGCD;
+	  }
+	  
+	  return back;
+  }
+
 }
