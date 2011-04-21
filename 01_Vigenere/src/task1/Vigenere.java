@@ -56,6 +56,7 @@ public class Vigenere extends Cipher {
    * Der Writer, der den Klartext schreiben soll.
    */
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
+	  String msg;
 	  //TODOL This values need to be read in later
 	  String cipher = "ciphertext-blahblubb";
 	  String alph = "generatedAlphabet.alph";
@@ -69,12 +70,184 @@ public class Vigenere extends Cipher {
 	  cipher = bufferedReaderToString(textInput);
 	  
 	  generateAlphabet(cipher,alph);
+	  BufferedReader standardInput = launcher.openStandardInput();
+	  boolean broken = false;
+	  do{
+		  boolean accepted = false;
+		  do {
+			  try{
+				  msg = "Anhand des Chiffretextes wurde ein Modulus von " 	
+					  + modulus + " geschätzt.\nBitte bestätigen Sie den Modulus " 
+					  + "oder geben sie einen anderen Modulus ein: ";
+				  System.out.println(msg);
+				  int modu2 = Integer.parseInt(standardInput.readLine());
+				  if (modu2==modulus) {
+					  accepted = true;}
+				  else if (modu2 < 1) {
+				     System.out.println("Ein Modulus < 1 wird nicht akzeptiert. Bitte "
+				              + "korrigieren Sie Ihre Eingabe.");
+				     } else {
+				          // Prüfe, ob zum eingegebenen Modulus ein Default-Alphabet existiert.
+				          String defaultAlphabet = CharacterMapping.getDefaultAlphabet(modu2);
+				          generateAlphabet(defaultAlphabet,alph);
+				          if (!defaultAlphabet.equals("")) {
+				            msg = "Vordefiniertes Alphabet: '" + defaultAlphabet
+				                + "'\nDieses vordefinierte Alphabet kann durch Angabe einer "
+				                + "geeigneten Alphabet-Datei\nersetzt werden. Weitere "
+				                + "Informationen finden Sie im Javadoc der Klasse\n'Character"
+				                + "Mapping'.";
+				            System.out.println(msg);
+				            modulus=modu2;
+				            accepted = true;
+				          } else {
+				            msg = "Warnung: Dem eingegebenen Modulus kann kein Default-"
+				                + "Alphabet zugeordnet werden.\nErstellen Sie zusätzlich zu "
+				                + "dieser Schlüssel- eine passende Alphabet-Datei.\nWeitere "
+				                + "Informationen finden Sie im Javadoc der Klasse 'Character"
+				                + "Mapping'.";
+				            System.out.println(msg);
+				            accepted = true;
+				          }
+				        }
+			  } catch (NumberFormatException e){
+				  System.out.println("Fehler beim Parsen des Modulus. Bitte korrigieren"
+				            + " Sie Ihre Eingabe.");
+			  } catch (IOException e) {
+			        System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+		        e.printStackTrace();
+		        System.exit(1);
+		      }
+		  } while(!accepted);
+	//Modulus ist nun festgelegt, jetzt machen wir Häufigkeitstabellen:
+		  
 	  createFrequencyTables(alph,textfile,minN,maxN,maxResults);
-	    
-	  int period = calcPossiblePeriod(cipher, "trennendesNGram");
+	  
+	  msg="Möchten Sie Di-, Tri- oder 4-gramme analysieren? Bitte geben Sie 2, 3 oder 4 ein: ";
+	  System.out.println(msg);
+	  int xgram;
+	  try{
+		  xgram = Integer.parseInt(standardInput.readLine());
+	  } catch (NumberFormatException e){
+		  System.out.println("Fehler beim Parsen. Verwende default-Wert 3.");
+		  xgram = 3;
+	  } catch (IOException e) {
+	      System.out.println("Fehler beim Parsen. Verwende default-Wert 3.");
+	      xgram = 3;
+      }
+	  String table[][]= readFrequencyTable("generated"+xgram+"-grams.alph.tab");
+	  int periods[] = new int[maxResults];
+	  System.out.println("Die möglichen Perioden und zugehörige Koinzidenzindizes sind: ");
+	  for(int i=0; i<maxResults;i++){
+		periods[i] = calcPossiblePeriod(cipher, table[i][0]);
+		System.out.println(periods[i] + "\t" + getSubtextCoincidenceIndex(cipher,periods[i]));
+	  }
+	  System.out.println("\nBitte wählen Sie eine Periode, deren Koinzidenzindex nahe bei 1 liegt,\n indem Sie sie eingeben: ");
+	  int period;
+	  try{
+		  period = Integer.parseInt(standardInput.readLine());
+	  } catch (NumberFormatException e){
+		  System.out.println("Fehler beim Parsen. Verwende "+periods[0]);
+		  period = periods[0];
+	  } catch (IOException e) {
+	      System.out.println("Fehler beim Parsen. Verwende "+periods[0]);
+	      period = periods[0];
+      }
+	  
+	  //Periode also keylength ist geraten, jetzt können wir beginnen, shifts zu füllen
+	  keylength=period;
+	  shifts = new int[keylength+1];
+	  shifts[0]=modulus;
+	  
+	  char[] passwort = new char[period];
+	  for(int i=0;i<period;i++){
+		  passwort[i]=mostFreqChar(getSubtext(cipher,period,i));
+		  System.out.println("Der häufigste Buchstabe im " + (i+1) 
+				  + "ten Chiffreblock ist " + passwort[i]);
+	  }
+	  msg = "Bitte raten Sie eine Zuordnung indem Sie eine Folge von " + period + " Zeichen eingeben,\n" 
+	  		+ "die Sie den häufigsten Buchstaben zuordnen wollen.\n" 
+	  		+ "Wir empfehlen e, n und *.\n"
+	  		+ "Für einen neuen Versuch, geben Sie zu viele oder wenige Zeichen ein.";
+	  accepted = false;
+	  do {
+		  System.out.println(msg);
+		  try {
+			  String pass=standardInput.readLine();
+			  if (pass.length()==period){
+				  char[] zuord = pass.toCharArray();
+				  for(int i=0;i<pass.length();i++){
+					  shifts[i+1]=(passwort[i]-zuord[i])%modulus;
+				  }
+				  decipher(ciphertext, cleartext);
+				  msg="Bitte überprüfen Sie die entschlüsselte Ausgabe.\n"
+					  + "Gefällt Ihnen das Ergebnis? [y/n]";
+				  System.out.println(msg);
+				  String decide=standardInput.readLine();
+				  if(decide.equalsIgnoreCase("y")) {accepted=true;}
+				  else {System.out.println("Neuer Versuch.");}
+			  }
+			  else {
+				  System.out.println("Suche wird abgebrochen.");
+				  accepted=true;
+			  }
+		  } catch (IOException e){
+			  System.out.println("Fehler beim Lesen von der Standardeingabe.\nNeuer Versuch.");
+		  }
+	  } while (!accepted);
+	  
+	  if(!broken) System.out.println("Ein neuer Brechungsversuch wird gestartet!");
+	  }while(!broken);
+	  System.out.println("Es ist Ihnen gelungen, die Chiffre zu brechen.\nHerzlichen Glückwunsch!");
   }
 
-  /**
+  private char mostFreqChar(String subtext){
+      int character;
+      HashMap<Integer, Integer> quantities = new HashMap<Integer, Integer>();
+      for (int i=0;i<subtext.length();i++) {
+    	character = subtext.charAt(i);
+        character = charMap.mapChar(character);
+        if (quantities.containsKey(character)) {
+          quantities.put(character, quantities.get(character) + 1);
+        } else {
+          quantities.put(character, 1);
+        }
+      }
+      int currKey = -1;
+      int currValue = -1;
+      int greatest = -1;
+      int mostFrequented = -1;
+      Iterator<Integer> it = quantities.keySet().iterator();
+      while (it.hasNext()) {
+        currKey = it.next();
+        currValue = quantities.get(currKey);
+        if (currValue > greatest) {
+          greatest = currValue;
+          mostFrequented = currKey;
+        }
+      }
+      return (char) charMap.remapChar(mostFrequented);
+  }
+  
+  private double getSubtextCoincidenceIndex(String cipher, int period) {
+	  String[] subtext= new String[period];
+	  double CI = 0.0;
+	  for(int i=0;i<period;i++){
+		subtext[i] = getSubtext(cipher,period,i);
+		CI = CI + calcCoincidenceIndex(subtext[i]);
+	  }
+	  return CI/period;
+	}
+  
+  private String getSubtext(String cipher, int period, int offset){
+	StringBuffer subtext = new StringBuffer("");
+	while (offset<cipher.length()){
+		subtext.append(cipher.charAt(offset));
+		offset=offset+period;
+	}
+	return subtext.toString();
+  }
+
+/**
    * Entschlüsselt den durch den Reader <code>ciphertext</code> gegebenen
    * Chiffretext und schreibt den Klartext mit dem Writer
    * <code>cleartext</code>.
@@ -367,7 +540,6 @@ public class Vigenere extends Cipher {
 	  		minN = maxN;
 	  		maxN = iTemp;
 	  	}
-	  
 		// Creates nGrams for the encrypted text
 		//nGram on an special encoded text
 		//String array for frequencytables.main
@@ -376,7 +548,6 @@ public class Vigenere extends Cipher {
 		frequencyTablesInput[1] = textfile;
 		frequencyTablesInput[2] = "" + minN;
 		frequencyTablesInput[3] = "" + maxResults;
-		
 		//Create frequency tables
 		try {
 			//int maxN = Integer.parseInt(frequencyTablesInput[2]);
@@ -387,6 +558,7 @@ public class Vigenere extends Cipher {
 				//sets the default output stream to a file while the frequency table is generated
 				FrequencyTables.main(frequencyTablesInput);
 				System.setOut(new PrintStream(ps)); // output back to normal
+				
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -396,16 +568,18 @@ public class Vigenere extends Cipher {
   private String[][] readFrequencyTable(String filename){
 	  String[][] table;
 	  String[][] help;
-	  String helper = "";
+	  StringBuffer help1 = new StringBuffer("");
+	  String helper;
 	  try{
 		  BufferedReader file = new BufferedReader(new FileReader(filename));
 		  String line;
 		  int linecount=0;
 			while ((line = file.readLine()) != null) {
-					helper.concat(line);
-					helper.concat("\n");
+					help1.append(line);
+					help1.append("\n");
 					linecount++;
 				}
+			helper=help1.toString();
 			help = new String[linecount][3];
 			int eol,e0,e1;
 			int i,j;
@@ -436,10 +610,11 @@ public class Vigenere extends Cipher {
 			}
 			linecount=i-1;
 			table = new String[linecount][3];
-			for(i=0;i<=linecount;i++){
+			for(i=0;i<linecount;i++){
 				table[i][0]=help[i][0];
 				table[i][1]=help[i][1];
 				table[i][2]=help[i][2];
+				//System.out.println(help[i][0] + " " + help[i][1] + " " + help[i][2]);
 			}
 		return table;
 	  } catch (IOException e2) {
@@ -448,45 +623,42 @@ public class Vigenere extends Cipher {
 	  return null;
   }
   
-  private float calcCoincidenceIndex(BufferedReader ciphertext) {
-	  float back = -1.0f;
+  private double calcCoincidenceIndex(BufferedReader ciphertext) {
+	  double back = -1.0;
 	  String text = bufferedReaderToString(ciphertext);
 	  back = calcCoincidenceIndex(text);
 	return back;
   }
   
-  private float calcCoincidenceIndex(String text) {
-	  float d = -1.0f;
-	  float N = (float) text.length();
+  private double calcCoincidenceIndex(String text) {
+	  double d = -1.0;
+	  double N = (double) text.length();
+	  if (N==1.0||N==0.0) {return 0;}
 	  createFrequencyTables("generatedAlphabet.alph", text, 1, 1, modulus);
 	  String[][] table = readFrequencyTable("generated" + "1" + "-grams.alph.tab");
 	  int n = table.length;
-	  float IC = 0;
+	  double IC = 0;
 	  for(int i=0;i<n;i++){
-		  IC=IC+Float.parseFloat(table[i][1])*(Float.parseFloat(table[i][1])-1);
+		  IC=IC+Double.parseDouble(table[i][1])/100*(Double.parseDouble(table[i][1])/100-1);
 	  }
 	  IC=IC/(N*(N-1));
-	  d=(N*(IC-1.0f/n))/((N-1)*IC-N/n+IC);
+	  d=(N*(IC-1.0/n))/((N-1)*IC-N/n+IC);
 	return d;
   }
   
-  private float calcPeriod(float ic) {
-	  return 0.0f;
-  }
-  
   private String bufferedReaderToString(BufferedReader text) {
-	String back  ="";
+	StringBuffer helper = new StringBuffer("");
 	String line;
 	try{
 		while ((line = text.readLine()) != null) {
-			System.out.println(">>>>BufferedReaderToString Loop: " + line);
-			back.concat(line);
+//			System.out.println(">>>>BufferedReaderToString Loop: " + line);
+			helper.append(line);
 		}
-		System.out.println(">>>>BufferedReaderToString Return: " + back);
+//		System.out.println(">>>>BufferedReaderToString Return: " + helper);
 	} catch (IOException e) {
 		e.printStackTrace();
 	}
-	return back;
+	return helper.toString();
   }
   
   private void generateAlphabet(String text,String pathAlph){
@@ -522,6 +694,7 @@ public class Vigenere extends Cipher {
 		    //Zeichen
 		    out.write(symbol);
 		    out.close();
+		    modulus=chars.size();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -529,38 +702,42 @@ public class Vigenere extends Cipher {
   
   public int getGCD(int a, int b)
   {
+	 int Tmp;
 	 if(a<b) {
-		 int iTmp = a;
+		 Tmp = a;
 		 a = b;
-		 b = iTmp;
+		 b = Tmp;
 	 }
-     if (b==0) return a;
-     return getGCD(b,a%b);
+     while (b!=0){
+    	 Tmp=a%b;
+    	 a=b;
+    	 b=Tmp;
+     }
+     return a;
   }
   
   private int calcPossiblePeriod(String text, String ngram) {
-	  int back = 0;
-	  
 	  //splitts text by the chosen ngram
 	  String[] subStrings = text.split(ngram);
 	  //gets periods between repeated ngram (first and last one are ignored)
 	  int[] subLengths = new int[subStrings.length];
-	  for(int i = 1; i<subStrings.length-1;i++) {
+	  for(int i = 0; i<subStrings.length;i++) {
 		  subLengths[i] = subStrings[i].length() + ngram.length();
+		  //System.out.println(subLengths[i]);
 	  }
 	  //gets ggt() of all periods
-	  int gcd = 0;
-	  int newGCD = 0;
-	  for(int i = 1;i<subLengths.length-1;i++) {
-		  newGCD = getGCD(subLengths[i], subLengths[(i+1)%(subLengths.length-1)]);
-		  if(i == 1) { gcd = newGCD ; }
-		  if(gcd != newGCD) {
-			  break;
+	  int GCD[] = new int[subLengths.length];
+	  if (subLengths.length==1) GCD[0]=subLengths[0];
+	  else {
+		  for(int i = 0;i<subLengths.length;i++) {
+			  GCD[i] = getGCD(subLengths[i], subLengths[(i+1)%(subLengths.length)]);
 		  }
-		  gcd = newGCD;
 	  }
-	  
-	  return back;
+	  int max=0;
+	  for(int i=0;i<GCD.length;i++){
+		  if (GCD[i]>max) max=GCD[i];
+	  }
+	  return max;
   }
   
   private BufferedReader readFromFile(String file) {
