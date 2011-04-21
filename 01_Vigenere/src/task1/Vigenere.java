@@ -563,12 +563,14 @@ public class Vigenere extends Cipher {
 			PrintStream ps = System.out; // for bringing back old output
 			for(int i = minN;i<=maxN;i++) {
 				frequencyTablesInput[2] = ""+i;
-				System.setOut(new PrintStream(new FileOutputStream(praefix + i + "-grams.alph.tab")));
+				FileOutputStream fos = new FileOutputStream(praefix + i + "-grams.alph.tab");
+				System.setOut(new PrintStream(fos));
 				//sets the default output stream to a file while the frequency table is generated
 				FrequencyTables.main(frequencyTablesInput);
 				System.setOut(new PrintStream(ps)); // output back to normal
-				
+				fos.close();
 			}
+			
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -647,7 +649,7 @@ public class Vigenere extends Cipher {
 	  	  
 	  generateAlphabet(bufferedReaderToString(readFromFile("ictext.txt")),"icAlph.alph");
 	  createFrequencyTables("icAlph.alph", "ictext.txt", 1, 1, modulus,"ic");
-	  String[][] table = readFrequencyTable("ic" + "1" + "-grams.alph.tab");
+	  String[][] table = readFrequencyTable("ic"+ "1" + "-grams.alph.tab");
 	  int n = table.length;
 	  double IC = 0;
 	  for(int i=0;i<n;i++){
