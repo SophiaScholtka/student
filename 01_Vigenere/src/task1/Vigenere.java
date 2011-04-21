@@ -145,7 +145,7 @@ public class Vigenere extends Cipher {
 	  System.out.println("Die möglichen Perioden und zugehörige Koinzidenzindizes sind: ");
 	  for(int i=0; i<maxResults;i++){
 		periods[i] = calcPossiblePeriod(cipher, table[i][0]);
-		System.out.println(periods[i] + "\t" + getSubtextCoincidenceIndex(cipher,periods[i]));
+		System.out.print(periods[i] + "\t"); System.out.println(getSubtextCoincidenceIndex(cipher,periods[i]));
 	  }
 	  System.out.println("\nBitte wählen Sie eine Periode, deren Koinzidenzindex nahe bei 1 liegt,\n indem Sie sie eingeben: ");
 	  int period;
@@ -237,11 +237,18 @@ public class Vigenere extends Cipher {
   private double getSubtextCoincidenceIndex(String cipher, int period) {
 	  String[] subtext= new String[period];
 	  double CI = 0.0;
+	  int p=0;
+	  double dummy;
 	  for(int i=0;i<period;i++){
 		subtext[i] = getSubtext(cipher,period,i);
-		CI = CI + calcCoincidenceIndex(subtext[i]);
+		dummy=calcCoincidenceIndex(subtext[i]);
+		if(dummy==-1.0){
+			CI+=dummy;
+			p++;
+		}
 	  }
-	  return CI/period;
+	  if (p==0) {return -1.0;}
+	  return CI/p;
 	}
   
   private String getSubtext(String cipher, int period, int offset){
@@ -250,6 +257,7 @@ public class Vigenere extends Cipher {
 		subtext.append(cipher.charAt(offset));
 		offset=offset+period;
 	}
+	//System.out.println(">>>"+subtext.toString());
 	return subtext.toString();
   }
 
@@ -570,7 +578,6 @@ public class Vigenere extends Cipher {
 				System.setOut(new PrintStream(ps)); // output back to normal
 				fos.close();
 			}
-			
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -620,6 +627,7 @@ public class Vigenere extends Cipher {
 				i++;
 			}
 			linecount=i-1;
+			if(linecount<1) return null;
 			table = new String[linecount][3];
 			for(i=0;i<linecount;i++){
 				table[i][0]=help[i][0];
@@ -627,6 +635,7 @@ public class Vigenere extends Cipher {
 				table[i][2]=help[i][2];
 				//System.out.println(help[i][0] + " " + help[i][1] + " " + help[i][2]);
 			}
+		file.close();
 		return table;
 	  } catch (IOException e2) {
 			e2.printStackTrace();
@@ -644,19 +653,25 @@ public class Vigenere extends Cipher {
   private double calcCoincidenceIndex(String text) {
 	  double d = -1.0;
 	  double N = (double) text.length();
-	  if (N==1.0||N==0.0) {return 0;}
+	  if (N==1.0||N==0.0) {return -1.0;}
+	  //System.out.println(">>>N"+N);
 	  writeToFile("ictext.txt",text);
 	  	  
 	  generateAlphabet(bufferedReaderToString(readFromFile("ictext.txt")),"icAlph.alph");
 	  createFrequencyTables("icAlph.alph", "ictext.txt", 1, 1, modulus,"ic");
-	  String[][] table = readFrequencyTable("ic"+ "1" + "-grams.alph.tab");
-	  int n = table.length;
-	  double IC = 0;
-	  for(int i=0;i<n;i++){
-		  IC=IC+Double.parseDouble(table[i][1])/100*(Double.parseDouble(table[i][1])/100-1);
+	  String[][] table = readFrequencyTable("ic" + "1" + "-grams.alph.tab");
+	  if(table!=null){
+		  int n = table.length;
+		  double IC = 0;
+		  for(int i=0;i<n;i++){
+			  IC=IC+Double.parseDouble(table[i][1])*N*(Double.parseDouble(table[i][1])*N-1);
+		  }
+		  IC=IC/(N*(N-1));
+		  d=(N*(IC-1.0/n))/((N-1)*IC-N/n+IC);
 	  }
-	  IC=IC/(N*(N-1));
-	  d=(N*(IC-1.0/n))/((N-1)*IC-N/n+IC);
+	  //System.out.println(">>>d"+d);
+	  //IC=IC/(N*(N-1));
+	  //d=(N*(IC-1.0/n))/((N-1)*IC-N/n+IC);
 	return d;
   }
   
