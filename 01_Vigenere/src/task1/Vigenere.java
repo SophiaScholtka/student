@@ -57,6 +57,7 @@ public class Vigenere extends Cipher {
    */
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
 	  String msg;
+	  int modu2 = modulus;
 	  //TODOL This values need to be read in later
 	  String cipher;
 	  String alph = "generatedAlphabet.alph";
@@ -86,7 +87,7 @@ public class Vigenere extends Cipher {
 					  + modulus + " geschätzt.\nBitte bestätigen Sie den Modulus " 
 					  + "oder geben sie einen anderen Modulus ein: ";
 				  System.out.println(msg);
-				  int modu2 = Integer.parseInt(standardInput.readLine());
+				  modu2 = Integer.parseInt(standardInput.readLine());
 				  if (modu2==modulus) {
 					  accepted = true;}
 				  else if (modu2 < 1) {
@@ -103,6 +104,7 @@ public class Vigenere extends Cipher {
 				                + "Informationen finden Sie im Javadoc der Klasse\n'Character"
 				                + "Mapping'.";
 				            System.out.println(msg);
+				            //System.out.println(">>> modulus=modu2: " + modu2);
 				            modulus=modu2;
 				            accepted = true;
 				          } else {
@@ -140,14 +142,22 @@ public class Vigenere extends Cipher {
 	      System.out.println("Fehler beim Parsen. Verwende default-Wert 3.");
 	      xgram = 3;
       }
+
+	  //System.out.println(">>>a modulus L145: " + modulus);
 	  String table[][]= readFrequencyTable("generated"+xgram+"-grams.alph.tab");
+	  //System.out.println(">>>table.length="+table.length);
 	  int periods[] = new int[maxResults];
 	  System.out.println("Die möglichen Perioden und zugehörige Koinzidenzindizes sind: ");
+
+	  //System.out.println(">>>a modulus L151: " + modulus);
 	  for(int i=0; i<maxResults;i++){
+		//System.out.println(">>>"+i+"ter Schleifendurchlauf");
 		periods[i] = calcPossiblePeriod(cipher, table[i][0]);
 		System.out.print(periods[i] + "\t"); 
 		System.out.println(getSubtextCoincidenceIndex(cipher,periods[i]));
 	  }
+
+	  //System.out.println(">>>a modulus vor periodenfrage: " + modulus);
 	  System.out.println("\nBitte wählen Sie eine Periode, deren Koinzidenzindex nahe bei 1 liegt,\n indem Sie sie eingeben: ");
 	  int period;
 	  try{
@@ -163,7 +173,8 @@ public class Vigenere extends Cipher {
 	  //Periode also keylength ist geraten, jetzt können wir beginnen, shifts zu füllen
 	  keylength=period;
 	  shifts = new int[keylength+1];
-	  shifts[0]=modulus;
+	  //System.out.println(">>>a modulus: " + modulus);
+	  shifts[0]=modu2;
 	  
 	  char[] passwort = new char[period];
 	  for(int i=0;i<period;i++){
@@ -171,20 +182,28 @@ public class Vigenere extends Cipher {
 		  System.out.println("Der häufigste Buchstabe im " + (i+1) 
 				  + "ten Chiffreblock ist " + passwort[i]);
 	  }
-	  msg = "Bitte raten Sie eine Zuordnung indem Sie eine Folge von " + period + " Zeichen eingeben,\n" 
+	  
+	  accepted = false;
+	  String pass;
+	  do {
+		  msg = "Bitte raten Sie eine Zuordnung indem Sie eine Folge von " + period + " Zeichen eingeben,\n" 
 	  		+ "die Sie den häufigsten Buchstaben zuordnen wollen.\n" 
 	  		+ "Wir empfehlen e, n und *.\n"
 	  		+ "Für einen neuen Versuch, geben Sie zu viele oder wenige Zeichen ein.";
-	  accepted = false;
-	  do {
 		  System.out.println(msg);
 		  try {
-			  String pass=standardInput.readLine();
+			  pass=standardInput.readLine();
 			  if (pass.length()==period){
 				  char[] zuord = pass.toCharArray();
 				  for(int i=0;i<pass.length();i++){
-					  shifts[i+1]=(passwort[i]-zuord[i])%modulus;
+					  shifts[i+1]=(zuord[i] - passwort[i] + modu2)%modu2;
 				  }
+				  String sTmp = "";
+				  for(int i = 0; i<shifts.length;i++) {
+					  sTmp = sTmp + " " + shifts[i];
+				  }
+				  writeToFile("test_key.txt", sTmp);
+				  //modulus = modu2;
 				  decipher(ciphertext, cleartext);
 				  msg="Bitte überprüfen Sie die entschlüsselte Ausgabe.\n"
 					  + "Gefällt Ihnen das Ergebnis? [y/n]";
@@ -202,15 +221,16 @@ public class Vigenere extends Cipher {
 		  }
 	  } while (!accepted);
 	  
+	  
+	  if(!broken) System.out.println("Ein neuer Brechungsversuch wird gestartet!");
+	  }while(!broken);
+	  System.out.println("Es ist Ihnen gelungen, die Chiffre zu brechen.\nHerzlichen Glückwunsch!");
+	  
 	  try {
 		standardInput.close();
 	} catch (IOException e) {
 		//e.printStackTrace();
 	}
-	  
-	  if(!broken) System.out.println("Ein neuer Brechungsversuch wird gestartet!");
-	  }while(!broken);
-	  System.out.println("Es ist Ihnen gelungen, die Chiffre zu brechen.\nHerzlichen Glückwunsch!");
   }
 
   private char mostFreqChar(String subtext){
@@ -635,7 +655,8 @@ public class Vigenere extends Cipher {
 //				System.out.println(help[i][0] + " " + help[i][1] + " " + help[i][2]);
 				i++;
 			}
-			linecount=i-1;
+			linecount=i;
+			//System.out.println(">>>Die Tabelle hat "+linecount+" Zeilen.");
 			if(linecount<1) return null;
 			table = new String[linecount][3];
 			for(i=0;i<linecount;i++){
