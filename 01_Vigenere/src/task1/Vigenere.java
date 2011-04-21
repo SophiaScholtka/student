@@ -58,7 +58,7 @@ public class Vigenere extends Cipher {
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
 	  String msg;
 	  //TODOL This values need to be read in later
-	  String cipher = "ciphertext-blahblubb";
+	  String cipher;
 	  String alph = "generatedAlphabet.alph";
 	  String textfile = "programmierer_enc.txt";
 	  int minN = 1;
@@ -120,7 +120,7 @@ public class Vigenere extends Cipher {
 		  } while(!accepted);
 	//Modulus ist nun festgelegt, jetzt machen wir Häufigkeitstabellen:
 		  
-	  createFrequencyTables(alph,textfile,minN,maxN,maxResults);
+	  createFrequencyTables(alph,textfile,minN,maxN,maxResults,"generated");
 	  
 	  msg="Möchten Sie Di-, Tri- oder 4-gramme analysieren? Bitte geben Sie 2, 3 oder 4 ein: ";
 	  System.out.println(msg);
@@ -531,7 +531,7 @@ public class Vigenere extends Cipher {
     }
   }
   
-  private void createFrequencyTables(String alph, String textfile, int minN, int maxN, int maxResults) {
+  private void createFrequencyTables(String alph, String textfile, int minN, int maxN, int maxResults,String praefix) {
 	  	//Controls the input of min and max N
 	  	if(minN <= 0) { minN = 1; }
 	  	if(maxN <= 0) { maxN = 1; }
@@ -543,18 +543,21 @@ public class Vigenere extends Cipher {
 		// Creates nGrams for the encrypted text
 		//nGram on an special encoded text
 		//String array for frequencytables.main
+	  	if(maxResults>textfile.length()){
+	  		maxResults=textfile.length();
+	  	}
 		String[] frequencyTablesInput = new String[4];
 		frequencyTablesInput[0] = alph;
 		frequencyTablesInput[1] = textfile;
 		frequencyTablesInput[2] = "" + minN;
 		frequencyTablesInput[3] = "" + maxResults;
-		//Create frequency tables
+		//Create frequency tablesh
 		try {
 			//int maxN = Integer.parseInt(frequencyTablesInput[2]);
 			PrintStream ps = System.out; // for bringing back old output
 			for(int i = minN;i<=maxN;i++) {
 				frequencyTablesInput[2] = ""+i;
-				System.setOut(new PrintStream(new FileOutputStream("generated" + i + "-grams.alph.tab")));
+				System.setOut(new PrintStream(new FileOutputStream(praefix + i + "-grams.alph.tab")));
 				//sets the default output stream to a file while the frequency table is generated
 				FrequencyTables.main(frequencyTablesInput);
 				System.setOut(new PrintStream(ps)); // output back to normal
@@ -634,8 +637,9 @@ public class Vigenere extends Cipher {
 	  double d = -1.0;
 	  double N = (double) text.length();
 	  if (N==1.0||N==0.0) {return 0;}
-	  createFrequencyTables("generatedAlphabet.alph", text, 1, 1, modulus);
-	  String[][] table = readFrequencyTable("generated" + "1" + "-grams.alph.tab");
+	  writeToFile("ictext.txt",text);
+	  createFrequencyTables("generatedAlphabet.alph", "ictext.txt", 1, 1, modulus,"ic");
+	  String[][] table = readFrequencyTable("ic" + "1" + "-grams.alph.tab");
 	  int n = table.length;
 	  double IC = 0;
 	  for(int i=0;i<n;i++){
@@ -721,23 +725,18 @@ public class Vigenere extends Cipher {
 	  String[] subStrings = text.split(ngram);
 	  //gets periods between repeated ngram (first and last one are ignored)
 	  int[] subLengths = new int[subStrings.length];
-	  for(int i = 0; i<subStrings.length;i++) {
+	  for(int i = 1; i<subStrings.length;i++) {
 		  subLengths[i] = subStrings[i].length() + ngram.length();
 		  //System.out.println(subLengths[i]);
 	  }
 	  //gets ggt() of all periods
 	  int GCD[] = new int[subLengths.length];
-	  if (subLengths.length==1) GCD[0]=subLengths[0];
-	  else {
-		  for(int i = 0;i<subLengths.length;i++) {
-			  GCD[i] = getGCD(subLengths[i], subLengths[(i+1)%(subLengths.length)]);
-		  }
+	  GCD[0]=subLengths[subLengths.length-1];
+	  for(int i = 1;i<subLengths.length;i++) {
+		  GCD[i] = getGCD(subLengths[i],subLengths[(i+1)%(subLengths.length)]);
 	  }
-	  int max=0;
-	  for(int i=0;i<GCD.length;i++){
-		  if (GCD[i]>max) max=GCD[i];
-	  }
-	  return max;
+	  GCD[0]=getGCD(GCD[subLengths.length-1],GCD[0]);
+	  return GCD[0];
   }
   
   private BufferedReader readFromFile(String file) {
@@ -748,6 +747,16 @@ public class Vigenere extends Cipher {
 		e.printStackTrace();
 	}
 	  return textInput;
+  }
+  
+  private void writeToFile(String filename,String text) {
+	  try {
+		  BufferedWriter out = new BufferedWriter(new FileWriter(filename));
+		  out.write(text);
+		  out.close();
+	  } catch (IOException e){
+		  e.printStackTrace();
+	  }
   }
 
 }
