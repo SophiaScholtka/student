@@ -572,10 +572,12 @@ public class Vigenere extends Cipher {
 			for(int i = minN;i<=maxN;i++) {
 				frequencyTablesInput[2] = ""+i;
 				FileOutputStream fos = new FileOutputStream(praefix + i + "-grams.alph.tab");
-				System.setOut(new PrintStream(fos));
+				PrintStream psNew = new PrintStream(fos);
+				System.setOut(psNew);
 				//sets the default output stream to a file while the frequency table is generated
 				FrequencyTables.main(frequencyTablesInput);
 				System.setOut(new PrintStream(ps)); // output back to normal
+				psNew.close();
 				fos.close();
 			}
 		} catch (IOException e1) {
