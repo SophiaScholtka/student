@@ -65,6 +65,12 @@ public class Vigenere extends Cipher {
 	  int maxN = 4;
 	  int maxResults = 5;
 	  
+	  //TEST
+	  //BufferedReader testIn = readFromFile("test.txt");
+	  //String testText = bufferedReaderToString(testIn);
+	  //generateAlphabet(testText, "test-alph.alph");
+	  //createFrequencyTables("test-alph.alph","test.txt",1,1,3,"test-freq-");
+	  
 	  //Read text
 	  BufferedReader textInput = readFromFile(textfile);
 	  cipher = bufferedReaderToString(textInput);
@@ -638,7 +644,9 @@ public class Vigenere extends Cipher {
 	  double N = (double) text.length();
 	  if (N==1.0||N==0.0) {return 0;}
 	  writeToFile("ictext.txt",text);
-	  createFrequencyTables("generatedAlphabet.alph", "ictext.txt", 1, 1, modulus,"ic");
+	  	  
+	  generateAlphabet(bufferedReaderToString(readFromFile("ictext.txt")),"icAlph.alph");
+	  createFrequencyTables("icAlph.alph", "ictext.txt", 1, 1, modulus,"ic");
 	  String[][] table = readFrequencyTable("ic" + "1" + "-grams.alph.tab");
 	  int n = table.length;
 	  double IC = 0;
