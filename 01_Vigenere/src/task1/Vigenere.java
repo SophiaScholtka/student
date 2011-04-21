@@ -145,7 +145,8 @@ public class Vigenere extends Cipher {
 	  System.out.println("Die möglichen Perioden und zugehörige Koinzidenzindizes sind: ");
 	  for(int i=0; i<maxResults;i++){
 		periods[i] = calcPossiblePeriod(cipher, table[i][0]);
-		System.out.print(periods[i] + "\t"); System.out.println(getSubtextCoincidenceIndex(cipher,periods[i]));
+		System.out.print(periods[i] + "\t"); 
+		System.out.println(getSubtextCoincidenceIndex(cipher,periods[i]));
 	  }
 	  System.out.println("\nBitte wählen Sie eine Periode, deren Koinzidenzindex nahe bei 1 liegt,\n indem Sie sie eingeben: ");
 	  int period;
@@ -200,6 +201,12 @@ public class Vigenere extends Cipher {
 			  System.out.println("Fehler beim Lesen von der Standardeingabe.\nNeuer Versuch.");
 		  }
 	  } while (!accepted);
+	  
+	  try {
+		standardInput.close();
+	} catch (IOException e) {
+		//e.printStackTrace();
+	}
 	  
 	  if(!broken) System.out.println("Ein neuer Brechungsversuch wird gestartet!");
 	  }while(!broken);
@@ -637,7 +644,7 @@ public class Vigenere extends Cipher {
 				table[i][2]=help[i][2];
 				//System.out.println(help[i][0] + " " + help[i][1] + " " + help[i][2]);
 			}
-		file.close();
+		//file.close();
 		return table;
 	  } catch (IOException e2) {
 			e2.printStackTrace();
@@ -770,7 +777,10 @@ public class Vigenere extends Cipher {
 	  BufferedReader textInput = null;
 	try {
 		textInput = new BufferedReader(new FileReader(file));
+		//textInput.close(); //has to be open!!
 	} catch (FileNotFoundException e) {
+		e.printStackTrace();
+	} catch (IOException e) {
 		e.printStackTrace();
 	}
 	  return textInput;
