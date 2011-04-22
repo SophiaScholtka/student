@@ -319,6 +319,7 @@ public class Vigenere extends Cipher {
       // ist. Der Buchstabe a wird z.B. als ein Wert von 97 gelesen.
       int counter=1;
       while ((character = ciphertext.read()) != -1) {
+    	  System.out.print(">>>"+character);
         // Bilde 'character' auf dessen interne Darstellung ab, d.h. auf einen
         // Wert der Menge {0, 1, ..., Modulus - 1}. Ist z.B. a der erste
         // Buchstabe des Alphabets, wird die gelesene 97 auf 0 abgebildet:
@@ -336,6 +337,7 @@ public class Vigenere extends Cipher {
           // konvertiert zu 98: remapChar(1) = 98. Der Wert 98 wird schließlich
           // in die Chiffretextdatei geschrieben.
           character = charMap.remapChar(character);
+          System.out.println(" entschlüsselt: "+character);
           cleartext.write(character);
         } else {
           // Das gelesene Zeichen ist im benutzten Alphabet nicht enthalten.
@@ -344,6 +346,7 @@ public class Vigenere extends Cipher {
         counter=(counter+1)%(keylength+1);
         if(counter==0) counter=1;
       }
+      System.out.println("\n>>>Ich bin decipher und habe alles gelesen!");
       if (characterSkipped) {
         System.out.println("Warnung: Mindestens ein Zeichen aus der "
             + "Klartextdatei ist im Alphabet nicht\nenthalten und wurde "
