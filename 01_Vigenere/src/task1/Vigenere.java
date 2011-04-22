@@ -198,11 +198,15 @@ public class Vigenere extends Cipher {
 				  for(int i=0;i<pass.length();i++){
 					  shifts[i+1]=(zuord[i] - passwort[i] + modu2)%modu2;
 				  }
-				  String sTmp = "";
-				  for(int i = 0; i<shifts.length;i++) {
-					  sTmp = sTmp + " " + shifts[i];
+				  String sTmp = ""+modu2+"\n"+period;
+				  keylength=period;
+				  for(int i = 1; i<shifts.length;i++) {
+					  sTmp = sTmp + "\n" + shifts[i];
 				  }
 				  writeToFile("test_key.txt", sTmp);
+				  BufferedReader key = readFromFile("test_key.txt");
+				  readKey(key);
+				  key.close();
 				  //modulus = modu2;
 				  decipher(ciphertext, cleartext);
 				  msg="Bitte überprüfen Sie die entschlüsselte Ausgabe.\n"
@@ -299,6 +303,7 @@ public class Vigenere extends Cipher {
    * Der Writer, der den Klartext schreiben soll.
    */
   public void decipher(BufferedReader ciphertext, BufferedWriter cleartext) {
+	  System.out.println(">>>Ich bin decipher!");
     // An dieser Stelle könnte man alle Zeichen, die aus der Klartextdatei
     // gelesen werden, in Klein- bzw. Großbuchstaben umwandeln lassen:
     // charMap.setConvertToLowerCase();
@@ -796,14 +801,12 @@ public class Vigenere extends Cipher {
   
   private BufferedReader readFromFile(String file) {
 	  BufferedReader textInput = null;
-	try {
+	  try {
 		textInput = new BufferedReader(new FileReader(file));
 		//textInput.close(); //has to be open!!
-	} catch (FileNotFoundException e) {
+	  } catch (FileNotFoundException e) {
 		e.printStackTrace();
-	} catch (IOException e) {
-		e.printStackTrace();
-	}
+	  }
 	  return textInput;
   }
   
