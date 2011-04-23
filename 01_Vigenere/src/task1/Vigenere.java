@@ -690,6 +690,7 @@ public class Vigenere extends Cipher {
 				table[i][2]=help[i][2];
 				//System.out.println(help[i][0] + " " + help[i][1] + " " + help[i][2]);
 			}
+		//TODO warum nicht file.close();?	
 		//file.close();
 		return table;
 	  } catch (IOException e2) {
@@ -808,12 +809,12 @@ public class Vigenere extends Cipher {
 		  //System.out.println(subLengths[i]);
 	  }
 	  //gets ggt() of all periods
-	  int GCD[] = new int[subLengths.length];
+	  int GCD[] = new int[subLengths.length-1];
 	  GCD[0]=subLengths[subLengths.length-1];
-	  for(int i = 1;i<subLengths.length;i++) {
-		  GCD[i] = getGCD(subLengths[i],subLengths[(i+1)%(subLengths.length)]);
+	  for(int i = 1;i<subLengths.length-1;i++) {
+		  GCD[i] = getGCD(subLengths[i],subLengths[(i+1)%(subLengths.length-1)]);
 	  }
-	  GCD[0]=getGCD(GCD[subLengths.length-1],GCD[0]);
+	  GCD[0]=getGCD(GCD[subLengths.length-2],GCD[0]);
 	  return GCD[0];
   }
   
