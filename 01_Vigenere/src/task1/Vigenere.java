@@ -21,6 +21,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,8 +97,8 @@ public class Vigenere extends Cipher {
 				     } else {
 				          // Prüfe, ob zum eingegebenen Modulus ein Default-Alphabet existiert.
 				          String defaultAlphabet = CharacterMapping.getDefaultAlphabet(modu2);
-				          generateAlphabet(defaultAlphabet,alph);
 				          if (!defaultAlphabet.equals("")) {
+				        	charMap = new CharacterMapping(modu2);		
 				            msg = "Vordefiniertes Alphabet: '" + defaultAlphabet
 				                + "'\nDieses vordefinierte Alphabet kann durch Angabe einer "
 				                + "geeigneten Alphabet-Datei\nersetzt werden. Weitere "
@@ -128,7 +129,7 @@ public class Vigenere extends Cipher {
 		  } while(!accepted);
 	//Modulus ist nun festgelegt, jetzt machen wir Häufigkeitstabellen:
 		  
-	  createFrequencyTables(alph,textfile,minN,maxN,maxResults,"generated");
+	  createFrequencyTables(charMap,textfile,minN,maxN,maxResults,"generated");
 	  
 	  msg="Möchten Sie Di-, Tri- oder 4-gramme analysieren? Bitte geben Sie 2, 3 oder 4 ein: ";
 	  System.out.println(msg);
@@ -213,7 +214,10 @@ public class Vigenere extends Cipher {
 					  + "Gefällt Ihnen das Ergebnis? [y/n]";
 				  System.out.println(msg);
 				  String decide=standardInput.readLine();
-				  if(decide.equalsIgnoreCase("y")) {accepted=true;}
+				  if(decide.equalsIgnoreCase("y")) {
+					  accepted=true;
+					  broken=true;
+				  }
 				  else {System.out.println("Neuer Versuch.");}
 			  }
 			  else {
@@ -318,30 +322,35 @@ public class Vigenere extends Cipher {
       // Lese zeichenweise aus der Klartextdatei, bis das Dateiende erreicht
       // ist. Der Buchstabe a wird z.B. als ein Wert von 97 gelesen.
       int counter=1;
+      int i=0;
       while ((character = ciphertext.read()) != -1) {
-    	  System.out.print(">>>"+character);
+    	if (i<11)  System.out.print(">>>"+(char)character);
         // Bilde 'character' auf dessen interne Darstellung ab, d.h. auf einen
         // Wert der Menge {0, 1, ..., Modulus - 1}. Ist z.B. a der erste
         // Buchstabe des Alphabets, wird die gelesene 97 auf 0 abgebildet:
         // mapChar(97) = 0.
         character = charMap.mapChar(character);
+        if (i<11) System.out.print(">>>remapped to: "+character);
         if (character != -1) {
           // Das gelesene Zeichen ist im benutzten Alphabet enthalten und konnte
           // abgebildet werden. Die folgende Quellcode-Zeile stellt den Kern der
           // Caesar-Chiffrierung dar: Addiere zu (der internen Darstellung von)
           // 'character' zyklisch den 'shift' hinzu.
           character = (character - shifts[counter] + modulus) % modulus;
+          if (i<11) System.out.print(">>>deciphered to: "+character);
           // Das nun chiffrierte Zeichen wird von der internen Darstellung in
           // die Dateikodierung konvertiert. Ist z.B. 1 das Ergebnis der
           // Verschlüsselung (also die interne Darstellung für b), so wird dies
           // konvertiert zu 98: remapChar(1) = 98. Der Wert 98 wird schließlich
           // in die Chiffretextdatei geschrieben.
           character = charMap.remapChar(character);
-          System.out.println(" entschlüsselt: "+character);
+          if (i<11) System.out.println(">>>remapped to: "+(char)character);
           cleartext.write(character);
+          i++;
         } else {
           // Das gelesene Zeichen ist im benutzten Alphabet nicht enthalten.
           characterSkipped = true;
+          System.out.println(">>>ooops not found");
         }
         counter=(counter+1)%(keylength+1);
         if(counter==0) counter=1;
@@ -580,8 +589,16 @@ public class Vigenere extends Cipher {
     }
   }
   
-  private void createFrequencyTables(String alph, String textfile, int minN, int maxN, int maxResults,String praefix) {
-	  	//Controls the input of min and max N
+  private void createFrequencyTables(CharacterMapping charMap, String textfile, int minN, int maxN, int maxResults,String praefix) {
+	  String alph;
+	  int modu3=charMap.getModulusFromAlphabet();
+	  //System.out.println(">>>modu3 is "+modu3);
+	  if (modu3==26||modu3==27||modu3==30||modu3==31||modu3==33||modu3==90||modu3==91){
+		  alph="../alphabet/default"+modu3+".alph";
+	  } else {
+		  alph="generatedAlphabet.alph";
+	  }
+	  //Controls the input of min and max N
 	  	if(minN <= 0) { minN = 1; }
 	  	if(maxN <= 0) { maxN = 1; }
 	  	if(maxN < minN) { 
@@ -694,9 +711,7 @@ public class Vigenere extends Cipher {
 	  if (N==1.0||N==0.0) {return -1.0;}
 	  //System.out.println(">>>N"+N);
 	  writeToFile("ictext.txt",text);
-	  	  
-	  generateAlphabet(bufferedReaderToString(readFromFile("ictext.txt")),"icAlph.alph");
-	  createFrequencyTables("icAlph.alph", "ictext.txt", 1, 1, modulus,"ic");
+	  createFrequencyTables(charMap, "ictext.txt", 1, 1, modulus,"ic");
 	  String[][] table = readFrequencyTable("ic" + "1" + "-grams.alph.tab");
 	  if(table!=null){
 		  int n = table.length;
