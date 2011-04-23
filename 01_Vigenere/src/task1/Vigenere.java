@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Vector;
 
 import de.tubs.cs.iti.jcrypt.chiffre.CharacterMapping;
 import de.tubs.cs.iti.jcrypt.chiffre.Cipher;
@@ -147,16 +148,60 @@ public class Vigenere extends Cipher {
 	  //System.out.println(">>>a modulus L145: " + modulus);
 	  String table[][]= readFrequencyTable("generated"+xgram+"-grams.alph.tab");
 	  //System.out.println(">>>table.length="+table.length);
-	  int periods[] = new int[maxResults];
 	  System.out.println("Die möglichen Perioden und zugehörige Koinzidenzindizes sind: ");
-
-	  //System.out.println(">>>a modulus L151: " + modulus);
+	  //mögliche Perioden in HashMap speichern, häufigste 5 finden, landen in peri[]
+	  HashMap<Integer, Integer> quantities = new HashMap<Integer, Integer>();
+	  int max=1;
 	  for(int i=0; i<maxResults;i++){
-		//System.out.println(">>>"+i+"ter Schleifendurchlauf");
-		periods[i] = calcPossiblePeriod(cipher, table[i][0]);
-		System.out.print(periods[i] + "\t"); 
-		System.out.println(getSubtextCoincidenceIndex(cipher,periods[i]));
+		int[] periods = calcPossiblePeriod(cipher, table[i][0]);
+		for(int j=0;j<periods.length;j++){
+			if (!quantities.containsKey(periods[j])){
+				quantities.put(periods[j],1);
+			} else {
+				quantities.put(periods[j], quantities.get(periods[j]) + 1);
+				if(quantities.get(periods[j])>max){
+					max=quantities.get(periods[j]);
+				}
+			}
+		}
 	  }
+	  int currKey = -1;
+      int currValue = -1;
+      int[] freq = {-1,-1,-1,-1,-1};
+      int[] peri = {1,1,1,1,1};
+      Iterator<Integer> it = quantities.keySet().iterator();
+      while (it.hasNext()) {
+        currKey = it.next();
+        currValue = quantities.get(currKey);
+        if (currValue > freq[0]) {
+          freq[4]=freq[3]; freq[3]=freq[2]; freq[2]=freq[1]; freq[1]=freq[0];
+          freq[0]=currValue;
+          peri[4]=peri[3]; peri[3]=peri[2]; peri[2]=peri[1]; peri[1]=peri[0];
+          peri[0] = currKey;
+        } else if (currValue > freq[1]){
+        	freq[4]=freq[3]; freq[3]=freq[2]; freq[2]=freq[1];
+            freq[1]=currValue;
+            peri[4]=peri[3]; peri[3]=peri[2]; peri[2]=peri[1];
+            peri[1] = currKey;
+        } else if (currValue > freq[2]){
+        	freq[4]=freq[3]; freq[3]=freq[2];
+            freq[2]=currValue;
+            peri[4]=peri[3]; peri[3]=peri[2];
+            peri[2] = currKey;
+        } else if (currValue > freq[3]){
+        	freq[4]=freq[3];
+            freq[3]=currValue;
+            peri[4]=peri[3];
+            peri[3] = currKey;
+        } else if (currValue > freq[4]){
+        	freq[4]=currValue;
+        	peri[4] = currKey;
+        }
+      }
+      for(int i=0;i<5;i++){
+		System.out.print(peri[i] + "\t"); 
+		System.out.println(getSubtextCoincidenceIndex(cipher,peri[i]));
+      }
 
 	  //System.out.println(">>>a modulus vor periodenfrage: " + modulus);
 	  System.out.println("\nBitte wählen Sie eine Periode, deren Koinzidenzindex nahe bei 1 liegt,\n indem Sie sie eingeben: ");
@@ -164,11 +209,11 @@ public class Vigenere extends Cipher {
 	  try{
 		  period = Integer.parseInt(standardInput.readLine());
 	  } catch (NumberFormatException e){
-		  System.out.println("Fehler beim Parsen. Verwende "+periods[0]);
-		  period = periods[0];
+		  System.out.println("Fehler beim Parsen. Verwende "+peri[0]);
+		  period = peri[0];
 	  } catch (IOException e) {
-	      System.out.println("Fehler beim Parsen. Verwende "+periods[0]);
-	      period = periods[0];
+	      System.out.println("Fehler beim Parsen. Verwende "+peri[0]);
+	      period = peri[0];
       }
 	  
 	  //Periode also keylength ist geraten, jetzt können wir beginnen, shifts zu füllen
@@ -799,7 +844,7 @@ public class Vigenere extends Cipher {
      return a;
   }
   
-  private int calcPossiblePeriod(String text, String ngram) {
+  private int[] calcPossiblePeriod(String text, String ngram) {
 	  //splitts text by the chosen ngram
 	  String[] subStrings = text.split(ngram);
 	  //gets periods between repeated ngram (first and last one are ignored)
@@ -815,7 +860,7 @@ public class Vigenere extends Cipher {
 		  GCD[i] = getGCD(subLengths[i],subLengths[(i+1)%(subLengths.length-1)]);
 	  }
 	  GCD[0]=getGCD(GCD[subLengths.length-2],GCD[0]);
-	  return GCD[0];
+	  return GCD;
   }
   
   private BufferedReader readFromFile(String file) {
