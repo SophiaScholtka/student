@@ -254,10 +254,10 @@ public class Vigenere extends Cipher {
 			  if (pass.length()==period){
 				  char[] zuord = pass.toCharArray();
 				  for(int i=0;i<pass.length();i++){
-					  shifts[i+1]=(charMap.mapChar(zuord[i]) - charMap.mapChar(passwort[i][0]) + modu2)%modu2;
+					  shifts[i+1]=(charMap.mapChar(passwort[i][0]) - charMap.mapChar(zuord[i]) + modu2)%modu2;
 					  if(DEBUG) { 
 						  System.out.print(">>>breakCipher Verschiebung eingegeben: " + shifts[i+1] + "\t");
-						  System.out.println();
+						  System.out.println(charMap.mapChar(zuord[i]) + "\t" + charMap.mapChar(passwort[i][0]) + "\t" + modu2);
 					  }
 				  }
 				  String sTmp = ""+modu2+"\n"+period;
