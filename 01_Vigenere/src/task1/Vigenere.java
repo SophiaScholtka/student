@@ -45,6 +45,8 @@ public class Vigenere extends Cipher {
 	private int[] shifts;
 	private int keylength;
 	
+	private boolean broken = true;
+	
 	private final boolean DEBUG = true;
 	
 	/**
@@ -59,6 +61,7 @@ public class Vigenere extends Cipher {
    * Der Writer, der den Klartext schreiben soll.
    */
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
+	  if(DEBUG) System.out.println(">>>breakCipher called");
 	  String msg;
 	  int modu2 = modulus;
 	  String cipher;
@@ -78,7 +81,7 @@ public class Vigenere extends Cipher {
 	  
 	  generateAlphabet(cipher,alph);
 	  BufferedReader standardInput = launcher.openStandardInput();
-	  boolean broken = false;
+	  broken = false;
 	  do{
 		  boolean accepted = false;
 		  do {
@@ -224,15 +227,26 @@ public class Vigenere extends Cipher {
 	  for(int i=0;i<period;i++){
 		  passwort[i]=mostFreqChar(getSubtext(cipher,period,i));
 		  System.out.println("Die häufigsten Buchstaben im " + (i+1) 
-				  + "ten Chiffreblock sind " + passwort[i][0] + " und " + passwort[i][1]);
+				  + "ten Chiffreblock sind \t" 
+				  + passwort[i][0] + " (" + (charMap.mapChar((int)passwort[i][0]))+  ") und \t"
+				  + passwort[i][1]+ " (" + (charMap.mapChar((int)passwort[i][1]))+  ")");
 	  }
 	  
 	  accepted = false;
+	  writeToFile("symbols.txt", charMap.toString());
 	  String pass;
+	  String[] sArray = {"e","n","i","*"};
+	  if(DEBUG) {System.out.println(">>>>breakCipher Passwortzuordnung raten");}
 	  do {
+		  if(DEBUG){System.out.println(">>>>breakCipher Passwortzuordnung raten (Loop)"); }
 		  msg = "Bitte raten Sie eine Zuordnung indem Sie eine Folge von " + period + " Zeichen eingeben,\n" 
 	  		+ "die Sie den häufigsten Buchstaben zuordnen wollen.\n" 
-	  		+ "Wir empfehlen e, n und *.\n"
+	  		+ "Wir empfehlen "
+	  		+ "e (" + charMap.mapChar((int)sArray[0].charAt(0)) + "), "
+	  		+ "n (" + charMap.mapChar((int)sArray[1].charAt(0)) + "), "
+	  		+ "i (" + charMap.mapChar((int)sArray[2].charAt(0)) + ") und "
+	  		+ "* (" + charMap.mapChar((int)sArray[3].charAt(0)) + ").\n"
+	  		+ "Für eine Übersicht der Zeichen ziehen Sie bitte die Datei symbols.txt zu rate.\n"
 	  		+ "Für einen neuen Versuch, geben Sie zu viele oder wenige Zeichen ein.";
 		  System.out.println(msg);
 		  try {
@@ -241,27 +255,40 @@ public class Vigenere extends Cipher {
 				  char[] zuord = pass.toCharArray();
 				  for(int i=0;i<pass.length();i++){
 					  shifts[i+1]=(charMap.mapChar(zuord[i]) - charMap.mapChar(passwort[i][0]) + modu2)%modu2;
+					  if(DEBUG) { 
+						  System.out.print(">>>breakCipher Verschiebung eingegeben: " + shifts[i+1] + "\t");
+						  System.out.println();
+					  }
 				  }
 				  String sTmp = ""+modu2+"\n"+period;
 				  keylength=period;
 				  for(int i = 1; i<shifts.length;i++) {
 					  sTmp = sTmp + "\n" + shifts[i];
 				  }
-				  writeToFile("test_key.txt", sTmp);
-				  BufferedReader key = readFromFile("test_key.txt");
+				  writeToFile("key_break.txt", sTmp);
+				  BufferedReader key = readFromFile("key_break.txt");
 				  readKey(key);
-				  key.close();
+				  //key.close();
 				  //modulus = modu2;
 				  decipher(ciphertext, cleartext);
-				  msg="Bitte überprüfen Sie die entschlüsselte Ausgabe.\n"
-					  + "Gefällt Ihnen das Ergebnis? [y/n]";
+				  msg="Bitte überprüfen Sie die entschlüsselte Ausgabe:";
+				  System.out.println(msg);
+				  //Prints the first symbols of the broken text
+				  BufferedReader rff = readFromFile("cleartext_broken.txt");
+				  String sRFF = bufferedReaderToString(rff);
+				  System.out.println("Ausgabe (Auszug):  " + sRFF.substring(0, 20) + "[...]");
+				  msg="Gefällt Ihnen das Ergebnis? [y/n]";
 				  System.out.println(msg);
 				  String decide=standardInput.readLine();
 				  if(decide.equalsIgnoreCase("y")) {
 					  accepted=true;
 					  broken=true;
 				  }
-				  else {System.out.println("Neuer Versuch.");}
+				  else {
+					  System.out.println("Neuer Versuch.");
+					  broken=false;
+					  accepted=false;
+				  }
 			  }
 			  else {
 				  System.out.println("Suche wird abgebrochen.");
@@ -276,6 +303,24 @@ public class Vigenere extends Cipher {
 	  if(!broken) System.out.println("Ein neuer Brechungsversuch wird gestartet!");
 	  }while(!broken);
 	  System.out.println("Es ist Ihnen gelungen, die Chiffre zu brechen.\nHerzlichen Glückwunsch!");
+	  
+	  //Calculate password
+	  if(DEBUG) {
+		  System.out.println(">>>>breakCipher Shift bei passwort Raten");
+		  for(int i = 0;i<shifts.length;i++)
+			  System.out.println(">>>>" + shifts[i]);		  
+	  }
+	  BufferedReader rff = readFromFile("cleartext_broken.txt");
+	  String sRFF = bufferedReaderToString(rff);
+	  sRFF = sRFF.substring(0, shifts.length-1);
+	  String guessedPass = "";
+	  //TODO calculate guessed password
+	  for(int i = 1;i<shifts.length;i++) {
+		  int rmc = charMap.remapChar(shifts[i]);
+		  String srmc = String.valueOf((char)rmc);
+		  guessedPass = guessedPass + srmc;
+	  }
+	  System.out.println("Das vermutete Passwort lautet:  " + guessedPass);
 	  
 	  try {
 		standardInput.close();
@@ -360,7 +405,7 @@ public class Vigenere extends Cipher {
    * Der Writer, der den Klartext schreiben soll.
    */
   public void decipher(BufferedReader ciphertext, BufferedWriter cleartext) {
-	  if(DEBUG) { System.out.println(">>>Ich bin decipher!"); }
+	  if(DEBUG) { System.out.println(">>>decipher called"); }
     // An dieser Stelle könnte man alle Zeichen, die aus der Klartextdatei
     // gelesen werden, in Klein- bzw. Großbuchstaben umwandeln lassen:
     // charMap.setConvertToLowerCase();
@@ -383,21 +428,21 @@ public class Vigenere extends Cipher {
         // Buchstabe des Alphabets, wird die gelesene 97 auf 0 abgebildet:
         // mapChar(97) = 0.
         character = charMap.mapChar(character);
-        if (DEBUG && i<11) { System.out.print(" -->>>remapped to: "+character); }
+        if (DEBUG && i<11) { System.out.print("\t -->>>remapped to: "+character); }
         if (character != -1) {
           // Das gelesene Zeichen ist im benutzten Alphabet enthalten und konnte
           // abgebildet werden. Die folgende Quellcode-Zeile stellt den Kern der
           // Caesar-Chiffrierung dar: Addiere zu (der internen Darstellung von)
           // 'character' zyklisch den 'shift' hinzu.
           character = (character - shifts[counter] + modulus) % modulus;
-          if (DEBUG && i<11) { System.out.print(" -->>>deciphered to: "+character); }
+          if (DEBUG && i<11) { System.out.print("\t -->>>deciphered to: "+character); }
           // Das nun chiffrierte Zeichen wird von der internen Darstellung in
           // die Dateikodierung konvertiert. Ist z.B. 1 das Ergebnis der
           // Verschlüsselung (also die interne Darstellung für b), so wird dies
           // konvertiert zu 98: remapChar(1) = 98. Der Wert 98 wird schließlich
           // in die Chiffretextdatei geschrieben.
           character = charMap.remapChar(character);
-          if (DEBUG && i<11) { System.out.println(" -->>>remapped to: "+(char)character); }
+          if (DEBUG && i<11) { System.out.println("\t -->>>remapped to: "+(char)character); }
           cleartext.write(character);
           i++;
         } else {
@@ -414,8 +459,12 @@ public class Vigenere extends Cipher {
             + "Klartextdatei ist im Alphabet nicht\nenthalten und wurde "
             + "überlesen.");
       }
-      cleartext.close();
-      ciphertext.close();
+      
+      //erst schließen, wenn kein weiterer Zugriff erforderlich ist!
+      if(broken) {
+          cleartext.close();
+          ciphertext.close();    	  
+      }
     } catch (IOException e) {
       System.err.println("Abbruch: Fehler beim Zugriff auf Klar- oder "
           + "Chiffretextdatei.");
@@ -497,6 +546,7 @@ public class Vigenere extends Cipher {
    * @see #writeKey writeKey
    */
   public void makeKey() {
+	  if(DEBUG) System.out.println(">>>makeKey called");
 
 
 	    BufferedReader standardInput = launcher.openStandardInput();
@@ -587,6 +637,7 @@ public class Vigenere extends Cipher {
    * @see #writeKey writeKey
    */
   public void readKey(BufferedReader key) {
+	  if(DEBUG) System.out.println(">>>readKey called");
 
     try {
       modulus = Integer.parseInt(key.readLine());
@@ -624,6 +675,7 @@ public class Vigenere extends Cipher {
    * @see #readKey readKey
    */
   public void writeKey(BufferedWriter key) {
+	  if(DEBUG) System.out.println(">>>writeKey called");
 
     try {
       key.write(""+modulus);
@@ -743,8 +795,8 @@ public class Vigenere extends Cipher {
 				table[i][2]=help[i][2];
 				//System.out.println(help[i][0] + " " + help[i][1] + " " + help[i][2]);
 			}
-		//TODO warum nicht file.close();?	
-		//file.close();
+		//TODO warum nicht file.close();?
+		file.close();
 		return table;
 	  } catch (IOException e2) {
 			e2.printStackTrace();
