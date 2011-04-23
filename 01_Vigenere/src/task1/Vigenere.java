@@ -46,6 +46,8 @@ public class Vigenere extends Cipher {
 	private int[] shifts;
 	private int keylength;
 	
+	private final boolean DEBUG = true;
+	
 	/**
    * Analysiert den durch den Reader <code>ciphertext</code> gegebenen
    * Chiffretext, bricht die Chiffre bzw. unterstützt das Brechen der Chiffre
@@ -352,7 +354,7 @@ public class Vigenere extends Cipher {
    * Der Writer, der den Klartext schreiben soll.
    */
   public void decipher(BufferedReader ciphertext, BufferedWriter cleartext) {
-	  System.out.println(">>>Ich bin decipher!");
+	  if(DEBUG) { System.out.println(">>>Ich bin decipher!"); }
     // An dieser Stelle könnte man alle Zeichen, die aus der Klartextdatei
     // gelesen werden, in Klein- bzw. Großbuchstaben umwandeln lassen:
     // charMap.setConvertToLowerCase();
@@ -369,38 +371,38 @@ public class Vigenere extends Cipher {
       int counter=1;
       int i=0;
       while ((character = ciphertext.read()) != -1) {
-    	if (i<11)  System.out.print(">>>"+(char)character);
+    	if (DEBUG && i<11) { System.out.print(">>>"+(char)character); }
         // Bilde 'character' auf dessen interne Darstellung ab, d.h. auf einen
         // Wert der Menge {0, 1, ..., Modulus - 1}. Ist z.B. a der erste
         // Buchstabe des Alphabets, wird die gelesene 97 auf 0 abgebildet:
         // mapChar(97) = 0.
         character = charMap.mapChar(character);
-        if (i<11) System.out.print(">>>remapped to: "+character);
+        if (DEBUG && i<11) { System.out.print(" -->>>remapped to: "+character); }
         if (character != -1) {
           // Das gelesene Zeichen ist im benutzten Alphabet enthalten und konnte
           // abgebildet werden. Die folgende Quellcode-Zeile stellt den Kern der
           // Caesar-Chiffrierung dar: Addiere zu (der internen Darstellung von)
           // 'character' zyklisch den 'shift' hinzu.
           character = (character - shifts[counter] + modulus) % modulus;
-          if (i<11) System.out.print(">>>deciphered to: "+character);
+          if (DEBUG && i<11) { System.out.print(" -->>>deciphered to: "+character); }
           // Das nun chiffrierte Zeichen wird von der internen Darstellung in
           // die Dateikodierung konvertiert. Ist z.B. 1 das Ergebnis der
           // Verschlüsselung (also die interne Darstellung für b), so wird dies
           // konvertiert zu 98: remapChar(1) = 98. Der Wert 98 wird schließlich
           // in die Chiffretextdatei geschrieben.
           character = charMap.remapChar(character);
-          if (i<11) System.out.println(">>>remapped to: "+(char)character);
+          if (DEBUG && i<11) { System.out.println(" -->>>remapped to: "+(char)character); }
           cleartext.write(character);
           i++;
         } else {
           // Das gelesene Zeichen ist im benutzten Alphabet nicht enthalten.
           characterSkipped = true;
-          System.out.println(">>>ooops not found");
+          if(DEBUG) { System.out.println(">>>ooops not found"); }
         }
         counter=(counter+1)%(keylength+1);
         if(counter==0) counter=1;
       }
-      System.out.println("\n>>>Ich bin decipher und habe alles gelesen!");
+      if(DEBUG) { System.out.println("\n>>>Ich bin decipher und habe alles gelesen!"); }
       if (characterSkipped) {
         System.out.println("Warnung: Mindestens ein Zeichen aus der "
             + "Klartextdatei ist im Alphabet nicht\nenthalten und wurde "
