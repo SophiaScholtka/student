@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Vector;
 
 import de.tubs.cs.iti.jcrypt.chiffre.CharacterMapping;
 import de.tubs.cs.iti.jcrypt.chiffre.Cipher;
@@ -60,13 +59,10 @@ public class Vigenere extends Cipher {
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
 	  String msg;
 	  int modu2 = modulus;
-	  //TODOL This values need to be read in later
 	  String cipher;
 	  String alph = "generatedAlphabet.alph";
-	  String textfile = "programmierer_enc.txt";
-	  int minN = 1;
-	  int maxN = 4;
-	  int maxResults = 5;
+	  String textfile = launcher.getCiphertextFile().toString(); 
+	  //"programmierer_enc.txt";
 	  
 	  //TEST
 	  //BufferedReader testIn = readFromFile("test.txt");
@@ -129,8 +125,8 @@ public class Vigenere extends Cipher {
 		      }
 		  } while(!accepted);
 	//Modulus ist nun festgelegt, jetzt machen wir Häufigkeitstabellen:
-		  
-	  createFrequencyTables(charMap,textfile,minN,maxN,maxResults,"generated");
+	  createFrequencyTables(charMap, textfile, 1,1,modulus,"");  
+	  createFrequencyTables(charMap,textfile,2,4,5,"generated");
 	  
 	  msg="Möchten Sie Di-, Tri- oder 4-gramme analysieren? Bitte geben Sie 2, 3 oder 4 ein: ";
 	  System.out.println(msg);
@@ -152,7 +148,7 @@ public class Vigenere extends Cipher {
 	  //mögliche Perioden in HashMap speichern, häufigste 5 finden, landen in peri[]
 	  HashMap<Integer, Integer> quantities = new HashMap<Integer, Integer>();
 	  int max=1;
-	  for(int i=0; i<maxResults;i++){
+	  for(int i=0; i<5;i++){
 		int[] periods = calcPossiblePeriod(cipher, table[i][0]);
 		for(int j=0;j<periods.length;j++){
 			if (!quantities.containsKey(periods[j])){
@@ -209,11 +205,11 @@ public class Vigenere extends Cipher {
 	  try{
 		  period = Integer.parseInt(standardInput.readLine());
 	  } catch (NumberFormatException e){
-		  System.out.println("Fehler beim Parsen. Verwende "+peri[0]);
-		  period = peri[0];
+		  System.out.println("Fehler beim Parsen. Verwende "+peri[1]);
+		  period = peri[1];
 	  } catch (IOException e) {
-	      System.out.println("Fehler beim Parsen. Verwende "+peri[0]);
-	      period = peri[0];
+	      System.out.println("Fehler beim Parsen. Verwende "+peri[1]);
+	      period = peri[1];
       }
 	  
 	  //Periode also keylength ist geraten, jetzt können wir beginnen, shifts zu füllen
@@ -222,11 +218,11 @@ public class Vigenere extends Cipher {
 	  //System.out.println(">>>a modulus: " + modulus);
 	  shifts[0]=modu2;
 	  
-	  char[] passwort = new char[period];
+	  char[][] passwort = new char[period][2];
 	  for(int i=0;i<period;i++){
 		  passwort[i]=mostFreqChar(getSubtext(cipher,period,i));
-		  System.out.println("Der häufigste Buchstabe im " + (i+1) 
-				  + "ten Chiffreblock ist " + passwort[i]);
+		  System.out.println("Die häufigsten Buchstaben im " + (i+1) 
+				  + "ten Chiffreblock sind " + passwort[i][0] + " und " + passwort[i][1]);
 	  }
 	  
 	  accepted = false;
@@ -242,7 +238,7 @@ public class Vigenere extends Cipher {
 			  if (pass.length()==period){
 				  char[] zuord = pass.toCharArray();
 				  for(int i=0;i<pass.length();i++){
-					  shifts[i+1]=(zuord[i] - passwort[i] + modu2)%modu2;
+					  shifts[i+1]=(charMap.mapChar(zuord[i]) - charMap.mapChar(passwort[i][0]) + modu2)%modu2;
 				  }
 				  String sTmp = ""+modu2+"\n"+period;
 				  keylength=period;
@@ -286,12 +282,22 @@ public class Vigenere extends Cipher {
 	}
   }
 
-  private char mostFreqChar(String subtext){
-      int character;
+  private char[] mostFreqChar(String subtext){
+	  //System.out.println(">>>Ich bin mostFreqChar");
+      char[] most=new char[2];
+      writeToFile("ictext.txt",subtext);
+      //System.out.println(">>>ictext neu geschrieben");
+	  createFrequencyTables(charMap, "ictext.txt", 1, 1, 2,"ic");
+	  //System.out.println(">>>ic1-grams neu geschrieben");
+	  String[][] table = readFrequencyTable("ic" + "1" + "-grams.alph.tab");
+	  //System.out.println(">>>tabelle eingelesen "+ table[0][0]+table[1][0]);
+      most[0]=table[0][0].charAt(0);
+      most[1]=table[1][0].charAt(0);
+      //System.out.println(">>>in char umgewandelt"+most.toString());
+/*      int character;
       HashMap<Integer, Integer> quantities = new HashMap<Integer, Integer>();
       for (int i=0;i<subtext.length();i++) {
     	character = subtext.charAt(i);
-        character = charMap.mapChar(character);
         if (quantities.containsKey(character)) {
           quantities.put(character, quantities.get(character) + 1);
         } else {
@@ -310,8 +316,8 @@ public class Vigenere extends Cipher {
           greatest = currValue;
           mostFrequented = currKey;
         }
-      }
-      return (char) charMap.remapChar(mostFrequented);
+      }*/
+      return most;
   }
   
   private double getSubtextCoincidenceIndex(String cipher, int period) {
@@ -322,7 +328,7 @@ public class Vigenere extends Cipher {
 	  for(int i=0;i<period;i++){
 		subtext[i] = getSubtext(cipher,period,i);
 		dummy=calcCoincidenceIndex(subtext[i]);
-		if(dummy==-1.0){
+		if(dummy!=-1.0){
 			CI+=dummy;
 			p++;
 		}
@@ -332,13 +338,13 @@ public class Vigenere extends Cipher {
 	}
   
   private String getSubtext(String cipher, int period, int offset){
-	StringBuffer subtext = new StringBuffer("");
+	String subtext = "";
 	while (offset<cipher.length()){
-		subtext.append(cipher.charAt(offset));
+		subtext=subtext+cipher.charAt(offset);
 		offset=offset+period;
 	}
-	//System.out.println(">>>"+subtext.toString());
-	return subtext.toString();
+	//System.out.println(">>>"+subtext);
+	return subtext;
   }
 
 /**
@@ -759,18 +765,24 @@ public class Vigenere extends Cipher {
 	  writeToFile("ictext.txt",text);
 	  createFrequencyTables(charMap, "ictext.txt", 1, 1, modulus,"ic");
 	  String[][] table = readFrequencyTable("ic" + "1" + "-grams.alph.tab");
-	  if(table!=null){
+	  String[][] table2 = readFrequencyTable("1-grams.alph.tab");
+	  if(table!=null && table2!=null){
 		  int n = table.length;
+		  int m = table2.length;
 		  double IC = 0;
+		  double psquared = 0;
+		  for(int i=0;i<m;i++){
+			  psquared=psquared+Double.parseDouble(table2[i][1])*Double.parseDouble(table2[i][1])/10000;
+		  }
 		  for(int i=0;i<n;i++){
-			  IC=IC+Double.parseDouble(table[i][1])*N*(Double.parseDouble(table[i][1])*N-1);
+			  IC=IC+Double.parseDouble(table[i][1])/100*N*(Double.parseDouble(table[i][1])/100*N-1);
 		  }
 		  IC=IC/(N*(N-1));
-		  d=(N*(IC-1.0/n))/((N-1)*IC-N/n+IC);
+		  //System.out.print(">>>p² "+psquared+"\t");
+		  //System.out.print(">>>IC "+IC+"\t");
+		  d=(N*(psquared-1.0/n))/((N-1)*IC-N/n+psquared);
 	  }
-	  //System.out.println(">>>d"+d);
-	  //IC=IC/(N*(N-1));
-	  //d=(N*(IC-1.0/n))/((N-1)*IC-N/n+IC);
+	  //System.out.println(">>>d "+d);
 	return d;
   }
   
