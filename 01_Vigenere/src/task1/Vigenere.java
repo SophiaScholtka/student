@@ -286,7 +286,7 @@ public class Vigenere extends Cipher {
 				  //key.close();
 				  //modulus = modu2;
 				  decipher(readFromFile(textfile), new BufferedWriter(new FileWriter(launcher.getCleartextFile())));
-				  if(DEBUG) {System.out.println(">>>breakCipher nach decipher shifts: " + Arrays.toString(shifts));};
+//				  if(DEBUG) {System.out.println(">>>breakCipher nach decipher shifts: " + Arrays.toString(shifts));};
 				  msg="Bitte überprüfen Sie die entschlüsselte Ausgabe:";
 				  System.out.println(msg);
 				  //Prints the first symbols of the broken text
@@ -346,13 +346,16 @@ public class Vigenere extends Cipher {
   }
 
   private char[] mostFreqChar(String subtext){
+	  if(DEBUG) { System.out.println(">>>>mostFreqChar called"); }
 	  //System.out.println(">>>Ich bin mostFreqChar");
       char[] most=new char[2];
       writeToFile("ictext.txt",subtext);
       //System.out.println(">>>ictext neu geschrieben");
-	  createFrequencyTables(charMap, "ictext.txt", 1, 1, 2,"ic");
+      String praefix = "ic" + System.nanoTime() + "-";
+      writeToFile(praefix + "Alph.alph",charMap.toString());
+	  createFrequencyTables(charMap, "ictext.txt", 1, 1, 5,praefix);
 	  //System.out.println(">>>ic1-grams neu geschrieben");
-	  String[][] table = readFrequencyTable("ic" + "1" + "-grams.alph.tab");
+	  String[][] table = readFrequencyTable(praefix +  "1" + "-grams.alph.tab");
 	  //System.out.println(">>>tabelle eingelesen "+ table[0][0]+table[1][0]);
       most[0]=table[0][0].charAt(0);
       most[1]=table[1][0].charAt(0);
@@ -430,14 +433,14 @@ public class Vigenere extends Cipher {
     // charMap.setConvertToLowerCase();
     // charMap.setConvertToUpperCase();
 
-	if(DEBUG) {
-		try {
-			System.out.println(">>>decipher test BufferedReader: L423 " + ciphertext.ready() );
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			System.out.println(">>>decipher BufferedReader für ciphertext tot?!");
-		}		
-	}
+//	if(DEBUG) {
+//		try {
+//			System.out.println(">>>decipher test BufferedReader: L423 " + ciphertext.ready() );
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//			System.out.println(">>>decipher BufferedReader für ciphertext tot?!");
+//		}		
+//	}
 	
     try {
       // 'character' ist die Integer-Repräsentation eines Zeichens.
@@ -450,38 +453,38 @@ public class Vigenere extends Cipher {
       int counter=1;
       int i=0;
 
-	if(DEBUG) {
-		try {
-			System.out.println(">>>decipher test BufferedReader: L442 " + ciphertext.ready() );
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			System.out.println(">>>decipher BufferedReader für ciphertext tot L445");
-		}		
-	}
+//	if(DEBUG) {
+//		try {
+//			System.out.println(">>>decipher test BufferedReader: L442 " + ciphertext.ready() );
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//			System.out.println(">>>decipher BufferedReader für ciphertext tot L445");
+//		}		
+//	}
       while ((character = ciphertext.read()) != -1) {
-    	if (DEBUG && i<11) { System.out.print(">>>"+(char)character); }
+//    	if (DEBUG && i<11) { System.out.print(">>>"+(char)character); }
         // Bilde 'character' auf dessen interne Darstellung ab, d.h. auf einen
         // Wert der Menge {0, 1, ..., Modulus - 1}. Ist z.B. a der erste
         // Buchstabe des Alphabets, wird die gelesene 97 auf 0 abgebildet:
         // mapChar(97) = 0.
         character = charMap.mapChar(character);
-        if (DEBUG && i<11) { System.out.print("\t -->>>mapped to: "+character); }
+//        if (DEBUG && i<11) { System.out.print("\t -->>>mapped to: "+character); }
         if (character != -1) {
           // Das gelesene Zeichen ist im benutzten Alphabet enthalten und konnte
           // abgebildet werden. Die folgende Quellcode-Zeile stellt den Kern der
           // Caesar-Chiffrierung dar: Addiere zu (der internen Darstellung von)
           // 'character' zyklisch den 'shift' hinzu.
           character = (character - shifts[counter] + modulus) % modulus;
-          if (DEBUG && i<11) { System.out.print("\t -->>>deciphered to: "+character); }
+//          if (DEBUG && i<11) { System.out.print("\t -->>>deciphered to: "+character); }
           // Das nun chiffrierte Zeichen wird von der internen Darstellung in
           // die Dateikodierung konvertiert. Ist z.B. 1 das Ergebnis der
           // Verschlüsselung (also die interne Darstellung für b), so wird dies
           // konvertiert zu 98: remapChar(1) = 98. Der Wert 98 wird schließlich
           // in die Chiffretextdatei geschrieben.
           character = charMap.remapChar(character);
-          if (DEBUG && i<11) { System.out.print("\t -->>>remapped to: "+(char)character); }
-          if (DEBUG && i<11) { System.out.print("\t -->>> with shift: " +shifts[counter]); }
-          if (DEBUG && i<11) { System.out.println("\t -->>> with modulus: " +modulus); }
+//          if (DEBUG && i<11) { System.out.print("\t -->>>remapped to: "+(char)character); }
+//          if (DEBUG && i<11) { System.out.print("\t -->>> with shift: " +shifts[counter]); }
+//          if (DEBUG && i<11) { System.out.println("\t -->>> with modulus: " +modulus); }
           cleartext.write(character);
           i++;
         } else {
@@ -492,14 +495,14 @@ public class Vigenere extends Cipher {
         counter=(counter+1)%(keylength+1);
         if(counter==0) counter=1;
       }
-  	if(DEBUG) {
-		try {
-			System.out.println(">>>decipher test BufferedReader: L484 " + ciphertext.ready() );
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			System.out.println(">>>decipher BufferedReader für ciphertext tot L487");
-		}		
-	}
+//  	if(DEBUG) {
+//		try {
+//			System.out.println(">>>decipher test BufferedReader: L484 " + ciphertext.ready() );
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//			System.out.println(">>>decipher BufferedReader für ciphertext tot L487");
+//		}		
+//	}
       if(DEBUG) { System.out.println("\n>>>Ich bin decipher und habe alles gelesen!"); }
       if (characterSkipped) {
         System.out.println("Warnung: Mindestens ein Zeichen aus der "
@@ -520,7 +523,7 @@ public class Vigenere extends Cipher {
       System.exit(1);
     }
         
-    if(DEBUG) { System.out.println(">>>decipher finished shifts:" + Arrays.toString(shifts)); }
+//    if(DEBUG) { System.out.println(">>>decipher finished shifts:" + Arrays.toString(shifts)); }
   }
 
   /**
