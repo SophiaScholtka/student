@@ -261,10 +261,10 @@ public class Vigenere extends Cipher {
 				  char[] zuord = pass.toCharArray();
 				  for(int i=0;i<pass.length();i++){
 					  //Cipher-Klar=Key; Klar+Key=Cipher; Cipher-Key=Klar
-					  shifts[i+1]=(charMap.mapChar(passwort[i][0]) - charMap.mapChar(zuord[i]))%modu2;
-					  if(shifts[i+1] <0) {
-						  shifts[i+1] = modu2 + shifts[i+1];
-					  }
+					  shifts[i+1]=(charMap.mapChar(passwort[i][0]) - charMap.mapChar(zuord[i]) + modu2)%modu2;
+//					  if(shifts[i+1] <0) {
+//						  shifts[i+1] = modu2 + shifts[i+1];
+//					  }
 					  if(DEBUG) { 
 						  System.out.print(">>>breakCipher Verschiebung eingegeben: " + shifts[i+1] + "\t");
 						  System.out.print(charMap.mapChar(passwort[i][0]) + "\t");
@@ -423,6 +423,8 @@ public class Vigenere extends Cipher {
   public void decipher(BufferedReader ciphertext, BufferedWriter cleartext) {
 	  if(DEBUG) { System.out.println(">>>decipher called"); }
       if(DEBUG) System.out.println(">>>decipher used Alphabet: " + charMap.getAlphabetFile());
+
+	  writeToFile("symbols-dec.txt", charMap.toString());
     // An dieser Stelle könnte man alle Zeichen, die aus der Klartextdatei
     // gelesen werden, in Klein- bzw. Großbuchstaben umwandeln lassen:
     // charMap.setConvertToLowerCase();
@@ -438,10 +440,6 @@ public class Vigenere extends Cipher {
 	}
 	
     try {
-
-    	if(!ciphertext.ready()) {
-    		ciphertext.reset();
-    	}
       // 'character' ist die Integer-Repräsentation eines Zeichens.
       int character;
       // 'characterSkipped' zeigt an, daß ein aus der Klartextdatei gelesenes
@@ -453,7 +451,6 @@ public class Vigenere extends Cipher {
       int i=0;
 
 	if(DEBUG) {
-		//von Zeile L442 - L484 wird irgendwo BufferedReader getötet oder so...
 		try {
 			System.out.println(">>>decipher test BufferedReader: L442 " + ciphertext.ready() );
 		} catch (IOException e1) {
@@ -541,6 +538,9 @@ public class Vigenere extends Cipher {
     // gelesen werden, in Klein- bzw. Großbuchstaben umwandeln lassen:
     // charMap.setConvertToLowerCase();
     // charMap.setConvertToUpperCase();
+	  
+
+	  writeToFile("symbols-enc.txt", charMap.toString());
 
     try {
       // 'character' ist die Integer-Repräsentation eines Zeichens.
