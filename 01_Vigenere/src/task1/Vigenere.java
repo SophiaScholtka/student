@@ -62,11 +62,17 @@ public class Vigenere extends Cipher {
    */
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
 	  if(DEBUG) System.out.println(">>>breakCipher called");
+
+	  //safe buffered ciphertext to file
+	  writeToFile("read-cipher.txt", bufferedReaderToString(ciphertext));
+	  ciphertext = readFromFile("read-cipher.txt");
+	  
 	  String msg;
 	  int modu2 = modulus;
 	  String cipher;
 	  String alph = "generatedAlphabet.alph";
 	  String textfile = launcher.getCiphertextFile().toString(); 
+	  String textfile2 = launcher.getCleartextFile().toString();
 	  //"programmierer_enc.txt";
 	  
 	  //TEST
@@ -276,7 +282,7 @@ public class Vigenere extends Cipher {
 				  readKey(key);
 				  //key.close();
 				  //modulus = modu2;
-				  decipher(ciphertext, cleartext);
+				  decipher(readFromFile(textfile), new BufferedWriter(new FileWriter(launcher.getCleartextFile())));
 				  if(DEBUG) {System.out.println(">>>breakCipher nach decipher shifts: " + Arrays.toString(shifts));};
 				  msg="Bitte überprüfen Sie die entschlüsselte Ausgabe:";
 				  System.out.println(msg);
@@ -426,7 +432,12 @@ public class Vigenere extends Cipher {
 			System.out.println(">>>decipher BufferedReader für ciphertext tot?!");
 		}		
 	}
+	
     try {
+
+    	if(!ciphertext.ready()) {
+    		ciphertext.reset();
+    	}
       // 'character' ist die Integer-Repräsentation eines Zeichens.
       int character;
       // 'characterSkipped' zeigt an, daß ein aus der Klartextdatei gelesenes
