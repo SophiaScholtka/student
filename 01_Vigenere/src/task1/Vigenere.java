@@ -261,7 +261,10 @@ public class Vigenere extends Cipher {
 				  char[] zuord = pass.toCharArray();
 				  for(int i=0;i<pass.length();i++){
 					  //Cipher-Klar=Key; Klar+Key=Cipher; Cipher-Key=Klar
-					  shifts[i+1]=(charMap.mapChar(passwort[i][0]) - charMap.mapChar(zuord[i]) + modu2)%modu2;
+					  shifts[i+1]=(charMap.mapChar(passwort[i][0]) - charMap.mapChar(zuord[i]))%modu2;
+					  if(shifts[i+1] <0) {
+						  shifts[i+1] = modu2 + shifts[i+1];
+					  }
 					  if(DEBUG) { 
 						  System.out.print(">>>breakCipher Verschiebung eingegeben: " + shifts[i+1] + "\t");
 						  System.out.print(charMap.mapChar(passwort[i][0]) + "\t");
@@ -419,6 +422,7 @@ public class Vigenere extends Cipher {
    */
   public void decipher(BufferedReader ciphertext, BufferedWriter cleartext) {
 	  if(DEBUG) { System.out.println(">>>decipher called"); }
+      if(DEBUG) System.out.println(">>>decipher used Alphabet: " + charMap.getAlphabetFile());
     // An dieser Stelle könnte man alle Zeichen, die aus der Klartextdatei
     // gelesen werden, in Klein- bzw. Großbuchstaben umwandeln lassen:
     // charMap.setConvertToLowerCase();
@@ -486,7 +490,7 @@ public class Vigenere extends Cipher {
         } else {
           // Das gelesene Zeichen ist im benutzten Alphabet nicht enthalten.
           characterSkipped = true;
-          if(DEBUG) { System.out.println(">>>ooops not found"); }
+          //if(DEBUG) { System.out.println(">>>ooops not found"); }
         }
         counter=(counter+1)%(keylength+1);
         if(counter==0) counter=1;
@@ -547,6 +551,7 @@ public class Vigenere extends Cipher {
       // Lese zeichenweise aus der Klartextdatei, bis das Dateiende erreicht
       // ist. Der Buchstabe a wird z.B. als ein Wert von 97 gelesen.
       int counter=1;
+      //if(DEBUG) System.out.println(">>>encipher used Alphabet: " + charMap.getAlphabetFile().getName());
       while ((character = cleartext.read()) != -1) {
         // Bilde 'character' auf dessen interne Darstellung ab, d.h. auf einen
         // Wert der Menge {0, 1, ..., Modulus - 1}. Ist z.B. a der erste
