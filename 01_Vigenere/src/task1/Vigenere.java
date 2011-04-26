@@ -593,12 +593,12 @@ public class Vigenere extends Cipher {
           // in die Chiffretextdatei geschrieben.
           character = charMap.remapChar(character);
           ciphertext.write(character);
+          counter=(counter+1)%(keylength+1);
+          if(counter==0) counter=1;
         } else {
           // Das gelesene Zeichen ist im benutzten Alphabet nicht enthalten.
           characterSkipped = true;
         }
-        counter=(counter+1)%(keylength+1);
-        if(counter==0) counter=1;
       }
       if (characterSkipped) {
         System.out.println("Warnung: Mindestens ein Zeichen aus der "
