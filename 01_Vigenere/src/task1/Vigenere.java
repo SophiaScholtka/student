@@ -83,8 +83,8 @@ public class Vigenere extends Cipher {
 //	  }
 
 	  //safe buffered ciphertext to file
-	  writeToFile("read-cipher.txt", bufferedReaderToString(ciphertext));
-	  ciphertext = readFromFile("read-cipher.txt");
+	  //writeToFile("read-cipher.txt", bufferedReaderToString(ciphertext));
+	  //ciphertext = readFromFile("read-cipher.txt");
 	  
 	  String msg;
 	  int modu2 = modulus;
@@ -349,7 +349,6 @@ public class Vigenere extends Cipher {
 	  String sRFF = bufferedReaderToString(rff);
 	  sRFF = sRFF.substring(0, shifts.length-1);
 	  String guessedPass = "";
-	  //TODO calculate guessed password
 	  for(int i = 1;i<shifts.length;i++) {
 		  int rmc = charMap.remapChar(shifts[i]);
 		  String srmc = String.valueOf((char)rmc);
@@ -872,7 +871,6 @@ public class Vigenere extends Cipher {
 				table[i][2]=help[i][2];
 				//System.out.println(help[i][0] + " " + help[i][1] + " " + help[i][2]);
 			}
-		//TODO warum nicht file.close();?
 		file.close();
 		return table;
 	  } catch (IOException e2) {
@@ -999,7 +997,7 @@ public class Vigenere extends Cipher {
 		  IC=IC/(N*(N-1));
 		  //System.out.print(">>>p² "+psquared+"\t");
 		  //System.out.print(">>>IC "+IC+"\t");
-		  d=(N*(psquared-1.0/n))/((N-1)*IC-N/n+psquared);
+		  d=(N*(psquared-1.0/n))/((N-1.0)*IC-N/n+psquared);
 	  }
 	  //System.out.println(">>>d "+d);
 	return d;
