@@ -62,6 +62,25 @@ public class Vigenere extends Cipher {
    */
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
 	  if(DEBUG) System.out.println(">>>breakCipher called");
+	  
+//	  //Test IC
+//	  if(DEBUG) {
+//		String sTmp = "abadeffhaj";
+//		System.out.print(">>>> String: " + sTmp);
+//		System.out.print("\t Länge: " + sTmp.length());
+//		System.out.print("\t oldIC: " + calcCoincidenceIndex(sTmp));
+//		System.out.print("\t IC: " + calcIC(sTmp));
+//		System.out.print("\t approx p: " + calcPeriod(calcIC(sTmp), sTmp));
+//		System.out.println();
+//		System.exit(0);
+//	  }
+	  
+//	  //Test writeToFile
+//	  if(DEBUG) {
+//		  writeToFile("test.txt", "blah2");
+//		  writeToFile("test.txt", "blah3");
+//		  System.exit(0);
+//	  }
 
 	  //safe buffered ciphertext to file
 	  writeToFile("read-cipher.txt", bufferedReaderToString(ciphertext));
@@ -349,11 +368,11 @@ public class Vigenere extends Cipher {
 	  if(DEBUG) { System.out.println(">>>>mostFreqChar called"); }
 	  //System.out.println(">>>Ich bin mostFreqChar");
       char[] most=new char[2];
-      writeToFile("ictext.txt",subtext);
+      writeToFile("ictextMostFreqChar.txt",subtext);
       //System.out.println(">>>ictext neu geschrieben");
       String praefix = "ic" + System.nanoTime() + "-";
       writeToFile(praefix + "Alph.alph",charMap.toString());
-	  createFrequencyTables(charMap, "ictext.txt", 1, 1, 5,praefix);
+	  createFrequencyTables(charMap, "ictextMostFreqChar.txt", 1, 1, 5,praefix);
 	  //System.out.println(">>>ic1-grams neu geschrieben");
 	  String[][] table = readFrequencyTable(praefix +  "1" + "-grams.alph.tab");
 	  //System.out.println(">>>tabelle eingelesen "+ table[0][0]+table[1][0]);
@@ -862,11 +881,98 @@ public class Vigenere extends Cipher {
 	  return null;
   }
   
-  private double calcCoincidenceIndex(BufferedReader ciphertext) {
+  private double calcIC(BufferedReader ciphertext) {
 	  double back = -1.0;
 	  String text = bufferedReaderToString(ciphertext);
-	  back = calcCoincidenceIndex(text);
+	  back = calcIC(text);
 	return back;
+  }
+  
+  private String[][] getAbsoluteFrequency(String text) {
+	//if(DEBUG) { System.out.println(">>>getAbsoluteFrequency called"); }
+	String[][] back;  
+	ArrayList<String> foundSymbols = new ArrayList<String>();
+	String sTmp = "";
+	
+	//Symbole suchen
+	for(int i = 0;i<text.length();i++) {
+		if(!foundSymbols.contains(String.valueOf(text.charAt(i)))) {
+			sTmp = "" + String.valueOf(text.charAt(i));
+			foundSymbols.add(sTmp);
+		}
+	}
+	//if(DEBUG) System.out.println(">>>> " + foundSymbols.toString());
+	
+	//Symbole zählen
+	ArrayList<Integer> countSymbols = new ArrayList<Integer>();
+	for(int i = 0;i<foundSymbols.size();i++) {
+		countSymbols.add(0); //erzeuge Zaehlerliste fuer Symbole
+	}
+	for(int i = 0;i<text.length();i++) {
+		int index = foundSymbols.indexOf(String.valueOf(text.charAt(i)));
+		int count = 0;
+		count = countSymbols.get(index);
+		countSymbols.set(index, count + 1);
+	}
+	//if(DEBUG) System.out.println(">>>> " + countSymbols.toString());
+	
+	//Erzeuge return statement
+	back = new String[foundSymbols.size()][2];
+	for(int i = 0;i<foundSymbols.size();i++) {
+		back[i][0] = foundSymbols.get(i);
+		back[i][1] = "" + countSymbols.get(i);
+		//if(DEBUG) System.out.print(">>>> " + Arrays.toString(back[i]) + " ; ");
+	}	
+	
+	return back;	  
+  }
+  /**
+   * Achtung, macht dummes Zeug - Periode ist immer 1.0, weil sich alles wegkürzt.
+   * @param ic
+   * @param text
+   * @return
+   * 
+   * @deprecated
+   */
+  private double calcPeriod(double ic,String text) {
+	  double back = -1.0; // approximierte Periodenlaenge
+	  
+	  String[][] sAbsoluteFreqency = getAbsoluteFrequency(text);
+	  double dN = text.length();
+	  double dn = sAbsoluteFreqency.length;
+	  
+	  back = (ic - 1.0 / dn) * dN;
+	  back = back / (((dN - 1.0) * ic) - (1.0/dn * dN) + ic);
+	  
+	  return back;
+  }
+  
+  private double calcIC(String text) {
+	  //if(DEBUG) System.out.println(">>>calcIC called");
+	  double ic = -1.0;
+	  
+	  //Hole absolute Häufigkeiten der Buchstaben.
+	  String[][] sAbsoluteFreqency = getAbsoluteFrequency(text);
+
+	  //Anzahl der einzelnen Buchstaben
+	  double iSum = 0;
+	  double[] iF = new double[sAbsoluteFreqency.length];
+	  for(int i = 0;i<sAbsoluteFreqency.length;i++) {
+		  iF[i] = Integer.parseInt(sAbsoluteFreqency[i][1]);
+	  }
+	  
+	  for(int i = 0;i<iF.length;i++) {
+		  iSum = iSum + iF[i] * (iF[i] - 1);
+	  }
+	  double iN = text.length();	//Laenge des Textes
+
+	  //if(DEBUG) System.out.println(">>>> iSum = " + iSum);
+	  //if(DEBUG) System.out.println(">>>> iN = " + iN);
+	  
+	  ic = iSum / (iN * (iN - 1.0));
+	  //if(DEBUG) System.out.println("IC = " + ic);
+	  
+	  return ic;
   }
   
   private double calcCoincidenceIndex(String text) {
@@ -883,6 +989,7 @@ public class Vigenere extends Cipher {
 		  int m = table2.length;
 		  double IC = 0;
 		  double psquared = 0;
+		  //SUM(p^2 - 1/n)
 		  for(int i=0;i<m;i++){
 			  psquared=psquared+Double.parseDouble(table2[i][1])*Double.parseDouble(table2[i][1])/10000;
 		  }
@@ -1000,7 +1107,8 @@ public class Vigenere extends Cipher {
   
   private void writeToFile(String filename,String text) {
 	  try {
-		  BufferedWriter out = new BufferedWriter(new FileWriter(filename));
+		  FileWriter writer = new FileWriter(filename);
+		  BufferedWriter out = new BufferedWriter(writer);
 		  out.write(text);
 		  out.close();
 	  } catch (IOException e){
