@@ -1057,7 +1057,7 @@ public class Vigenere extends Cipher {
 		}
   }
   
-  public int getGCD(int a, int b)
+  private int getGCD(int a, int b)
   {
 	 int Tmp;
 	 if(a<b) {
