@@ -81,6 +81,22 @@ public class Vigenere extends Cipher {
 //		  writeToFile("test.txt", "blah3");
 //		  System.exit(0);
 //	  }
+	  
+	  //Test getSubtext
+//	  if(DEBUG) {
+//		  String sTmp = bufferedReaderToString(readFromFile("test.txt"));
+//		  double dTmp = getSubtextCoincidenceIndex(sTmp, 10);
+//		  String sTmp2 = getSubtext(sTmp,10,0);
+//		  System.out.print("#### " + dTmp);
+//		  System.out.print("\t" + sTmp2);
+//		  System.out.println();
+//		  for (int i = 0; i < 11; i++) {
+//			sTmp2 = getSubtext(sTmp,10,i);
+//			System.out.println(i + " \t" + sTmp2);			
+//		  }
+//		  System.out.println();
+//		  System.exit(0);
+//	  }
 
 	  //safe buffered ciphertext to file
 	  //writeToFile("read-cipher.txt", bufferedReaderToString(ciphertext));
@@ -370,7 +386,7 @@ public class Vigenere extends Cipher {
       char[] most=new char[2];
       writeToFile("ictextMostFreqChar.txt",subtext);
       //System.out.println(">>>ictext neu geschrieben");
-      String praefix = "ic" + System.nanoTime() + "-";
+      String praefix = "ic-";
       writeToFile(praefix + "Alph.alph",charMap.toString());
 	  createFrequencyTables(charMap, "ictextMostFreqChar.txt", 1, 1, 5,praefix);
 	  //System.out.println(">>>ic1-grams neu geschrieben");
