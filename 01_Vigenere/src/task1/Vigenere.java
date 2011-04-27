@@ -63,47 +63,7 @@ public class Vigenere extends Cipher {
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
 	  if(DEBUG) System.out.println(">>>breakCipher called");
 	  
-//	  //Test IC
-//	  if(DEBUG) {
-//		String sTmp = "abadeffhaj";
-//		System.out.print(">>>> String: " + sTmp);
-//		System.out.print("\t Länge: " + sTmp.length());
-//		System.out.print("\t oldIC: " + calcCoincidenceIndex(sTmp));
-//		System.out.print("\t IC: " + calcIC(sTmp));
-//		System.out.print("\t approx p: " + calcPeriod(calcIC(sTmp), sTmp));
-//		System.out.println();
-//		System.exit(0);
-//	  }
-	  
-//	  //Test writeToFile
-//	  if(DEBUG) {
-//		  writeToFile("test.txt", "blah2");
-//		  writeToFile("test.txt", "blah3");
-//		  System.exit(0);
-//	  }
-	  
-	  //Test getSubtext
-//	  if(DEBUG) {
-//		  String sTmp = bufferedReaderToString(readFromFile("test.txt"));
-//		  double dTmp = getSubtextCoincidenceIndex(sTmp, 10);
-//		  String sTmp2 = getSubtext(sTmp,10,0);
-//		  System.out.print("#### " + dTmp);
-//		  System.out.print("\t" + sTmp2);
-//		  System.out.println();
-//		  for (int i = 0; i < 11; i++) {
-//			sTmp2 = getSubtext(sTmp,10,i);
-//			System.out.println(i + " \t" + sTmp2);			
-//		  }
-//		  System.out.println();
-//		  System.exit(0);
-//	  }
-
-//	  if(DEBUG){
-//		  String s = "\n";
-//		  System.out.println((int)'\n' + "" +  '\n' + "blah \t" + s);
-//		  System.out.println("blah");
-//		  System.exit(0);
-//	  }
+	  //if(DEBUG) callTest();
 	  
 	  //safe buffered ciphertext to file
 	  //writeToFile("read-cipher.txt", bufferedReaderToString(ciphertext));
@@ -1171,6 +1131,51 @@ private char[] mostFreqChar(ArrayList<Character> text){
 	  } catch (IOException e){
 		  e.printStackTrace();
 	  }
+  }
+  
+  private void callTest() {
+
+//	  //Test IC
+//	  if(DEBUG) {
+//		String sTmp = "abadeffhaj";
+//		System.out.print(">>>> String: " + sTmp);
+//		System.out.print("\t Länge: " + sTmp.length());
+//		System.out.print("\t oldIC: " + calcCoincidenceIndex(sTmp));
+//		System.out.print("\t IC: " + calcIC(sTmp));
+//		System.out.print("\t approx p: " + calcPeriod(calcIC(sTmp), sTmp));
+//		System.out.println();
+//		System.exit(0);
+//	  }
+	  
+//	  //Test writeToFile
+//	  if(DEBUG) {
+//		  writeToFile("test.txt", "blah2");
+//		  writeToFile("test.txt", "blah3");
+//		  System.exit(0);
+//	  }
+	  
+	  //Test getSubtext
+//	  if(DEBUG) {
+//		  String sTmp = bufferedReaderToString(readFromFile("test.txt"));
+//		  double dTmp = getSubtextCoincidenceIndex(sTmp, 10);
+//		  String sTmp2 = getSubtext(sTmp,10,0);
+//		  System.out.print("#### " + dTmp);
+//		  System.out.print("\t" + sTmp2);
+//		  System.out.println();
+//		  for (int i = 0; i < 11; i++) {
+//			sTmp2 = getSubtext(sTmp,10,i);
+//			System.out.println(i + " \t" + sTmp2);			
+//		  }
+//		  System.out.println();
+//		  System.exit(0);
+//	  }
+
+//	  if(DEBUG){
+//		  String s = "\n";
+//		  System.out.println((int)'\n' + "" +  '\n' + "blah \t" + s);
+//		  System.out.println("blah");
+//		  System.exit(0);
+//	  }
   }
 
 }
