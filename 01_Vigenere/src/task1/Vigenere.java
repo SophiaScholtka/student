@@ -98,6 +98,13 @@ public class Vigenere extends Cipher {
 //		  System.exit(0);
 //	  }
 
+//	  if(DEBUG){
+//		  String s = "\n";
+//		  System.out.println((int)'\n' + "" +  '\n' + "blah \t" + s);
+//		  System.out.println("blah");
+//		  System.exit(0);
+//	  }
+	  
 	  //safe buffered ciphertext to file
 	  //writeToFile("read-cipher.txt", bufferedReaderToString(ciphertext));
 	  //ciphertext = readFromFile("read-cipher.txt");
