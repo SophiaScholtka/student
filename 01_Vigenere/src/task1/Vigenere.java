@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import de.tubs.cs.iti.jcrypt.chiffre.CharacterMapping;
 import de.tubs.cs.iti.jcrypt.chiffre.Cipher;
@@ -162,7 +163,8 @@ public class Vigenere extends Cipher {
 	  HashMap<Integer, Integer> quantities = new HashMap<Integer, Integer>();
 	  int max=1;
 	  for(int i=0; i<5;i++){
-		int[] periods = calcPossiblePeriod(String.valueOf(cipher), table[i][0]);
+		//int[] periods = calcPossiblePeriod(String.valueOf(cipher), table[i][0]);
+		int[] periods = calcPossiblePeriod(cipher, table[i][0]);
 		for(int j=0;j<periods.length;j++){
 			if (!quantities.containsKey(periods[j])){
 				quantities.put(periods[j],1);
@@ -447,7 +449,7 @@ private char[] mostFreqChar(ArrayList<Character> text){
 	  if(DEBUG) { System.out.println(">>>decipher called"); }
       if(DEBUG) System.out.println(">>>decipher used Alphabet: " + charMap.getAlphabetFile());
 
-	  writeToFile("symbols-dec.txt", charMap.toString());
+	  //writeToFile("symbols-dec.txt", charMap.toString());
     // An dieser Stelle könnte man alle Zeichen, die aus der Klartextdatei
     // gelesen werden, in Klein- bzw. Großbuchstaben umwandeln lassen:
     // charMap.setConvertToLowerCase();
@@ -563,7 +565,7 @@ private char[] mostFreqChar(ArrayList<Character> text){
     // charMap.setConvertToUpperCase();
 	  
 
-	  writeToFile("symbols-enc.txt", charMap.toString());
+	  //writeToFile("symbols-enc.txt", charMap.toString());
 
     try {
       // 'character' ist die Integer-Repräsentation eines Zeichens.
@@ -984,7 +986,7 @@ private char[] mostFreqChar(ArrayList<Character> text){
 	  double N = (double) text.size();
 	  if (N==1.0||N==0.0) {return -1.0;}
 	  //System.out.println(">>>N"+N);
-	  if (DEBUG) System.out.println(">>>t is "+text);
+	  //if (DEBUG) System.out.println(">>>t is "+text);
 	  writeToFile("ictext.txt",text);
 	  createFrequencyTables(charMap, "ictext.txt", 1, 1, modulus,"ic");
 	  String[][] table = readFrequencyTable("ic" + "1" + "-grams.alph.tab");
@@ -1080,14 +1082,66 @@ private char[] mostFreqChar(ArrayList<Character> text){
      return a;
   }
   
-  private int[] calcPossiblePeriod(String text, String ngram) {
-	  //splitts text by the chosen ngram
-	  String[] subStrings = text.split(ngram);
+  private char[] convertListToCharArray(List<Character> list) {
+	  char[] back = new char[list.size()];
+	  
+	  for(int i = 0 ; i < back.length ; i++) {
+		  back[i] = list.get(i);
+	  }
+	  
+	  return back;
+  }
+  /**
+   * ngramme nicht enthalten.
+   * @param list
+   * @param ngram
+   * @return
+   */
+  private ArrayList< ArrayList<Character>> getSubLists(ArrayList<Character> list, String ngram) {	  //split old List by ngram into sublists
+	  ArrayList< ArrayList<Character>> subLists;
+	  subLists = new ArrayList< ArrayList< Character >>();
+	  
+	  ArrayList<Character> bufferList = new ArrayList<Character>();
+	  List<Character> bufferNGram;
+	  for(int i = 0 ; i < list.size() ; i++) {
+		  char c = list.get(i);
+		  bufferList.add(c);
+		  if(bufferList.size()>= ngram.length()) {		  
+			  int indexF = bufferList.size() - ngram.length();
+			  int indexT = bufferList.size();
+			  bufferNGram = bufferList.subList(indexF, indexT);
+			  char[] charArray = convertListToCharArray(bufferNGram);
+			  String check = String.valueOf(charArray);
+			  if(check.equals(ngram)) {
+				  //Trage den Teil vorm nGram als Sublist ein
+				  indexT = bufferList.size() - ngram.length();
+				  List<Character> tmpList = bufferList.subList(0,indexT);
+				  bufferList = new ArrayList<Character>();
+				  for(int j = 0; j<tmpList.size(); j++) {
+					  bufferList.add((Character)tmpList.get(j));
+				  }
+				  //Fuege neue subListe hinzu
+				  subLists.add(bufferList);
+				  
+				  //Vorbereitung der Variablen fuer naechste Runde
+				  bufferList = new ArrayList<Character>();
+			  }
+		  }
+	  }
+	  
+	  return subLists;
+  }
+  
+  private int[] calcPossiblePeriod(ArrayList<Character> list, String ngram) {
+
+	  //get sublists
+	  ArrayList< ArrayList<Character>> subLists;
+	  subLists = getSubLists(list,ngram);	 
+	  
 	  //gets periods between repeated ngram (first and last one are ignored)
-	  int[] subLengths = new int[subStrings.length];
-	  for(int i = 1; i<subStrings.length;i++) {
-		  subLengths[i] = subStrings[i].length() + ngram.length();
-		  //System.out.println(subLengths[i]);
+	  int[] subLengths = new int[subLists.size()];
+	  for(int i = 1; i<subLists.size();i++) {
+		  subLengths[i] = subLists.get(i).size() + ngram.length();
 	  }
 	  //gets ggt() of all periods
 	  int GCD[] = new int[subLengths.length-1];
@@ -1096,7 +1150,35 @@ private char[] mostFreqChar(ArrayList<Character> text){
 		  GCD[i] = getGCD(subLengths[i],subLengths[(i+1)%(subLengths.length-1)]);
 	  }
 	  GCD[0]=getGCD(GCD[subLengths.length-2],GCD[0]);
+
 	  return GCD;
+  }
+  
+  /**
+   * Out of order
+   * @param text
+   * @param ngram
+   * @return
+   * @deprecated
+   */
+  private int[] calcPossiblePeriod(String text, String ngram) {
+//	  //splitts text by the chosen ngram
+//	  String[] subStrings = text.split(ngram);
+//	  //gets periods between repeated ngram (first and last one are ignored)
+//	  int[] subLengths = new int[subStrings.length];
+//	  for(int i = 1; i<subStrings.length;i++) {
+//		  subLengths[i] = subStrings[i].length() + ngram.length();
+//		  //System.out.println(subLengths[i]);
+//	  }
+//	  //gets ggt() of all periods
+//	  int GCD[] = new int[subLengths.length-1];
+//	  GCD[0]=subLengths[subLengths.length-1];
+//	  for(int i = 1;i<subLengths.length-1;i++) {
+//		  GCD[i] = getGCD(subLengths[i],subLengths[(i+1)%(subLengths.length-1)]);
+//	  }
+//	  GCD[0]=getGCD(GCD[subLengths.length-2],GCD[0]);
+//	  return GCD;
+	  return null;
   }
   
   private BufferedReader readFromFile(String file) {
@@ -1135,6 +1217,17 @@ private char[] mostFreqChar(ArrayList<Character> text){
   
   private void callTest() {
 
+	  //Test ArraySubListkram
+	  if(DEBUG) {
+		ArrayList<Character> l = new ArrayList<Character>();
+		l.add('a');l.add('b');l.add('c');l.add('d');l.add('e');l.add('f');
+		System.out.println(l);
+		List<Character> l2 = l.subList(0, l.size() - 3);
+		System.out.println(l2);
+		System.out.println("Vigenere.callTest()");
+		System.exit(0);
+	  }	  
+	  
 //	  //Test IC
 //	  if(DEBUG) {
 //		String sTmp = "abadeffhaj";
