@@ -47,7 +47,7 @@ public class Vigenere extends Cipher {
 	
 	private boolean broken = true;
 	
-	private final boolean DEBUG = false;
+	private final boolean DEBUG = true;
 	
 	/**
    * Analysiert den durch den Reader <code>ciphertext</code> gegebenen
