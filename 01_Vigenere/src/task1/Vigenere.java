@@ -111,7 +111,7 @@ public class Vigenere extends Cipher {
 	  
 	  String msg;
 	  int modu2 = modulus;
-	  String cipher;
+	  ArrayList<Character> cipher;
 	  String alph = "generatedAlphabet.alph";
 	  String textfile = launcher.getCiphertextFile().toString(); 
 	  String textfile2 = launcher.getCleartextFile().toString();
@@ -393,7 +393,11 @@ public class Vigenere extends Cipher {
       char[] most=new char[2];
       writeToFile("ictextMostFreqChar.txt",subtext);
       //System.out.println(">>>ictext neu geschrieben");
+<<<<<<< HEAD
+      String praefix = "ic";
+=======
       String praefix = "ic-";
+>>>>>>> branch 'refs/heads/master' of https://github.com/SophiaScholtka/student.git
       writeToFile(praefix + "Alph.alph",charMap.toString());
 	  createFrequencyTables(charMap, "ictextMostFreqChar.txt", 1, 1, 5,praefix);
 	  //System.out.println(">>>ic1-grams neu geschrieben");
@@ -446,13 +450,27 @@ public class Vigenere extends Cipher {
 	}
   
   private String getSubtext(String cipher, int period, int offset){
-	String subtext = "";
+	char[] subtext = new char[cipher.length()/period+1];
+	int off = offset;
+	int i=0;
+	ArrayList<Character> newl = new ArrayList<Character>();
 	while (offset<cipher.length()){
-		subtext=subtext+cipher.charAt(offset);
+		if(cipher.charAt(offset) == 10 || cipher.charAt(offset) == 13) {
+			if(DEBUG) System.out.println(">>>Newline found!");
+			newl.add(cipher.charAt(offset));
+		}
+		subtext[i]=cipher.charAt(offset);
 		offset=offset+period;
+		i++;
 	}
-	//System.out.println(">>>"+subtext);
-	return subtext;
+	char[] newlA = new char[newl.size()];
+	for(int j = 0; j< newlA.length;j++) {
+		newlA[j] = newl.get(j);
+	}
+	if(DEBUG) writeToFile("subtext"+off+"-nwql.txt",String.valueOf(newlA));
+	if(DEBUG) writeToFile("subtext"+off+".txt",String.valueOf(subtext));
+	//if(DEBUG) System.out.println(">>>"+subtext);
+	return String.valueOf(subtext);
   }
 
 /**
@@ -595,15 +613,16 @@ public class Vigenere extends Cipher {
       boolean characterSkipped = false;
       // Lese zeichenweise aus der Klartextdatei, bis das Dateiende erreicht
       // ist. Der Buchstabe a wird z.B. als ein Wert von 97 gelesen.
-      int counter=1;
+      int counter=1, temp=0;
       //if(DEBUG) System.out.println(">>>encipher used Alphabet: " + charMap.getAlphabetFile().getName());
       while ((character = cleartext.read()) != -1) {
         // Bilde 'character' auf dessen interne Darstellung ab, d.h. auf einen
         // Wert der Menge {0, 1, ..., Modulus - 1}. Ist z.B. a der erste
         // Buchstabe des Alphabets, wird die gelesene 97 auf 0 abgebildet:
         // mapChar(97) = 0.
-        character = charMap.mapChar(character);
-        if (character != -1) {
+        //if (charMap.mapChar(character) != -1 && character !=10 && character !=13) {
+    	  if (charMap.mapChar(character) !=-1) {
+    	  character = charMap.mapChar(character);
           // Das gelesene Zeichen ist im benutzten Alphabet enthalten und konnte
           // abgebildet werden. Die folgende Quellcode-Zeile stellt den Kern der
           // Caesar-Chiffrierung dar: Addiere zu (der internen Darstellung von)
@@ -618,11 +637,14 @@ public class Vigenere extends Cipher {
           ciphertext.write(character);
           counter=(counter+1)%(keylength+1);
           if(counter==0) counter=1;
-        } else {
+//        } else if (character == 10 || character == 13){
+//        	temp++;
+      	} else {
           // Das gelesene Zeichen ist im benutzten Alphabet nicht enthalten.
           characterSkipped = true;
         }
       }
+      if (DEBUG) System.out.println(">>> newlines " +temp);
       if (characterSkipped) {
         System.out.println("Warnung: Mindestens ein Zeichen aus der "
             + "Klartextdatei ist im Alphabet nicht\nenthalten und wurde "
