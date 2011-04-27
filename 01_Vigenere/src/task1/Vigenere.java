@@ -271,7 +271,7 @@ public class Vigenere extends Cipher {
 	  		+ "n (" + charMap.mapChar((int)sArray[1].charAt(0)) + "), "
 	  		+ "i (" + charMap.mapChar((int)sArray[2].charAt(0)) + "), "
 	  		+ "* (" + charMap.mapChar((int)sArray[3].charAt(0)) + ") und "
-	  		+ "leerzeichen  (" + charMap.mapChar((int)sArray[3].charAt(0)) + ").\n"
+	  		+ "leerzeichen  (" + charMap.mapChar((int)sArray[4].charAt(0)) + ").\n"
 	  		+ "Für eine Übersicht der Zeichen ziehen Sie bitte die Datei symbols.txt zu rate.\n"
 	  		+ "Für einen neuen Versuch, geben Sie zu viele oder wenige Zeichen ein.";
 		  System.out.println(msg);
