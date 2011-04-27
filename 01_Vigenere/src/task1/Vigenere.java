@@ -255,7 +255,7 @@ public class Vigenere extends Cipher {
 	  		+ "n (" + charMap.mapChar((int)sArray[1].charAt(0)) + "), "
 	  		+ "i (" + charMap.mapChar((int)sArray[2].charAt(0)) + "), "
 	  		+ "* (" + charMap.mapChar((int)sArray[3].charAt(0)) + ") und "
-	  		+ "leerzeichen  (" + charMap.mapChar((int)sArray[4].charAt(0)) + ").\n"
+	  		+ "Leerzeichen (" + charMap.mapChar((int)sArray[4].charAt(0)) + ").\n"
 	  		+ "Für eine Übersicht der Zeichen ziehen Sie bitte die Datei symbols.txt zu rate.\n"
 	  		+ "Für einen neuen Versuch, geben Sie zu viele oder wenige Zeichen ein.";
 		  System.out.println(msg);
@@ -279,25 +279,25 @@ public class Vigenere extends Cipher {
 						  System.out.println();
 					  }
 				  }
-				  ArrayList<Character> sTmp = new ArrayList<Character>(); 
-				  sTmp.add((char) modu2);
-				  sTmp.add('\n');
-				  sTmp.add((char) period);
+				  
+				  //Schluessel speichern
+				  String sTmp = "" + modu2;
+				  sTmp += "\n";
+				  sTmp += period;
 				  keylength=period;
 				  for(int i = 1; i<shifts.length;i++) {
-					  sTmp.add('\n');
-					  sTmp.add((char) shifts[i]);
+					  sTmp += "\n" + shifts[i];
 				  }
 				  writeToFile("key_break.txt", sTmp);
+				  
+				  //Schluessel lesen zum Probe-Entschluesseln
 				  BufferedReader key = readFromFile("key_break.txt");
 				  readKey(key);
-				  //key.close();
-				  //modulus = modu2;
 				  decipher(readFromFile(textfile), new BufferedWriter(new FileWriter(launcher.getCleartextFile())));
-//				  if(DEBUG) {System.out.println(">>>breakCipher nach decipher shifts: " + Arrays.toString(shifts));};
+
+				  //Prints the first symbols of the broken text
 				  msg="Bitte überprüfen Sie die entschlüsselte Ausgabe:";
 				  System.out.println(msg);
-				  //Prints the first symbols of the broken text
 				  BufferedReader rff = readFromFile("cleartext_broken.txt");
 				  String sRFF = bufferedReaderToString(rff);
 				  System.out.println("Ausgabe (Auszug):  " + sRFF.substring(0, 20) + "[...]");
@@ -430,8 +430,10 @@ private char[] mostFreqChar(ArrayList<Character> text){
 		offset=offset+period;
 	}
 	
-	if(DEBUG) writeToFile("subtext"+off+".txt",String.valueOf(subtext));
-	//if(DEBUG) System.out.println(">>>"+subtext);
+	if(DEBUG) {
+		writeToFile("subtext"+off+".txt",subtext);
+	}
+	
 	return subtext;
   }
 
@@ -1204,6 +1206,7 @@ private char[] mostFreqChar(ArrayList<Character> text){
 		  e.printStackTrace();
 	  }
   }
+  
   private void writeToFile(String filename,String text) {
 	  try {
 		  FileWriter writer = new FileWriter(filename);
