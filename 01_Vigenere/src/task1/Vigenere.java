@@ -47,7 +47,7 @@ public class Vigenere extends Cipher {
 	
 	private boolean broken = true;
 	
-	private final boolean DEBUG = true;
+	private final boolean DEBUG = false;
 	
 	/**
    * Analysiert den durch den Reader <code>ciphertext</code> gegebenen
@@ -125,9 +125,9 @@ public class Vigenere extends Cipher {
 	  
 	  //Read text
 	  BufferedReader textInput = readFromFile(textfile);
-	  cipher = bufferedReaderToString(textInput);
+	  cipher = bufferedReaderToAL(textInput);
 	  
-	  generateAlphabet(cipher,alph);
+	  generateAlphabet(String.valueOf(cipher),alph);
 	  BufferedReader standardInput = launcher.openStandardInput();
 	  broken = false;
 	  do{
@@ -202,7 +202,7 @@ public class Vigenere extends Cipher {
 	  HashMap<Integer, Integer> quantities = new HashMap<Integer, Integer>();
 	  int max=1;
 	  for(int i=0; i<5;i++){
-		int[] periods = calcPossiblePeriod(cipher, table[i][0]);
+		int[] periods = calcPossiblePeriod(String.valueOf(cipher), table[i][0]);
 		for(int j=0;j<periods.length;j++){
 			if (!quantities.containsKey(periods[j])){
 				quantities.put(periods[j],1);
@@ -281,7 +281,6 @@ public class Vigenere extends Cipher {
 	  }
 	  
 	  accepted = false;
-	  writeToFile("symbols.txt", charMap.toString());
 	  String pass;
 	  String[] sArray = {"e","n","i","*"," "};
 	  //if(DEBUG) {System.out.println(">>>>breakCipher Passwortzuordnung raten");}
@@ -318,10 +317,14 @@ public class Vigenere extends Cipher {
 						  System.out.println();
 					  }
 				  }
-				  String sTmp = ""+modu2+"\n"+period;
+				  ArrayList<Character> sTmp = new ArrayList<Character>(); 
+				  sTmp.add((char) modu2);
+				  sTmp.add('\n');
+				  sTmp.add((char) period);
 				  keylength=period;
 				  for(int i = 1; i<shifts.length;i++) {
-					  sTmp = sTmp + "\n" + shifts[i];
+					  sTmp.add('\n');
+					  sTmp.add((char) shifts[i]);
 				  }
 				  writeToFile("key_break.txt", sTmp);
 				  BufferedReader key = readFromFile("key_break.txt");
@@ -387,17 +390,25 @@ public class Vigenere extends Cipher {
 	}
   }
 
-  private char[] mostFreqChar(String subtext){
+  private ArrayList<Character> bufferedReaderToAL(BufferedReader textInput) {
+	  ArrayList<Character> text= new ArrayList<Character>();
+	  try{
+			while (textInput.ready()){
+				text.add((char) textInput.read());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return text;
+	}
+
+private char[] mostFreqChar(ArrayList<Character> text){
 	  if(DEBUG) { System.out.println(">>>>mostFreqChar called"); }
 	  //System.out.println(">>>Ich bin mostFreqChar");
       char[] most=new char[2];
-      writeToFile("ictextMostFreqChar.txt",subtext);
+      writeToFile("ictextMostFreqChar.txt",text);
       //System.out.println(">>>ictext neu geschrieben");
-<<<<<<< HEAD
       String praefix = "ic";
-=======
-      String praefix = "ic-";
->>>>>>> branch 'refs/heads/master' of https://github.com/SophiaScholtka/student.git
       writeToFile(praefix + "Alph.alph",charMap.toString());
 	  createFrequencyTables(charMap, "ictextMostFreqChar.txt", 1, 1, 5,praefix);
 	  //System.out.println(">>>ic1-grams neu geschrieben");
@@ -432,14 +443,14 @@ public class Vigenere extends Cipher {
       return most;
   }
   
-  private double getSubtextCoincidenceIndex(String cipher, int period) {
-	  String[] subtext= new String[period];
+  private double getSubtextCoincidenceIndex(ArrayList<Character> cipher, int period) {
+	  ArrayList<Character> subtext;
 	  double CI = 0.0;
 	  int p=0;
 	  double dummy;
 	  for(int i=0;i<period;i++){
-		subtext[i] = getSubtext(cipher,period,i);
-		dummy=calcCoincidenceIndex(subtext[i]);
+		subtext = getSubtext(cipher,period,i);
+		dummy=calcCoincidenceIndex(subtext);
 		if(dummy!=-1.0){
 			CI+=dummy;
 			p++;
@@ -449,28 +460,17 @@ public class Vigenere extends Cipher {
 	  return CI/p;
 	}
   
-  private String getSubtext(String cipher, int period, int offset){
-	char[] subtext = new char[cipher.length()/period+1];
+  private ArrayList<Character> getSubtext(ArrayList<Character> cipher, int period, int offset){
+	ArrayList<Character> subtext = new ArrayList<Character>();
 	int off = offset;
-	int i=0;
-	ArrayList<Character> newl = new ArrayList<Character>();
-	while (offset<cipher.length()){
-		if(cipher.charAt(offset) == 10 || cipher.charAt(offset) == 13) {
-			if(DEBUG) System.out.println(">>>Newline found!");
-			newl.add(cipher.charAt(offset));
-		}
-		subtext[i]=cipher.charAt(offset);
+	while (offset<cipher.size()){
+		subtext.add(cipher.get(offset));
 		offset=offset+period;
-		i++;
 	}
-	char[] newlA = new char[newl.size()];
-	for(int j = 0; j< newlA.length;j++) {
-		newlA[j] = newl.get(j);
-	}
-	if(DEBUG) writeToFile("subtext"+off+"-nwql.txt",String.valueOf(newlA));
+	
 	if(DEBUG) writeToFile("subtext"+off+".txt",String.valueOf(subtext));
 	//if(DEBUG) System.out.println(">>>"+subtext);
-	return String.valueOf(subtext);
+	return subtext;
   }
 
 /**
@@ -1019,11 +1019,12 @@ public class Vigenere extends Cipher {
 	  return ic;
   }
   
-  private double calcCoincidenceIndex(String text) {
+  private double calcCoincidenceIndex(ArrayList<Character> text) {
 	  double d = -1.0;
-	  double N = (double) text.length();
+	  double N = (double) text.size();
 	  if (N==1.0||N==0.0) {return -1.0;}
 	  //System.out.println(">>>N"+N);
+	  if (DEBUG) System.out.println(">>>t is "+text);
 	  writeToFile("ictext.txt",text);
 	  createFrequencyTables(charMap, "ictext.txt", 1, 1, modulus,"ic");
 	  String[][] table = readFrequencyTable("ic" + "1" + "-grams.alph.tab");
@@ -1149,6 +1150,18 @@ public class Vigenere extends Cipher {
 	  return textInput;
   }
   
+  private void writeToFile(String filename,ArrayList<Character> text) {
+	  try {
+		  FileWriter writer = new FileWriter(filename);
+		  BufferedWriter out = new BufferedWriter(writer);
+		  for(int i=0;i<text.size();i++){
+			  out.append(text.get(i));
+	  		}
+		  out.close();
+	  } catch (IOException e){
+		  e.printStackTrace();
+	  }
+  }
   private void writeToFile(String filename,String text) {
 	  try {
 		  FileWriter writer = new FileWriter(filename);
