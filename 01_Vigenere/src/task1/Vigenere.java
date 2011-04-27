@@ -260,7 +260,7 @@ public class Vigenere extends Cipher {
 	  accepted = false;
 	  writeToFile("symbols.txt", charMap.toString());
 	  String pass;
-	  String[] sArray = {"e","n","i","*"};
+	  String[] sArray = {"e","n","i","*"," "};
 	  //if(DEBUG) {System.out.println(">>>>breakCipher Passwortzuordnung raten");}
 	  do {
 		  //if(DEBUG){System.out.println(">>>>breakCipher Passwortzuordnung raten (Loop)"); }
@@ -269,8 +269,9 @@ public class Vigenere extends Cipher {
 	  		+ "Wir empfehlen "
 	  		+ "e (" + charMap.mapChar((int)sArray[0].charAt(0)) + "), "
 	  		+ "n (" + charMap.mapChar((int)sArray[1].charAt(0)) + "), "
-	  		+ "i (" + charMap.mapChar((int)sArray[2].charAt(0)) + ") und "
-	  		+ "* (" + charMap.mapChar((int)sArray[3].charAt(0)) + ").\n"
+	  		+ "i (" + charMap.mapChar((int)sArray[2].charAt(0)) + "), "
+	  		+ "* (" + charMap.mapChar((int)sArray[3].charAt(0)) + ") und "
+	  		+ "leerzeichen  (" + charMap.mapChar((int)sArray[3].charAt(0)) + ").\n"
 	  		+ "Für eine Übersicht der Zeichen ziehen Sie bitte die Datei symbols.txt zu rate.\n"
 	  		+ "Für einen neuen Versuch, geben Sie zu viele oder wenige Zeichen ein.";
 		  System.out.println(msg);
