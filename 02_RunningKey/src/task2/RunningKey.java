@@ -11,6 +11,7 @@
 
 package task2;
 
+import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,7 +35,7 @@ public class RunningKey extends Cipher {
 	
 	final boolean DEBUG = true;
 	
-	int keyAlphLenght;
+	//int keyAlphLenght; //modulus
 	String keyFilePath;
 
   /**
@@ -89,7 +90,8 @@ public class RunningKey extends Cipher {
 	  if(keyChars.size() >= clearChars.size()) {
 		  doEncipher(keyChars,clearChars);
 	  } else {
-		  msg = "Schlüsseldatei ist zu klein! Verschlüsseln wird abgebrochen.";
+		  msg = "Schlüsseldatei ist zu klein! Verschlüsseln wird abgebrochen. " +
+		  		"Empfohlene Mindestlänge des Schlüssels ist " + clearChars.size();
 		  System.out.println(msg);
 	  }
   }
@@ -163,16 +165,18 @@ public class RunningKey extends Cipher {
     
     //Erzeuge key
     if(accepted) {
-    	String keySafed = "" + alphabetLength + " " + keypath;
-	    try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter("key.txt"));
-			bw.write("" + alphabetLength);
-			bw.write(" ");
-			bw.write(keypath);
-			bw.close();
+		try {
+			//Setze globale Variablen des Schlüssels
+			modulus = alphabetLength;
+			keyFilePath = keypath;
+			
+			//Speichere Key
+			BufferedWriter bw;
+			bw = new BufferedWriter(new FileWriter("key.txt"));
+			writeKey(bw);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}   
+		}
     } 
   }
 
@@ -198,8 +202,7 @@ public class RunningKey extends Cipher {
 				System.out.println();
 			}
 			if(sKey.length == 2) {
-				keyAlphLenght = Integer.parseInt(sKey[0]);
-				modulus = keyAlphLenght;
+				modulus = Integer.parseInt(sKey[0]);
 				keyFilePath = sKey[1];
 			} else {
 				System.out.println("!ACHTUNG! Key wurde falsch eingelesen.");
@@ -219,9 +222,21 @@ public class RunningKey extends Cipher {
    */
   public void writeKey(BufferedWriter key) {
 	  if(DEBUG) System.out.println(">>>writeKey called");
-
 	  
+	  try {
+		  key.write("" + modulus);
+		  key.write(" ");
+		  key.write(keyFilePath);
+		  //key.newLine();
+		  key.close();
+	  } catch (IOException e) {
+		  System.out.println("Abbruch: Fehler beim Schreiben oder Schließen der "
+	          + "Schlüsseldatei.");
+	      e.printStackTrace();
+	      System.exit(1);
+	  }
   }
+  
   /**
    * Für Tests
    */
