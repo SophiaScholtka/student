@@ -11,10 +11,8 @@
 
 package task2;
 
-import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -23,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import de.tubs.cs.iti.jcrypt.chiffre.CharacterMapping;
 import de.tubs.cs.iti.jcrypt.chiffre.Cipher;
 
 /**
@@ -316,23 +313,31 @@ public class RunningKey extends Cipher {
 		try {
 	      int character;
 	      boolean characterSkipped = false;
+	      boolean useNextKey = true;
 	      	      
 	      Iterator<Integer> keyIterator = keyChars.iterator();
 	      Iterator<Integer> clearIterator = clearChars.iterator();
 	      int shift = 0;
+	      int keyChar = 0;
 	      while(clearIterator.hasNext() && keyIterator.hasNext()) {
-	    	  shift     = keyIterator.next();
+	    	  if(useNextKey) {
+		    	  keyChar = keyIterator.next();	  
+	    	  }	    	  
+	    	  useNextKey = true;
+	    	  
+	    	  shift = keyChar;
 	    	  character = clearIterator.next();
 	    	  
 	    	  if (charMap.mapChar(character) !=-1) {
 		    	  character = charMap.mapChar(character);
-		    	  shift = charMap.mapChar(shift);
+		    	  shift = charMap.mapChar(shift);	
 		    	  
-		          character = (character + shift) % modulus;
+		          character = (character + shift + modulus) % modulus;
 		          character = charMap.remapChar(character);
 		          ciphertext.write(character);
 	    	  } else {
 	    		  characterSkipped = true;
+	    		  useNextKey = false;
 	          }
 	      }
 	      if (characterSkipped) {
@@ -340,7 +345,6 @@ public class RunningKey extends Cipher {
 	            + "Klartextdatei ist im Alphabet nicht\nenthalten und wurde "
 	            + "überlesen.");
 	      }
-	      System.out.println("Zugriff auf Klar- und Ciphertext geschlossen.");
 	    } catch (IOException e) {
 	      System.err.println("Abbruch: Fehler beim Zugriff auf Klar- oder "
 	          + "Chiffretextdatei.");
@@ -367,6 +371,7 @@ public class RunningKey extends Cipher {
 		    	  if (charMap.mapChar(character) !=-1) {
 			    	  character = charMap.mapChar(character);
 			    	  shift = charMap.mapChar(shift);
+			    	  if(shift == -1) System.out.println("### " + shift);
 	
 			          character = (character - shift + modulus) % modulus;
 			          character = charMap.remapChar(character);
