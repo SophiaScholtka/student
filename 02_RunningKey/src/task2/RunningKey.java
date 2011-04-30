@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import de.tubs.cs.iti.jcrypt.chiffre.CharacterMapping;
 import de.tubs.cs.iti.jcrypt.chiffre.Cipher;
 
 /**
@@ -81,7 +82,80 @@ public class RunningKey extends Cipher {
   public void makeKey() {
 	//if(DEBUG) testMethod();
 
-    System.out.println("Dummy für die Schlüsselerzeugung.");
+	if(DEBUG) System.out.println(">>>makeKey called");
+    int alphabetLength = 0; //Laenge des verwendeten Alphabets
+    String keypath = null; //Datei mit Schluesseltext
+    
+    BufferedReader standardInput = launcher.openStandardInput();
+    
+    //Einlesen der Größe des Alphabets
+    boolean accepted = false;
+    String msg = "Bitte geben Sie die Größe des verwendeten Alphabetes ein:";
+    System.out.println(msg);
+    do {
+      System.out.print("Geben Sie die Größe des Alphabetes ein: ");
+      try {
+        alphabetLength = Integer.parseInt(standardInput.readLine());
+        if (alphabetLength < 1) {
+          System.out.println(
+        		  "Eine Größe des Alphabetes unter 1 wird nicht akzeptiert. " +
+        		  "Bitte korrigieren Sie Ihre Eingabe.");
+        } else {
+	        msg = "Die Größe des Alphabetes wurde aktzeptiert. Das Alphabet umfasst " +
+	        	alphabetLength + " Zeichen.";
+	        System.out.println(msg);
+	        accepted = true;
+          
+        }
+      } catch (NumberFormatException e) {
+        System.out.println("Fehler beim Parsen der Alphabetsgröße. Bitte korrigieren"
+            + " Sie Ihre Eingabe.");
+      } catch (IOException e) {
+        System.err
+            .println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+        e.printStackTrace();
+        System.exit(1);
+      }
+    } while (!accepted);
+    
+    //Einlesen des Dateinamens für Schlüsseltext
+    accepted = false;
+    do {
+      try {
+        System.out.print("Geben Sie den Dateinamen des Schlüsseltextes ein: ");
+        keypath = standardInput.readLine();
+        if (keypath.length() > 0) {
+          msg = "Der Pfad zur Schlüsseldatei lautet: " + keypath;
+          System.out.println(msg);
+          accepted = true;
+        } else {
+          System.out.println("Der Dateiname ist zu kurz. " +
+          		"Es ist mindestens ein Zeichen erforderlich.");
+        }
+      } catch (IOException e) {
+        System.err
+            .println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+        e.printStackTrace();
+        System.exit(1);
+      }
+    } while (!accepted);
+    
+    //Erzeuge key
+    if(accepted) {
+    	String keySafed = "" + alphabetLength + " " + keypath;
+	    try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter("key.txt"));
+			bw.write("" + alphabetLength);
+			bw.write(" ");
+			bw.write(keypath);
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}   
+    } 
+    
+//    //Setze globalen Moduls (Alphabetlänge)
+//    modulus = alphabetLength;
   }
 
   /**
