@@ -21,6 +21,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import de.tubs.cs.iti.jcrypt.chiffre.CharacterMapping;
 import de.tubs.cs.iti.jcrypt.chiffre.Cipher;
@@ -65,6 +66,20 @@ public class RunningKey extends Cipher {
    */
   public void decipher(BufferedReader ciphertext, BufferedWriter cleartext) {
 	  if(DEBUG) System.out.println(">>>decipher called");
+	  String msg = "";
+	  
+	  //Lese die Buchstaben des Keys ein
+	  ArrayList<Integer> keyChars,cipherChars;
+	  keyChars = readFileToList(keyFilePath);
+	  cipherChars = readBufferedReaderToList(ciphertext);
+	  
+	  if(keyChars.size() >= cipherChars.size()) {
+		  doDencipher(keyChars,cipherChars,cleartext);
+	  } else {
+		  msg = "Schlüsseldatei ist zu klein! Verschlüsseln wird abgebrochen. " +
+		  		"Empfohlene Mindestlänge des Schlüssels ist " + cipherChars.size();
+		  System.out.println(msg);
+	  }  
 
   }
 
@@ -88,7 +103,7 @@ public class RunningKey extends Cipher {
 	  clearChars = readBufferedReaderToList(cleartext);
 	  
 	  if(keyChars.size() >= clearChars.size()) {
-		  doEncipher(keyChars,clearChars);
+		  doEncipher(keyChars,clearChars,ciphertext);
 	  } else {
 		  msg = "Schlüsseldatei ist zu klein! Verschlüsseln wird abgebrochen. " +
 		  		"Empfohlene Mindestlänge des Schlüssels ist " + clearChars.size();
@@ -295,8 +310,92 @@ public class RunningKey extends Cipher {
   	 * @param keyChars	Liste der einzelnen Zeichen der Schlüsseldatei
   	 * @param clearChars	Liste der einzelnen Zeichen der Klartextdatei
   	 */
-	private void doEncipher(ArrayList<Integer> keyChars, ArrayList<Integer> clearChars) {
+	private void doEncipher(ArrayList<Integer> keyChars, ArrayList<Integer> clearChars,BufferedWriter ciphertext) {
 		if(DEBUG) System.out.println(">>>doEncipher called");
+
+	    // charMap.setConvertToLowerCase();
+	    // charMap.setConvertToUpperCase();
+
+		try {
+	      int character;
+	      boolean characterSkipped = false;
+	      	      
+	      Iterator<Integer> keyIterator = keyChars.iterator();
+	      Iterator<Integer> clearIterator = clearChars.iterator();
+	      int shift = 0;
+	      while(clearIterator.hasNext() && keyIterator.hasNext()) {
+	    	  shift     = keyIterator.next();
+	    	  character = clearIterator.next();
+	    	  
+	    	  if (charMap.mapChar(character) !=-1) {
+		    	  character = charMap.mapChar(character);
+		    	  shift = charMap.mapChar(shift);
+		    	  
+		          character = (character + shift) % modulus;
+		          character = charMap.remapChar(character);
+		          ciphertext.write(character);
+	    	  } else {
+	    		  characterSkipped = true;
+	          }
+	      }
+	      if (characterSkipped) {
+	        System.out.println("Warnung: Mindestens ein Zeichen aus der "
+	            + "Klartextdatei ist im Alphabet nicht\nenthalten und wurde "
+	            + "überlesen.");
+	      }
+	      System.out.println("Zugriff auf Klar- und Ciphertext geschlossen.");
+	    } catch (IOException e) {
+	      System.err.println("Abbruch: Fehler beim Zugriff auf Klar- oder "
+	          + "Chiffretextdatei.");
+	      e.printStackTrace();
+	      System.exit(1);
+	    }
+		
+	}
+
+	private void doDencipher(ArrayList<Integer> keyChars, 
+			ArrayList<Integer> cipherChars, BufferedWriter cleartext) {
+
+		  try {
+		      int character;
+		      boolean characterSkipped = false;
+		      int counter=1;
+		      int i=0;
+
+		      Iterator<Integer> keyIterator = keyChars.iterator();
+		      Iterator<Integer> cipherIterator = cipherChars.iterator();
+		      int shift = 0;
+		      while(cipherIterator.hasNext() && keyIterator.hasNext()) {
+		    	  shift     = keyIterator.next();
+		    	  character = cipherIterator.next();
+		    	  
+		    	  if (charMap.mapChar(character) !=-1) {
+			    	  character = charMap.mapChar(character);
+			    	  shift = charMap.mapChar(shift);
+	
+			          character = (character - shift + modulus) % modulus;
+			          character = charMap.remapChar(character);
+			          cleartext.write(character);
+			          i++;
+		    	  } else {
+		    		  characterSkipped = true;
+		    	  }
+		      }
+		
+		      if (characterSkipped) {
+		        System.out.println("Warnung: Mindestens ein Zeichen aus der "
+		            + "Klartextdatei ist im Alphabet nicht\nenthalten und wurde "
+		            + "überlesen.");
+		      }
+		
+		      //erst schließen, wenn kein weiterer Zugriff erforderlich ist!
+		  } catch (IOException e) {
+		      System.err.println("Abbruch: Fehler beim Zugriff auf Klar- oder "
+		          + "Chiffretextdatei.");
+		      e.printStackTrace();
+		      System.exit(1);
+		  }
+		
 		
 	}
 }
