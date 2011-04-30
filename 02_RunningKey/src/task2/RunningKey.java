@@ -304,7 +304,8 @@ public class RunningKey extends Cipher {
   	 * @param keyChars	Liste der einzelnen Zeichen der Schlüsseldatei
   	 * @param clearChars	Liste der einzelnen Zeichen der Klartextdatei
   	 */
-	private void doEncipher(ArrayList<Integer> keyChars, ArrayList<Integer> clearChars,BufferedWriter ciphertext) {
+	private void doEncipher(ArrayList<Integer> keyChars, 
+			ArrayList<Integer> clearChars,BufferedWriter ciphertext) {
 		if(DEBUG) System.out.println(">>>doEncipher called");
 
 	    // charMap.setConvertToLowerCase();
@@ -364,6 +365,8 @@ public class RunningKey extends Cipher {
 
 		      Iterator<Integer> keyIterator = keyChars.iterator();
 		      Iterator<Integer> cipherIterator = cipherChars.iterator();
+		      
+		      ArrayList<String> newCleartext = new ArrayList<String>();
 		      while(cipherIterator.hasNext() && keyIterator.hasNext()) {
 		    	  shift     = keyIterator.next();
 		    	  character = cipherIterator.next();
@@ -371,16 +374,24 @@ public class RunningKey extends Cipher {
 		    	  if (charMap.mapChar(character) !=-1) {
 			    	  character = charMap.mapChar(character);
 			    	  shift = charMap.mapChar(shift);
-			    	  if(shift == -1) System.out.println("### " + shift);
 	
 			          character = (character - shift + modulus) % modulus;
 			          character = charMap.remapChar(character);
-			          cleartext.write(character);
+			          newCleartext.add(Character.toString((char) character));
+			          cleartext.write((char) character);
 		    	  } else {
 		    		  characterSkipped = true;
 		    	  }
 		      }
-		
+
+		      //Zeige deciphered Klartext
+		      System.out.println("Ausschnitt aus dem Klartext: ");
+		      Iterator<String> newClearIterator = newCleartext.iterator();
+		      for (int i=0; i<100;i++) {
+				System.out.print(newClearIterator.next());
+			  }
+		      System.out.println();
+		      
 		      if (characterSkipped) {
 		        System.out.println("Warnung: Mindestens ein Zeichen aus der "
 		            + "Klartextdatei ist im Alphabet nicht\nenthalten und wurde "
@@ -388,6 +399,7 @@ public class RunningKey extends Cipher {
 		      }
 		
 		      //erst schließen, wenn kein weiterer Zugriff erforderlich ist!
+		      cleartext.close();
 		  } catch (IOException e) {
 		      System.err.println("Abbruch: Fehler beim Zugriff auf Klar- oder "
 		          + "Chiffretextdatei.");
