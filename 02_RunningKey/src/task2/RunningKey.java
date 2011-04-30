@@ -118,9 +118,8 @@ public class RunningKey extends Cipher {
    * @see #writeKey writeKey
    */
   public void makeKey() {
-	//if(DEBUG) testMethod();
-
 	if(DEBUG) System.out.println(">>>makeKey called");
+	
     int alphabetLength = 0; //Laenge des verwendeten Alphabets
     String keypath = null; //Datei mit Schluesseltext
     
@@ -276,9 +275,7 @@ public class RunningKey extends Cipher {
 		  back = readBufferedReaderToList(br);
 	  } catch (FileNotFoundException e) {
 		  e.printStackTrace();
-	  } catch (IOException e) {
-		  e.printStackTrace();
-	  }
+	  } 
 	  
 	  return back;
   }
@@ -358,13 +355,11 @@ public class RunningKey extends Cipher {
 
 		  try {
 		      int character;
+		      int shift = 0;
 		      boolean characterSkipped = false;
-		      int counter=1;
-		      int i=0;
 
 		      Iterator<Integer> keyIterator = keyChars.iterator();
 		      Iterator<Integer> cipherIterator = cipherChars.iterator();
-		      int shift = 0;
 		      while(cipherIterator.hasNext() && keyIterator.hasNext()) {
 		    	  shift     = keyIterator.next();
 		    	  character = cipherIterator.next();
@@ -376,7 +371,6 @@ public class RunningKey extends Cipher {
 			          character = (character - shift + modulus) % modulus;
 			          character = charMap.remapChar(character);
 			          cleartext.write(character);
-			          i++;
 		    	  } else {
 		    		  characterSkipped = true;
 		    	  }
