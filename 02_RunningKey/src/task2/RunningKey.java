@@ -13,6 +13,9 @@ package task2;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import de.tubs.cs.iti.jcrypt.chiffre.Cipher;
 
@@ -23,6 +26,8 @@ import de.tubs.cs.iti.jcrypt.chiffre.Cipher;
  * @version 1.0 - Tue Mar 30 16:23:47 CEST 2010
  */
 public class RunningKey extends Cipher {
+	
+	final boolean DEBUG = true;
 
   /**
    * Analysiert den durch den Reader <code>ciphertext</code> gegebenen
@@ -74,6 +79,7 @@ public class RunningKey extends Cipher {
    * @see #writeKey writeKey
    */
   public void makeKey() {
+	//if(DEBUG) testMethod();
 
     System.out.println("Dummy für die Schlüsselerzeugung.");
   }
@@ -100,5 +106,14 @@ public class RunningKey extends Cipher {
    */
   public void writeKey(BufferedWriter key) {
 
+  }
+  
+  private void testMethod() {
+	  System.out.println(">>>testMethod called");
+	
+	  
+	  
+	  System.out.println(">>>/testMethod finished");
+	  System.exit(0);
   }
 }

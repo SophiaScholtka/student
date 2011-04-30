@@ -6,9 +6,6 @@
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
 </listAttribute>
-<listAttribute key="org.eclipse.debug.ui.favoriteGroups">
-<listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
-</listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="de.tubs.cs.iti.jcrypt.chiffre.Launcher"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-execute task1.Vigenere&#13;&#10;-action break&#13;&#10;-cleartext ../01_Vigenere/cleartext_broken.txt&#13;&#10;-ciphertext ../01_Vigenere/programmierer_enc.txt&#13;&#10;-key ../01_Vigenere/key_break.txt&#10;-modulus 27"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="01_Vigenere"/>
