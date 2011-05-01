@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.lang.Math;
 
 import de.tubs.cs.iti.jcrypt.chiffre.Cipher;
 
@@ -52,13 +53,22 @@ public class RunningKey extends Cipher {
 	  ArrayList<Integer> cipherChars;
 	  cipherChars = readBufferedReaderToList(ciphertext);
 	
+	  //Mache Platz für Klartext und Schlüsseltext
+	  int[] klartext=new int[cipherChars.size()];
+	  int[] schluesseltext=new int[cipherChars.size()];
+	  
+	//Fülle Klartext mit -1 damit festgestellt werden kann, ob eine Textstelle schon behandelt wurde
+	  for(int i=0;i<klartext.length;i++) klartext[i]=-1;
+	   
 	//Solange der User noch Lust hat, Textteile zu entziffern: 
 	boolean fertig=false;
 	do {
 		//Erfrage die Position und Länge des Ciphertextabschnittes, den der User betrachten möchte
+		int start=0; int laenge=4;
 		//TODO 0 und 4 durch User-Eingaben Start und Länge ersetzen
-		ArrayList<Integer> abschnitt = getAbschnitt(0,4,cipherChars);
+		ArrayList<Integer> abschnitt = getAbschnitt(start,laenge,cipherChars);
 		//Zeige bereits entschlüsselte Abschnitte, falls sie angrenzen/überlappen
+		showClearAndKeyText(start,laenge,klartext,schluesseltext);
 		//Analysiere den Abschnitt auf wahrscheinliche Klar & Schlüsseltexte
 		//Bitte den User um eine Auswahl und speichere sein Ergebnis ab
 		//Abfrage ob der Text vollständig bearbeitet wurde oder der User schon zufrieden ist, dann
@@ -66,7 +76,20 @@ public class RunningKey extends Cipher {
 	} while (!fertig);
   }
 
-  private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer> cipherChars) {
+private void showClearAndKeyText(int start, int laenge, int[] klartext, int[] schluesseltext) {
+	//TODO, prüfe ob es angrenzend oder überlappend zum Textabschnitt ab start bis start+laenge bereits entschlüsselte Textstellen gibt.
+	boolean notext=true;
+	for(int i=Math.min(start-1,0);i<Math.max(start+laenge+1,klartext.length);i++){
+		if(klartext[i]!=-1) notext=false;
+	}
+	if(notext) {
+		System.out.println("Kein bereits entschlüsselter Abschnitt grenzt an den gewählten Abschnitt");
+	} else {
+		//TODO bereits entschlüsselte Teile (klartext != -1) finden und klartext und schluesseltext, sowie ihre Position ausgeben
+	}
+}
+
+private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer> cipherChars) {
 	//Checken ob Start und Länge zulässig sind
 	if (start<0 || laenge<=0 || start+laenge>=cipherChars.size()){
 		System.out.println("Ungültige Eingabe. Start muss zwischen 0 und "+cipherChars.size()+" sein. \n Länge >=1 und Start+Länge <="+cipherChars.size());
