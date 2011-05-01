@@ -59,6 +59,8 @@ public class RunningKey extends Cipher {
 		//Zeige bereits entschlüsselte Abschnitte, falls sie angrenzen/überlappen
 		//Analysiere den Abschnitt auf wahrscheinliche Klar & Schlüsseltexte
 		//Bitte den User um eine Auswahl und speichere sein Ergebnis ab
+		//Abfrage ob der Text vollständig bearbeitet wurde oder der User schon zufrieden ist, dann
+		fertig=true;
 	} while (!fertig);
   }
 
