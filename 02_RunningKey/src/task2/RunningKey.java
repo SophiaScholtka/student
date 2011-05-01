@@ -56,6 +56,8 @@ public class RunningKey extends Cipher {
 	boolean fertig=false;
 	do {
 		//Erfrage die Position und Länge des Ciphertextabschnittes, den der User betrachten möchte
+		//TODO 0 und 4 durch User-Eingaben Start und Länge ersetzen
+		ArrayList<Integer> abschnitt = getAbschnitt(0,4,cipherChars);
 		//Zeige bereits entschlüsselte Abschnitte, falls sie angrenzen/überlappen
 		//Analysiere den Abschnitt auf wahrscheinliche Klar & Schlüsseltexte
 		//Bitte den User um eine Auswahl und speichere sein Ergebnis ab
@@ -64,7 +66,22 @@ public class RunningKey extends Cipher {
 	} while (!fertig);
   }
 
-  /**
+  private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer> cipherChars) {
+	//Checken ob Start und Länge zulässig sind
+	if (start<0 || laenge<=0 || start+laenge>=cipherChars.size()){
+		System.out.println("Ungültige Eingabe. Start muss zwischen 0 und "+cipherChars.size()+" sein. \n Länge >=1 und Start+Länge <="+cipherChars.size());
+		return null;
+	}
+	//abschnitt aus dem ciphertext herauskopieren
+	ArrayList<Integer> abschnitt = new ArrayList<Integer>();
+	for(int i=start;i<(start+laenge);i++){
+		abschnitt.add(cipherChars.get(i));
+	}
+	if(DEBUG) System.out.println(abschnitt.toString());
+	return abschnitt;
+}
+
+/**
    * Entschlüsselt den durch den Reader <code>ciphertext</code> gegebenen
    * Chiffretext und schreibt den Klartext mit dem Writer
    * <code>cleartext</code>.
