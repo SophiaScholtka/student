@@ -176,18 +176,11 @@ public class RunningKey extends Cipher {
     
     //Erzeuge key
     if(accepted) {
-		try {
-			//Setze globale Variablen des Schlüssels
-			modulus = alphabetLength;
-			keyFilePath = keypath;
-			
-			//Speichere Key
-			BufferedWriter bw;
-			bw = new BufferedWriter(new FileWriter("key.txt"));
-			writeKey(bw);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		//Setze globale Variablen des Schlüssels
+		modulus = alphabetLength;
+		keyFilePath = keypath;
+		
+		//Speicherung erfolgt automatisch durch Job
     } 
   }
 
