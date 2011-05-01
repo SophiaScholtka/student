@@ -48,7 +48,18 @@ public class RunningKey extends Cipher {
    * Der Writer, der den Klartext schreiben soll.
    */
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
-
+	//Lese die Buchstaben des Ciphertextes ein
+	  ArrayList<Integer> cipherChars;
+	  cipherChars = readBufferedReaderToList(ciphertext);
+	
+	//Solange der User noch Lust hat, Textteile zu entziffern: 
+	boolean fertig=false;
+	do {
+		//Erfrage die Position und Länge des Ciphertextabschnittes, den der User betrachten möchte
+		//Zeige bereits entschlüsselte Abschnitte, falls sie angrenzen/überlappen
+		//Analysiere den Abschnitt auf wahrscheinliche Klar & Schlüsseltexte
+		//Bitte den User um eine Auswahl und speichere sein Ergebnis ab
+	} while (!fertig);
   }
 
   /**
