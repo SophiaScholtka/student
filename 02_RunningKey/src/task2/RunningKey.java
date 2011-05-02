@@ -168,6 +168,7 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
    * @see #writeKey writeKey
    */
   public void makeKey() {
+	//if(DEBUG) testMethod();
 	if(DEBUG) System.out.println(">>>makeKey called");
 	
     int alphabetLength = 0; //Laenge des verwendeten Alphabets
@@ -300,7 +301,45 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
   private void testMethod() {
 	  System.out.println(">>>testMethod called");
 	
-	  
+	  //Tests für intersectLists(...)
+	  ArrayList<ArrayList<Integer>> ll;
+	  ArrayList<Integer> l1,l2;
+	  l1 = new ArrayList<Integer>();
+	  l2 = new ArrayList<Integer>();
+	  int l = 10;
+	  for(int i = 0; i < l; i++) {
+		  l1.add(i);
+		  l2.add(i+100);
+	  }
+	  l1.add(l+1);
+	  System.out.println("Die Listen:");
+	  System.out.println(l1.toString());
+	  System.out.println(l2.toString());
+	  System.out.println();
+	  System.out.println("Listen mit getauschtem Inhalt: (0<from<to<Längen)");
+	  ll = translocateLists(l1, l2, 4, 6);
+	  System.out.println(ll.get(0).toString());
+	  System.out.println(ll.get(1).toString());
+	  System.out.println("Listen mit getauschtem Inhalt: (from < 0)");
+	  ll = translocateLists(l1, l2, -4, 6);
+	  System.out.println(ll.get(0).toString());
+	  System.out.println(ll.get(1).toString());
+	  System.out.println("Listen mit getauschtem Inhalt: (to < 0)");
+	  ll = translocateLists(l1, l2, 4, -6);
+	  System.out.println(ll.get(0).toString());
+	  System.out.println(ll.get(1).toString());
+	  System.out.println("Listen mit getauschtem Inhalt: (ListSize1 < to)");
+	  ll = translocateLists(l1, l2, 4, l1.size() + 4);
+	  System.out.println(ll.get(0).toString());
+	  System.out.println(ll.get(1).toString());
+	  System.out.println("Listen mit getauschtem Inhalt: (ListSize2 < to)");
+	  ll = translocateLists(l1, l2, 4, l2.size() + 4);
+	  System.out.println(ll.get(0).toString());
+	  System.out.println(ll.get(1).toString());
+	  System.out.println("Listen mit getauschtem Inhalt: (from > to)");
+	  ll = translocateLists(l1, l2, 6, 4);
+	  System.out.println(ll.get(0).toString());
+	  System.out.println(ll.get(1).toString());
 	  
 	  System.out.println(">>>/testMethod finished");
 	  System.exit(0);
@@ -452,7 +491,81 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 		      e.printStackTrace();
 		      System.exit(1);
 		  }
-		
-		
+				
 	}
+	
+	/**
+	 * Tauscht ein inneres Teilstueck zweier Listen untereinander aus.
+	 * - Erwartet zwei Listen
+	 * - Vertauscht inneres Teilstueck (from...to, alle inklusive)
+	 * - getauschte Listen werden in gleicher Reihenfolge wie bei Eingabe 
+	 * zurückgegeben.
+	 * Methode sorgt dafür dass 0 <= from <= to <= kleinste Listengröße.
+	 * Indexe beginnen bei 0.
+	 * @param list1	Liste 1
+	 * @param list2	Liste 2
+	 * @param from	Beginn des zu tauschenden Teilstueck-Indexes (inklusiv)
+	 * @param to	Ende des zu tauschenden Teilstueck-Indexes (inklusiv)
+	 * @return	die zwei neuen Listen mit vertauschtem Innerem. 
+	 * Liste 1 ist die erste, Liste 2 die zweite.
+	 */
+	private ArrayList<ArrayList<Integer>> translocateLists(ArrayList<Integer> list1, ArrayList<Integer> list2, int from, int to)  {
+		//Prüfe Listenlängen
+		if(list1.size()<to+1) {
+			to = list1.size() - 1;
+		}
+		if(list2.size()<to+1 && list2.size() < list1.size()) {
+			to = list2.size() - 1;
+		}
+		//sorge fuer 0<=from <= to
+		if(from <= 0) {
+			from = 0;
+		}
+		if(to <= 0) {
+			to = 0;
+		}
+		if(from > to) {
+			int tmp = from;
+			from = to;
+			to = tmp;
+		}
+				
+		ArrayList<ArrayList<Integer>> back;
+		ArrayList<Integer> list1Back, list2Back;
+		Iterator<Integer> list1Iterator,list2Iterator;
+		int counter;
+		
+		back = new ArrayList<ArrayList<Integer>>();
+		list1Back = new ArrayList<Integer>();
+		list2Back = new ArrayList<Integer>();				
+		list1Iterator = list1.iterator();
+		list2Iterator = list2.iterator();
+		
+		counter = 0;
+		while (list1Iterator.hasNext() && list2Iterator.hasNext()) {
+			if(counter < from || to < counter) {
+				list1Back.add(list1Iterator.next());
+				list2Back.add(list2Iterator.next());
+			} else { //if(from <= counter && counter <= to) {
+				list1Back.add(list2Iterator.next());
+				list2Back.add(list1Iterator.next());
+			} 
+			counter ++;
+		}
+		
+		//hängt Rest der jeweiligen Listen an die Rückgabelisten an.
+		while(list1Iterator.hasNext()) {
+			list1Back.add(list1Iterator.next());
+		}
+		while(list2Iterator.hasNext()) {
+			list2Back.add(list2Iterator.next());
+		}
+		
+		//Rückgabe vorbereiten
+		back.add(list1Back);
+		back.add(list2Back);
+		 
+		return back;
+	}
+
 }
