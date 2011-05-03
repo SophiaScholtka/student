@@ -142,7 +142,8 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	  
 	  //Lese die Buchstaben des Keys ein
 	  ArrayList<Integer> keyChars,cipherChars;
-	  //TODO keyFilePath ist an dieser Stelle noch null!
+	  //TODO keyFilePath ist an dieser Stelle noch null! 
+	  keyFilePath = "out/out.txt"; //Workaround
 	  System.out.println(">>>> keyFilePath=" + keyFilePath);
 	  keyChars = readFileToList(keyFilePath);
 	  cipherChars = readBufferedReaderToList(ciphertext);
