@@ -178,7 +178,7 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
    * @see #writeKey writeKey
    */
   public void makeKey() {
-	//if(DEBUG) testMethod();
+	if(DEBUG) testMethod();
 	if(DEBUG) System.out.println(">>>makeKey called");
 	
     int alphabetLength = 0; //Laenge des verwendeten Alphabets
@@ -310,47 +310,69 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
    */
   private void testMethod() {
 	  System.out.println(">>>testMethod called");
-	
-	  //Tests für intersectLists(...)
-	  ArrayList<ArrayList<Integer>> ll;
-	  ArrayList<Integer> l1,l2;
-	  l1 = new ArrayList<Integer>();
-	  l2 = new ArrayList<Integer>();
-	  int l = 10;
-	  for(int i = 0; i < l; i++) {
-		  l1.add(i);
-		  l2.add(i+100);
-	  }
-	  l1.add(l+1);
-	  System.out.println("Die Listen:");
-	  System.out.println(l1.toString());
-	  System.out.println(l2.toString());
-	  System.out.println();
-	  System.out.println("Listen mit getauschtem Inhalt: (0<from<to<Längen)");
-	  ll = translocateLists(l1, l2, 4, 6);
-	  System.out.println(ll.get(0).toString());
-	  System.out.println(ll.get(1).toString());
-	  System.out.println("Listen mit getauschtem Inhalt: (from < 0)");
-	  ll = translocateLists(l1, l2, -4, 6);
-	  System.out.println(ll.get(0).toString());
-	  System.out.println(ll.get(1).toString());
-	  System.out.println("Listen mit getauschtem Inhalt: (to < 0)");
-	  ll = translocateLists(l1, l2, 4, -6);
-	  System.out.println(ll.get(0).toString());
-	  System.out.println(ll.get(1).toString());
-	  System.out.println("Listen mit getauschtem Inhalt: (ListSize1 < to)");
-	  ll = translocateLists(l1, l2, 4, l1.size() + 4);
-	  System.out.println(ll.get(0).toString());
-	  System.out.println(ll.get(1).toString());
-	  System.out.println("Listen mit getauschtem Inhalt: (ListSize2 < to)");
-	  ll = translocateLists(l1, l2, 4, l2.size() + 4);
-	  System.out.println(ll.get(0).toString());
-	  System.out.println(ll.get(1).toString());
-	  System.out.println("Listen mit getauschtem Inhalt: (from > to)");
-	  ll = translocateLists(l1, l2, 6, 4);
-	  System.out.println(ll.get(0).toString());
-	  System.out.println(ll.get(1).toString());
-	  
+
+//	//Tests für replacePartOfArrayList(...)
+//	  ArrayList<Integer> ll;
+//	  ArrayList<Integer> l1,l2;
+//	  l1 = new ArrayList<Integer>();
+//	  l2 = new ArrayList<Integer>();
+//	  for(int i = 0; i < 10; i++) {
+//		  l1.add(i);
+//	  }
+//	  for(int i = 3; i < 6; i++) {
+//		  l2.add(i+100);
+//	  }
+//	  System.out.println("Die Listen:");
+//	  System.out.println(l1.toString());
+//	  System.out.println(l2.toString());
+//	  System.out.println();
+//	  System.out.println("Listen mit ersetztem Inhalt: (0<atStart<list.length)");
+//	  ll = replacePartOfArrayList(l1, l2, 3);
+//	  System.out.println(ll.toString());
+//	  System.out.println("Listen mit ersetztem Inhalt: (list.length<atStart)");
+//	  ll = replacePartOfArrayList(l2, l1, 1);
+//	  System.out.println(ll.toString());
+		  
+//	  //Tests für intersectLists(...)
+//	  ArrayList<ArrayList<Integer>> ll;
+//	  ArrayList<Integer> l1,l2;
+//	  l1 = new ArrayList<Integer>();
+//	  l2 = new ArrayList<Integer>();
+//	  int l = 10;
+//	  for(int i = 0; i < l; i++) {
+//		  l1.add(i);
+//		  l2.add(i+100);
+//	  }
+//	  l1.add(l+1);
+//	  System.out.println("Die Listen:");
+//	  System.out.println(l1.toString());
+//	  System.out.println(l2.toString());
+//	  System.out.println();
+//	  System.out.println("Listen mit getauschtem Inhalt: (0<from<to<Längen)");
+//	  ll = translocateLists(l1, l2, 4, 6);
+//	  System.out.println(ll.get(0).toString());
+//	  System.out.println(ll.get(1).toString());
+//	  System.out.println("Listen mit getauschtem Inhalt: (from < 0)");
+//	  ll = translocateLists(l1, l2, -4, 6);
+//	  System.out.println(ll.get(0).toString());
+//	  System.out.println(ll.get(1).toString());
+//	  System.out.println("Listen mit getauschtem Inhalt: (to < 0)");
+//	  ll = translocateLists(l1, l2, 4, -6);
+//	  System.out.println(ll.get(0).toString());
+//	  System.out.println(ll.get(1).toString());
+//	  System.out.println("Listen mit getauschtem Inhalt: (ListSize1 < to)");
+//	  ll = translocateLists(l1, l2, 4, l1.size() + 4);
+//	  System.out.println(ll.get(0).toString());
+//	  System.out.println(ll.get(1).toString());
+//	  System.out.println("Listen mit getauschtem Inhalt: (ListSize2 < to)");
+//	  ll = translocateLists(l1, l2, 4, l2.size() + 4);
+//	  System.out.println(ll.get(0).toString());
+//	  System.out.println(ll.get(1).toString());
+//	  System.out.println("Listen mit getauschtem Inhalt: (from > to)");
+//	  ll = translocateLists(l1, l2, 6, 4);
+//	  System.out.println(ll.get(0).toString());
+//	  System.out.println(ll.get(1).toString());
+	  	  
 	  System.out.println(">>>/testMethod finished");
 	  System.exit(0);
   }
@@ -580,4 +602,42 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 		return back;
 	}
 
+	/**
+	 * Ersetzt einen Teil einer Liste durch neue Werte.
+	 * Die neue Liste ist maximal so lang wie die alte. Alles darüber hinaus 
+	 * wird ignoriert.
+	 * @param list	Liste, in welcher ein Stück ersetzt werden soll
+	 * @param part	zu ersetzende Werte
+	 * @param atStart	Index, an welchem mit dem Ersetzen begonnen werden soll
+	 * @return	Gibt die neue Liste zurück
+	 */
+	private ArrayList<Integer> replacePartOfArrayList(ArrayList<Integer> list, ArrayList<Integer> part, int atStart) {
+		if(atStart < 0) { atStart = 0; }
+		
+		ArrayList<Integer> back;
+		back = new ArrayList<Integer>();
+		
+		Iterator<Integer> listIterator = list.iterator();
+		Iterator<Integer> partIterator = part.iterator();
+		int value;
+		int counter = 0;
+		while(listIterator.hasNext() && partIterator.hasNext()) {
+			if(counter < atStart) {
+				value = listIterator.next();
+			} else {
+				listIterator.next();
+				value = partIterator.next();
+			}
+			back.add(value);
+			counter++;
+		}
+		
+		//Fügt den bestehenden Rest der originalen Liste an
+		while(listIterator.hasNext()) {
+			value = listIterator.next();
+			back.add(value);
+		}
+				
+		return back;
+	}
 }
