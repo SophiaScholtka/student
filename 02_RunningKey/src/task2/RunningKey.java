@@ -74,6 +74,8 @@ public class RunningKey extends Cipher {
 		//Abfrage ob der Text vollständig bearbeitet wurde oder der User schon zufrieden ist, dann
 		fertig=true;
 	} while (!fertig);
+	
+	if(DEBUG) System.out.println(">>>/breakCipher finished");
   }
 
 private void showClearAndKeyText(int start, int laenge, int[] klartext, int[] schluesseltext) {
@@ -124,7 +126,9 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	  //Lese die Buchstaben des Keys ein
 	  ArrayList<Integer> keyChars,cipherChars;
 	  //TODO keyFilePath ist an dieser Stelle noch null! 
-	  keyFilePath = "out/out.txt"; //Workaround
+	  if(keyFilePath.equals(null)) {
+		  keyFilePath = "out/out.txt"; //Workaround
+	  }
 	  System.out.println(">>>> keyFilePath=" + keyFilePath);
 	  keyChars = readFileToList(keyFilePath);
 	  cipherChars = readBufferedReaderToList(ciphertext);
