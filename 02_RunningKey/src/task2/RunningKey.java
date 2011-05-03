@@ -57,8 +57,9 @@ public class RunningKey extends Cipher {
 	  int[] klartext=new int[cipherChars.size()];
 	  int[] schluesseltext=new int[cipherChars.size()];
 	  
-	//Fülle Klartext mit -1 damit festgestellt werden kann, ob eine Textstelle schon behandelt wurde
+	//Fülle Klar-und Schlüsseltext mit -1 damit festgestellt werden kann, ob eine Textstelle schon behandelt wurde
 	  for(int i=0;i<klartext.length;i++) klartext[i]=-1;
+	  for(int i=0;i<schluesseltext.length;i++) schluesseltext[i]=-1;
 	   
 	//Solange der User noch Lust hat, Textteile zu entziffern: 
 	boolean fertig=false;
@@ -74,8 +75,6 @@ public class RunningKey extends Cipher {
 		//Abfrage ob der Text vollständig bearbeitet wurde oder der User schon zufrieden ist, dann
 		fertig=true;
 	} while (!fertig);
-	
-	if(DEBUG) System.out.println(">>>/breakCipher finished");
   }
 
 private void showClearAndKeyText(int start, int laenge, int[] klartext, int[] schluesseltext) {
@@ -83,13 +82,31 @@ private void showClearAndKeyText(int start, int laenge, int[] klartext, int[] sc
 	if(laenge < 0) laenge = 0;
 	//TODO, prüfe ob es angrenzend oder überlappend zum Textabschnitt ab start bis start+laenge bereits entschlüsselte Textstellen gibt.
 	boolean notext=true;
-	for(int i=Math.min(start,0);i<Math.max(start+laenge+1,klartext.length);i++){
-		if(klartext[i]!=-1) notext=false;
+	for(int i=Math.max(start-1,0);i<Math.min(start+laenge+1,klartext.length);i++){
+		if(klartext[i]!=-1 && schluesseltext[i]!=-1) notext=false;
 	}
 	if(notext) {
 		System.out.println("Kein bereits entschlüsselter Abschnitt grenzt an den gewählten Abschnitt");
 	} else {
-		//TODO bereits entschlüsselte Teile (klartext != -1) finden und klartext und schluesseltext, sowie ihre Position ausgeben
+		int j=Math.max(start-1,0);
+		while (j>1 && klartext[j]!=-1 && schluesseltext[j]!=-1){
+			j--;
+		}
+		int i=j;
+		ArrayList<Character> klar=new ArrayList<Character>();
+		ArrayList<Character> schl=new ArrayList<Character>();
+		while(i<klartext.length){
+			while(klartext[i]!=-1 && schluesseltext[i]!=-1){
+				klar.add((char)klartext[i]);
+				schl.add((char)schluesseltext[i]);
+				i++;
+				if(i>klartext.length) break;
+			}
+			System.out.println("Bereits entzifferter Klartext\n von Position "+j+" bis Position "+i+":\n"+String.valueOf(klar));
+			System.out.println("Bereits entzifferter Schlüsseltext\n von Position "+j+" bis Position "+i+":\n"+String.valueOf(schl));
+			j=i;
+			if(j>Math.min(start+laenge+1,klartext.length)) break;
+		}
 	}
 }
 
@@ -126,9 +143,7 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	  //Lese die Buchstaben des Keys ein
 	  ArrayList<Integer> keyChars,cipherChars;
 	  //TODO keyFilePath ist an dieser Stelle noch null! 
-	  if(keyFilePath.equals(null)) {
-		  keyFilePath = "out/out.txt"; //Workaround
-	  }
+	  keyFilePath = "out/out.txt"; //Workaround
 	  System.out.println(">>>> keyFilePath=" + keyFilePath);
 	  keyChars = readFileToList(keyFilePath);
 	  cipherChars = readBufferedReaderToList(ciphertext);
@@ -178,7 +193,7 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
    * @see #writeKey writeKey
    */
   public void makeKey() {
-	if(DEBUG) testMethod();
+	//if(DEBUG) testMethod();
 	if(DEBUG) System.out.println(">>>makeKey called");
 	
     int alphabetLength = 0; //Laenge des verwendeten Alphabets
