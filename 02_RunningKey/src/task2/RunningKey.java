@@ -49,6 +49,46 @@ public class RunningKey extends Cipher {
    * Der Writer, der den Klartext schreiben soll.
    */
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
+	//Bereite Schlüsseltext-Datei vor
+	keyFilePath = "key_text.txt"; //Datei mit Schlüsseltext
+	writeToFile(keyFilePath, ""); //Legt die Datei für Schlüsseltext an
+	
+	
+	//Erfrage vermutete Alphabetgröße/Modulus
+	BufferedReader standardInput = launcher.openStandardInput();
+	boolean accepted = false;
+
+	String msg = "Bitte geben Sie die Größe des vermuteten Alphabetes ein:";
+	System.out.println(msg);
+	do {
+	  msg = "Bitte geben Sie die Größe des vermuteten Alphabetes ein:";
+	  try {
+		modulus = Integer.parseInt(standardInput.readLine());
+		if (modulus < 1) {
+		  System.out.println(
+				  "Eine Größe des Alphabetes unter 1 wird nicht akzeptiert. " +
+				  "Bitte korrigieren Sie Ihre Eingabe.");
+		} else {
+			msg = "Die Größe des Alphabetes wurde aktzeptiert. Das verwendete Alphabet umfasst " +
+				modulus + " Zeichen.";
+			System.out.println(msg);
+			accepted = true;  
+		}
+	  } catch (NumberFormatException e) {
+		  System.out.println("Fehler beim Parsen der Alphabetsgröße. Bitte korrigieren"
+				 + " Sie Ihre Eingabe.");
+	  } catch (IOException e) {
+		  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+		  e.printStackTrace();
+		  System.exit(1);
+	  }
+	} while (!accepted);
+	
+	
+	//Chiffre start
+	msg = "Beginne mit dem Verfahren zum Brechen der Chiffre.";
+	System.out.println(msg);
+	  
 	//Lese die Buchstaben des Ciphertextes ein
 	  ArrayList<Integer> cipherChars;
 	  cipherChars = readBufferedReaderToList(ciphertext);
@@ -80,7 +120,8 @@ public class RunningKey extends Cipher {
 private void showClearAndKeyText(int start, int laenge, int[] klartext, int[] schluesseltext) {
 	if(start < 0) start = 0;
 	if(laenge < 0) laenge = 0;
-	//TODO, prüfe ob es angrenzend oder überlappend zum Textabschnitt ab start bis start+laenge bereits entschlüsselte Textstellen gibt.
+	//TODO, prüfe ob es angrenzend oder überlappend zum Textabschnitt ab start 
+	//bis start+laenge bereits entschlüsselte Textstellen gibt.
 	boolean notext=true;
 	for(int i=Math.max(start-1,0);i<Math.min(start+laenge+1,klartext.length);i++){
 		if(klartext[i]!=-1 && schluesseltext[i]!=-1) notext=false;
@@ -143,7 +184,9 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	  //Lese die Buchstaben des Keys ein
 	  ArrayList<Integer> keyChars,cipherChars;
 	  //TODO keyFilePath ist an dieser Stelle noch null! 
-	  keyFilePath = "out/out.txt"; //Workaround
+	  if(keyFilePath == null) {
+		  keyFilePath = "out/out.txt"; //Workaround
+	  }
 	  System.out.println(">>>> keyFilePath=" + keyFilePath);
 	  keyChars = readFileToList(keyFilePath);
 	  cipherChars = readBufferedReaderToList(ciphertext);
@@ -214,10 +257,10 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
         		  "Eine Größe des Alphabetes unter 1 wird nicht akzeptiert. " +
         		  "Bitte korrigieren Sie Ihre Eingabe.");
         } else {
-	        msg = "Die Größe des Alphabetes wurde aktzeptiert. Das Alphabet umfasst " +
-	        	alphabetLength + " Zeichen.";
-	        System.out.println(msg);
-	        accepted = true;
+	msg = "Die Größe des Alphabetes wurde aktzeptiert. Das Alphabet umfasst " +
+		alphabetLength + " Zeichen.";
+	System.out.println(msg);
+	accepted = true;
           
         }
       } catch (NumberFormatException e) {
@@ -314,9 +357,9 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 		  key.close();
 	  } catch (IOException e) {
 		  System.out.println("Abbruch: Fehler beim Schreiben oder Schließen der "
-	          + "Schlüsseldatei.");
-	      e.printStackTrace();
-	      System.exit(1);
+	  + "Schlüsseldatei.");
+	  e.printStackTrace();
+	  System.exit(1);
 	  }
   }
   
@@ -442,50 +485,50 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 			ArrayList<Integer> clearChars,BufferedWriter ciphertext) {
 		if(DEBUG) System.out.println(">>>doEncipher called");
 
-	    // charMap.setConvertToLowerCase();
-	    // charMap.setConvertToUpperCase();
+	// charMap.setConvertToLowerCase();
+	// charMap.setConvertToUpperCase();
 
 		try {
-	      int character;
-	      boolean characterSkipped = false;
-	      boolean useNextKey = true;
-	      	      
-	      Iterator<Integer> keyIterator = keyChars.iterator();
-	      Iterator<Integer> clearIterator = clearChars.iterator();
-	      int shift = 0;
-	      int keyChar = 0;
-	      while(clearIterator.hasNext() && keyIterator.hasNext()) {
-	    	  if(useNextKey) {
-		    	  keyChar = keyIterator.next();	  
-	    	  }	    	  
-	    	  useNextKey = true;
-	    	  
-	    	  shift = keyChar;
-	    	  character = clearIterator.next();
-	    	  
-	    	  if (charMap.mapChar(character) !=-1) {
-		    	  character = charMap.mapChar(character);
-		    	  shift = charMap.mapChar(shift);	
-		    	  
-		          character = (character + shift + modulus) % modulus;
-		          character = charMap.remapChar(character);
-		          ciphertext.write(character);
-	    	  } else {
-	    		  characterSkipped = true;
-	    		  useNextKey = false;
-	          }
-	      }
-	      if (characterSkipped) {
-	        System.out.println("Warnung: Mindestens ein Zeichen aus der "
-	            + "Klartextdatei ist im Alphabet nicht\nenthalten und wurde "
-	            + "überlesen.");
-	      }
-	    } catch (IOException e) {
-	      System.err.println("Abbruch: Fehler beim Zugriff auf Klar- oder "
-	          + "Chiffretextdatei.");
-	      e.printStackTrace();
-	      System.exit(1);
-	    }
+	  int character;
+	  boolean characterSkipped = false;
+	  boolean useNextKey = true;
+	  	  
+	  Iterator<Integer> keyIterator = keyChars.iterator();
+	  Iterator<Integer> clearIterator = clearChars.iterator();
+	  int shift = 0;
+	  int keyChar = 0;
+	  while(clearIterator.hasNext() && keyIterator.hasNext()) {
+		  if(useNextKey) {
+			  keyChar = keyIterator.next();	  
+		  }		  
+		  useNextKey = true;
+		  
+		  shift = keyChar;
+		  character = clearIterator.next();
+		  
+		  if (charMap.mapChar(character) !=-1) {
+			  character = charMap.mapChar(character);
+			  shift = charMap.mapChar(shift);	
+			  
+		  character = (character + shift + modulus) % modulus;
+		  character = charMap.remapChar(character);
+		  ciphertext.write(character);
+		  } else {
+			  characterSkipped = true;
+			  useNextKey = false;
+	  }
+	  }
+	  if (characterSkipped) {
+	System.out.println("Warnung: Mindestens ein Zeichen aus der "
+	+ "Klartextdatei ist im Alphabet nicht\nenthalten und wurde "
+	+ "überlesen.");
+	  }
+	} catch (IOException e) {
+	  System.err.println("Abbruch: Fehler beim Zugriff auf Klar- oder "
+	  + "Chiffretextdatei.");
+	  e.printStackTrace();
+	  System.exit(1);
+	}
 		
 	}
 
@@ -493,52 +536,52 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 			ArrayList<Integer> cipherChars, BufferedWriter cleartext) {
 
 		  try {
-		      int character;
-		      int shift = 0;
-		      boolean characterSkipped = false;
+		  int character;
+		  int shift = 0;
+		  boolean characterSkipped = false;
 
-		      Iterator<Integer> keyIterator = keyChars.iterator();
-		      Iterator<Integer> cipherIterator = cipherChars.iterator();
-		      
-		      ArrayList<String> newCleartext = new ArrayList<String>();
-		      while(cipherIterator.hasNext() && keyIterator.hasNext()) {
-		    	  shift     = keyIterator.next();
-		    	  character = cipherIterator.next();
-		    	  
-		    	  if (charMap.mapChar(character) !=-1) {
-			    	  character = charMap.mapChar(character);
-			    	  shift = charMap.mapChar(shift);
+		  Iterator<Integer> keyIterator = keyChars.iterator();
+		  Iterator<Integer> cipherIterator = cipherChars.iterator();
+		  
+		  ArrayList<String> newCleartext = new ArrayList<String>();
+		  while(cipherIterator.hasNext() && keyIterator.hasNext()) {
+			  shift     = keyIterator.next();
+			  character = cipherIterator.next();
+			  
+			  if (charMap.mapChar(character) !=-1) {
+				  character = charMap.mapChar(character);
+				  shift = charMap.mapChar(shift);
 	
-			          character = (character - shift + modulus) % modulus;
-			          character = charMap.remapChar(character);
-			          newCleartext.add(Character.toString((char) character));
-			          cleartext.write((char) character);
-		    	  } else {
-		    		  characterSkipped = true;
-		    	  }
-		      }
+			  character = (character - shift + modulus) % modulus;
+			  character = charMap.remapChar(character);
+			  newCleartext.add(Character.toString((char) character));
+			  cleartext.write((char) character);
+			  } else {
+				  characterSkipped = true;
+			  }
+		  }
 
-		      //Zeige deciphered Klartext
-		      System.out.println("Ausschnitt aus dem Klartext: ");
-		      Iterator<String> newClearIterator = newCleartext.iterator();
-		      for (int i=0; i<100;i++) {
+		  //Zeige deciphered Klartext
+		  System.out.println("Ausschnitt aus dem Klartext: ");
+		  Iterator<String> newClearIterator = newCleartext.iterator();
+		  for (int i=0; i<100;i++) {
 				System.out.print(newClearIterator.next());
 			  }
-		      System.out.println();
-		      
-		      if (characterSkipped) {
-		        System.out.println("Warnung: Mindestens ein Zeichen aus der "
-		            + "Klartextdatei ist im Alphabet nicht\nenthalten und wurde "
-		            + "überlesen.");
-		      }
+		  System.out.println();
+		  
+		  if (characterSkipped) {
+		System.out.println("Warnung: Mindestens ein Zeichen aus der "
+		+ "Klartextdatei ist im Alphabet nicht\nenthalten und wurde "
+		+ "überlesen.");
+		  }
 		
-		      //erst schließen, wenn kein weiterer Zugriff erforderlich ist!
-		      cleartext.close();
+		  //erst schließen, wenn kein weiterer Zugriff erforderlich ist!
+		  cleartext.close();
 		  } catch (IOException e) {
-		      System.err.println("Abbruch: Fehler beim Zugriff auf Klar- oder "
-		          + "Chiffretextdatei.");
-		      e.printStackTrace();
-		      System.exit(1);
+		  System.err.println("Abbruch: Fehler beim Zugriff auf Klar- oder "
+		  + "Chiffretextdatei.");
+		  e.printStackTrace();
+		  System.exit(1);
 		  }
 				
 	}
@@ -655,4 +698,29 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 				
 		return back;
 	}
+	
+	  
+	private void writeToFile(String filename,ArrayList<Character> text) {
+		try {
+			  FileWriter writer = new FileWriter(filename);
+			  BufferedWriter out = new BufferedWriter(writer);
+			  for(int i=0;i<text.size();i++){
+				  out.append(text.get(i));
+		  		}
+			  out.close();
+		  } catch (IOException e){
+			  e.printStackTrace();
+		  }
+	  }
+	  
+	  private void writeToFile(String filename,String text) {
+		  try {
+			  FileWriter writer = new FileWriter(filename);
+			  BufferedWriter out = new BufferedWriter(writer);
+			  out.write(text);
+			  out.close();
+		  } catch (IOException e){
+			  e.printStackTrace();
+		  }
+	  }
 }
