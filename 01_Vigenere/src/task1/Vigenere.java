@@ -48,7 +48,7 @@ public class Vigenere extends Cipher {
 	
 	private boolean broken = true;
 	
-	private final boolean DEBUG = true;
+	private final boolean DEBUG = false;
 	
 	/**
    * Analysiert den durch den Reader <code>ciphertext</code> gegebenen
@@ -236,10 +236,6 @@ public class Vigenere extends Cipher {
 	  char[][] passwort = new char[period][2];
 	  for(int i=0;i<period;i++){
 		  passwort[i]=mostFreqChar(getSubtext(cipher,period,i));
-		  System.out.println("Die häufigsten Buchstaben im " + (i+1) 
-				  + "ten Chiffreblock sind \t" 
-				  + passwort[i][0] + " (" + (charMap.mapChar((int)passwort[i][0]))+  ") und \t"
-				  + passwort[i][1]+ " (" + (charMap.mapChar((int)passwort[i][1]))+  ")");
 	  }
 	  
 	  accepted = false;
@@ -247,6 +243,12 @@ public class Vigenere extends Cipher {
 	  String[] sArray = {"e","n","i","*"," "};
 	  //if(DEBUG) {System.out.println(">>>>breakCipher Passwortzuordnung raten");}
 	  do {
+		  for(int i=0;i<period;i++){
+			  System.out.println("Die häufigsten Buchstaben im " + (i+1) 
+					  + "ten Chiffreblock sind \t" 
+					  + passwort[i][0] + " (" + (charMap.mapChar((int)passwort[i][0]))+  ") und \t"
+					  + passwort[i][1]+ " (" + (charMap.mapChar((int)passwort[i][1]))+  ")");
+		  }
 		  //if(DEBUG){System.out.println(">>>>breakCipher Passwortzuordnung raten (Loop)"); }
 		  msg = "Bitte raten Sie eine Zuordnung indem Sie eine Folge von " + period + " Zeichen eingeben,\n" 
 	  		+ "die Sie den häufigsten Buchstaben zuordnen wollen.\n" 
