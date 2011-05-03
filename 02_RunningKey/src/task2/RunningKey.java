@@ -77,9 +77,11 @@ public class RunningKey extends Cipher {
   }
 
 private void showClearAndKeyText(int start, int laenge, int[] klartext, int[] schluesseltext) {
+	if(start < 0) start = 0;
+	if(laenge < 0) laenge = 0;
 	//TODO, prüfe ob es angrenzend oder überlappend zum Textabschnitt ab start bis start+laenge bereits entschlüsselte Textstellen gibt.
 	boolean notext=true;
-	for(int i=Math.min(start-1,0);i<Math.max(start+laenge+1,klartext.length);i++){
+	for(int i=Math.min(start,0);i<Math.max(start+laenge+1,klartext.length);i++){
 		if(klartext[i]!=-1) notext=false;
 	}
 	if(notext) {
@@ -90,6 +92,7 @@ private void showClearAndKeyText(int start, int laenge, int[] klartext, int[] sc
 }
 
 private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer> cipherChars) {
+	if(DEBUG) System.out.println(">>>getAbschnitt called");
 	//Checken ob Start und Länge zulässig sind
 	if (start<0 || laenge<=0 || start+laenge>=cipherChars.size()){
 		System.out.println("Ungültige Eingabe. Start muss zwischen 0 und "+cipherChars.size()+" sein. \n Länge >=1 und Start+Länge <="+cipherChars.size());
@@ -100,7 +103,7 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	for(int i=start;i<(start+laenge);i++){
 		abschnitt.add(cipherChars.get(i));
 	}
-	if(DEBUG) System.out.println(abschnitt.toString());
+	if(DEBUG) System.out.println(">>>> Abschnitt Array: " + abschnitt.toString());
 	return abschnitt;
 }
 
@@ -120,6 +123,8 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	  
 	  //Lese die Buchstaben des Keys ein
 	  ArrayList<Integer> keyChars,cipherChars;
+	  //TODO keyFilePath ist an dieser Stelle noch null!
+	  System.out.println(">>>> keyFilePath=" + keyFilePath);
 	  keyChars = readFileToList(keyFilePath);
 	  cipherChars = readBufferedReaderToList(ciphertext);
 	  
@@ -350,6 +355,8 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
    * @return Liste der einzelnen Zeichen, Zahlenwerte der Zeichen
    */
   private ArrayList<Integer> readFileToList(String filePath) {
+	  //if(DEBUG) System.out.println(">>>readfileToList called");
+	  //if(DEBUG) System.out.println(">>>> filePath=" + filePath);
 	  ArrayList<Integer> back = new ArrayList<Integer>();
   
 	  try {
