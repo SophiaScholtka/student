@@ -795,6 +795,7 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 			value = value + g[j] * sum;
 		}
 		back = back + value;
+		
 		//Schlüsseltextausschnit
 		value = 0;
 		sum = 0;
