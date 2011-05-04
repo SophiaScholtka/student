@@ -37,6 +37,7 @@ public class RunningKey extends Cipher {
 	
 	//int keyAlphLenght; //modulus
 	String keyFilePath;
+	ArrayList<ArrayList<Integer[]>> lookup;
 
   /**
    * Analysiert den durch den Reader <code>ciphertext</code> gegebenen
@@ -84,6 +85,7 @@ public class RunningKey extends Cipher {
 	  }
 	} while (!accepted);
 	
+	createLookupTable(modulus);
 	
 	//Chiffre start
 	msg = "Beginne mit dem Verfahren zum Brechen der Chiffre.";
@@ -114,16 +116,93 @@ public class RunningKey extends Cipher {
 		//Zeige bereits entschlüsselte Abschnitte, falls sie angrenzen/überlappen
 		showClearAndKeyText(start,laenge,klartext,schluesseltext);
 		//Analysiere den Abschnitt auf wahrscheinliche Klar & Schlüsseltexte
+		ArrayList<String[]> possible4grams=getPossible4grams(abschnitt);
+		if(possible4grams.size()==0){
+			msg="Die Analyse war nicht erfolgreich, da der Chiffretext nicht aus den häufigsten Zeichen zusammengesetzt ist.\n Bitte wählen sie einen anderen Abschnitt.";
+			System.out.println(msg);
+			continue;
+		}
 		//Bitte den User um eine Auswahl und speichere sein Ergebnis ab
 		//Abfrage ob der Text vollständig bearbeitet wurde oder der User schon zufrieden ist, dann
 		fertig=true;
 	} while (!fertig);
   }
 
+private ArrayList<String[]> getPossible4grams(ArrayList<Integer> abschnitt) {
+	ArrayList<String[]> possible4grams = new ArrayList<String[]>();
+	String clear,key;
+	char tmp;
+	//gehe für jeden der 4 Ciffre-Buchstaben alle möglichen Paare häufigster Buchstaben durch und bilde alle Kombinationen
+	for(int i=0; i<lookup.get(charMap.mapChar(abschnitt.get(0))).size();i++){
+		for(int j=0; j<lookup.get(charMap.mapChar(abschnitt.get(0))).size();j++){
+			for(int k=0; k<lookup.get(charMap.mapChar(abschnitt.get(0))).size();k++){
+				for(int l=0; l<lookup.get(charMap.mapChar(abschnitt.get(0))).size();l++){
+					//Schreibe aktuelle Kombinationen in Strings und von da aus in possible4grams
+					clear="";
+					key="";
+					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(0))).get(i)[0]);
+					clear += tmp;
+					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(0))).get(i)[1]);
+					key += tmp;
+					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(1))).get(j)[0]);
+					clear += tmp;
+					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(1))).get(j)[1]);
+					key += tmp;
+					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(2))).get(k)[0]);
+					clear += tmp;
+					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(2))).get(k)[1]);
+					key += tmp;
+					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(3))).get(l)[0]);
+					clear += tmp;
+					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(3))).get(l)[1]);
+					key += tmp;
+					String[] tmp2={clear,key};
+					possible4grams.add(tmp2);
+				}
+			}
+		}
+	}
+	return possible4grams;
+}
+
+private void createLookupTable(int modulus) {
+	int[] mostfreq = new int[10];
+	mostfreq[0]=charMap.mapChar('e');
+	mostfreq[1]=charMap.mapChar('n');
+	mostfreq[2]=charMap.mapChar('r');
+	mostfreq[3]=charMap.mapChar('i');
+	mostfreq[4]=charMap.mapChar('s');
+	mostfreq[5]=charMap.mapChar('a');
+	mostfreq[6]=charMap.mapChar('d');
+	mostfreq[7]=charMap.mapChar('t');
+	mostfreq[8]=charMap.mapChar('h');
+	mostfreq[9]=charMap.mapChar('u');
+	if (modulus == 27 || modulus == 31 || modulus == 33){
+		mostfreq[9]=charMap.mapChar('*');
+	}
+	if (modulus == 90 || modulus == 91){
+		mostfreq[9]=charMap.mapChar(' ');
+	}
+	Integer[] tmp={0,0};
+	lookup = new ArrayList<ArrayList<Integer[]>>();
+	for (int i=0;i<modulus;i++){
+		lookup.add(new ArrayList<Integer[]>());
+		for(int j=0;j<10;j++){
+			for(int k=0;k<10;k++){
+				if((j+k)%modulus == i){
+					tmp[0]=j;
+					tmp[1]=k;
+					lookup.get(i).add(tmp);
+				}
+			}
+		}
+	}
+}
+
 private void showClearAndKeyText(int start, int laenge, int[] klartext, int[] schluesseltext) {
 	if(start < 0) start = 0;
 	if(laenge < 0) laenge = 0;
-	//TODO, prüfe ob es angrenzend oder überlappend zum Textabschnitt ab start 
+	//Prüfe ob es angrenzend oder überlappend zum Textabschnitt ab start 
 	//bis start+laenge bereits entschlüsselte Textstellen gibt.
 	boolean notext=true;
 	for(int i=Math.max(start-1,0);i<Math.min(start+laenge+1,klartext.length);i++){
