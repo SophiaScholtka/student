@@ -144,9 +144,9 @@ public class RunningKey extends Cipher {
 			System.out.println(">>>ENDE von possible4grams");
 		}
 		//Gib dem User die bewerteten 4gram Paare aus
-	
+		
 		//Bitte den User um eine Auswahl und speichere sein Ergebnis ab
-		//TODO setClearAndKeyText(klartext,schluesseltext,abschnitt);
+		setClearAndKeyText(start,klartext,schluesseltext,abschnitt);
 		//Abfrage ob der Text vollständig bearbeitet wurde oder der User schon zufrieden ist, dann
 		System.out.println("Möchten Sie die Entschlüsselung beenden? [y/n]");
 		try{
@@ -159,9 +159,11 @@ public class RunningKey extends Cipher {
 	//TODO schreibe den Schlüssel voller 'a' überall da wo bisher nix drin steht
   }
 
-private void setClearAndKeyText(int[] klartext, int[] schluesseltext, ArrayList<Integer> abschnitt) {
+private void setClearAndKeyText(int start,int[] klartext, int[] schluesseltext, ArrayList<Integer> abschnitt) {
 	String msg;
-	String input;
+	String input, yesorno;
+	int tempo;
+	char[] tmp = new char[4];
 	BufferedReader standardInput = launcher.openStandardInput();
 	boolean entscheidung=false;
 	do{
@@ -169,6 +171,42 @@ private void setClearAndKeyText(int[] klartext, int[] schluesseltext, ArrayList<
 		System.out.println(msg);
 		try{ 
 			input=standardInput.readLine();
+			for(int i=0;i<4;i++){
+				tempo = (charMap.mapChar(abschnitt.get(i))-charMap.mapChar(input.charAt(i)))%modulus;
+				tmp[i]=(char) charMap.remapChar(tempo);
+			}
+			msg = "Der passende Schlüsseltext ist "+ String.valueOf(tmp) +"\nEinverstanden? [y/n]";
+			System.out.println(msg);
+			yesorno=standardInput.readLine();
+			if(yesorno.equalsIgnoreCase("y")) {
+				entscheidung=true;
+				for(int i=0;i<input.length();i++){
+					klartext[i+start]=input.charAt(i);
+					schluesseltext[i+start]=tmp[i];
+				}
+				msg="Klar und Schlüsseltext wurden abgespeichert.";
+				System.out.println(msg);
+				if(klartext.length>start+4 && klartext[start+4]!=-1){
+					msg="Der auf den Klartext folgende Text lautet :";
+					int i=start+4;
+					while(klartext.length>i && klartext[i]!=-1){
+						msg+= (char) klartext[i];
+						i++;
+					}
+					msg+="\nMöchten Sie Klar- und Schlüsseltext ab hier tauschen?[y/n]";
+					System.out.println(msg);
+					yesorno=standardInput.readLine();
+					if(yesorno.equalsIgnoreCase("y")) {
+						int temp;
+						for(int j=start+4;j<klartext.length;j++){
+							temp=klartext[j];
+							klartext[j]=schluesseltext[j];
+							schluesseltext[j]=temp;
+						}
+						System.out.println("Klar- und Schlüsseltext wurden ab Position "+start+4+" getauscht.");
+					}
+				} 
+			}
 		}catch(IOException e) {
 			System.err.println(e);
 		}
@@ -266,7 +304,7 @@ private void showClearAndKeyText(int start, int laenge, int[] klartext, int[] sc
 		System.out.println("Kein bereits entschlüsselter Abschnitt grenzt an den gewählten Abschnitt");
 	} else {
 		int j=Math.max(start-1,0);
-		while (j>1 && klartext[j]!=-1 && schluesseltext[j]!=-1){
+		while (j>0 && klartext[j]!=-1 && schluesseltext[j]!=-1){
 			j--;
 		}
 		int i=j;
@@ -281,7 +319,7 @@ private void showClearAndKeyText(int start, int laenge, int[] klartext, int[] sc
 			}
 			System.out.println("Bereits entzifferter Klartext\n von Position "+j+" bis Position "+i+":\n"+String.valueOf(klar));
 			System.out.println("Bereits entzifferter Schlüsseltext\n von Position "+j+" bis Position "+i+":\n"+String.valueOf(schl));
-			j=i;
+			j=++i;
 			if(j>Math.min(start+laenge+1,klartext.length)) break;
 		}
 	}
