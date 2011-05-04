@@ -350,6 +350,7 @@ private void showClearAndKeyText(int start, int laenge, int[] klartext, int[] sc
 	if(notext) {
 		System.out.println("Kein bereits entschlüsselter Abschnitt grenzt an den gewählten Abschnitt");
 	} else {
+		//TODO Ausgabe noch mal fixen - momentan wird zu viel ausgegeben
 		int j=Math.max(start-1,0);
 		while (j>0 && klartext[j]!=-1 && schluesseltext[j]!=-1){
 			j--;
