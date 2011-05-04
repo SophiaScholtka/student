@@ -207,6 +207,7 @@ private void createLookupTable(int modulus) {
 		for(int j=0;j<10;j++){
 			for(int k=0;k<10;k++){
 				if((j+k)%modulus == i){
+					tmp = new Integer[2];
 					tmp[0]=j;
 					tmp[1]=k;
 					lookup.get(i).add(tmp);
