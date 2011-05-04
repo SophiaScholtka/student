@@ -133,6 +133,15 @@ public class RunningKey extends Cipher {
 			System.out.println(msg);
 			continue;
 		}
+		if(DEBUG){
+			System.out.println(">>>possible4grams:");
+			Iterator<String[]> it = possible4grams.iterator();
+			while(it.hasNext()){
+				String[] ausgabetmp = it.next();
+				System.out.println(ausgabetmp[0] + " " + ausgabetmp[1]);
+			}
+			System.out.println(">>>ENDE von possible4grams");
+		}
 		//Bitte den User um eine Auswahl und speichere sein Ergebnis ab
 		//Abfrage ob der Text vollständig bearbeitet wurde oder der User schon zufrieden ist, dann
 		fertig=true;
@@ -155,12 +164,12 @@ private ArrayList<String[]> getPossible4grams(ArrayList<Integer> abschnitt) {
 					clear += tmp;
 					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(0))).get(i)[1]);
 					key += tmp;
-					if(DEBUG){
+					/*if(DEBUG){
 						System.out.println(">>>"+lookup.get(charMap.mapChar(abschnitt.get(1))));
 						System.out.println(">>>"+lookup.get(charMap.mapChar(abschnitt.get(1))).size());
 						System.out.println(">>>"+lookup.get(charMap.mapChar(abschnitt.get(1))).get(j));
 						System.out.println(">>>"+lookup.get(charMap.mapChar(abschnitt.get(1))).get(j).length);
-					}
+					}*/
 					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(1))).get(j)[0]);
 					clear += tmp;
 					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(1))).get(j)[1]);
@@ -206,10 +215,10 @@ private void createLookupTable(int modulus) {
 		lookup.add(new ArrayList<Integer[]>());
 		for(int j=0;j<10;j++){
 			for(int k=0;k<10;k++){
-				if((j+k)%modulus == i){
+				if((mostfreq[j]+mostfreq[k])%modulus == i){
 					tmp = new Integer[2];
-					tmp[0]=j;
-					tmp[1]=k;
+					tmp[0]=mostfreq[j];
+					tmp[1]=mostfreq[k];
 					lookup.get(i).add(tmp);
 				}
 			}
