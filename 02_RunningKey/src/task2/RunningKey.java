@@ -94,9 +94,9 @@ public class RunningKey extends Cipher {
 			while(it2.hasNext()) {
 				System.out.print(Arrays.toString(it2.next()) + "\t");
 			}
-			System.out.println("---ENDE");
+			System.out.println("---ENDE (Elemente: " + list.size() + ")");
 		}
-		System.out.println();
+		System.out.println("Elemente: " + lookup.size());
 	}
 	
 	//Chiffre start
