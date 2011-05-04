@@ -955,9 +955,9 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 			cMTri[i] = "" + klar.charAt(i) + klar.charAt(i+1) + klar.charAt(i+2);
 			cKTri[i] = "" + key.charAt(i) + key.charAt(i+1) + key.charAt(i+2);
 		}
-		System.out.println("Unigramme: " + Arrays.toString(cMUni) + "\t" + Arrays.toString(cKUni));
-		System.out.println("Digramme: " + Arrays.toString(cMDi) + "\t" + Arrays.toString(cKDi));
-		System.out.println("Trigramme: " + Arrays.toString(cMTri) + "\t" + Arrays.toString(cKTri));
+//		System.out.println("Unigramme: " + Arrays.toString(cMUni) + "\t" + Arrays.toString(cKUni));
+//		System.out.println("Digramme: " + Arrays.toString(cMDi) + "\t" + Arrays.toString(cKDi));
+//		System.out.println("Trigramme: " + Arrays.toString(cMTri) + "\t" + Arrays.toString(cKTri));
 		
 		//Bereite Häufigkeitsvariablen vor
 		String[][] freqUni  = readFrequencyTable("../table/1-grams_programmierer.alph.tab");
