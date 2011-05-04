@@ -53,10 +53,7 @@ public class RunningKey extends Cipher {
 	//Bereite Schlüsseltext-Datei vor
 	keyFilePath = "key_text.txt"; //Datei mit Schlüsseltext
 	writeToFile(keyFilePath, ""); //Legt die Datei für Schlüsseltext an
-	
-	enterIndexes();
-	System.exit(0);
-	
+		
 	//Erfrage vermutete Alphabetgröße/Modulus
 	BufferedReader standardInput = launcher.openStandardInput();
 	boolean accepted = false;
@@ -109,7 +106,10 @@ public class RunningKey extends Cipher {
 	do {
 		//Erfrage die Position und Länge des Ciphertextabschnittes, den der User betrachten möchte
 		int start=0; int laenge=4;
-		//TODO 0 und 4 durch User-Eingaben Start und Länge ersetzen
+		int[] enteredIndexes = enterIndexes();
+		start = enteredIndexes[0];
+		laenge = enteredIndexes[1] - enteredIndexes[0] + 1;
+		if(DEBUG) System.out.println("Abschnitt " + enteredIndexes[0] + " - " + enteredIndexes[1] + "(Länge: " + laenge + ")");
 		ArrayList<Integer> abschnitt = getAbschnitt(start,laenge,cipherChars);
 		//Zeige bereits entschlüsselte Abschnitte, falls sie angrenzen/überlappen
 		showClearAndKeyText(start,laenge,klartext,schluesseltext);
