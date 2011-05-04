@@ -142,7 +142,10 @@ public class RunningKey extends Cipher {
 			}
 			System.out.println(">>>ENDE von possible4grams");
 		}
+		//Gib dem User die bewerteten 4gram Paare aus
+	
 		//Bitte den User um eine Auswahl und speichere sein Ergebnis ab
+		//TODO setClearAndKeyText(klartext,schluesseltext,abschnitt);
 		//Abfrage ob der Text vollständig bearbeitet wurde oder der User schon zufrieden ist, dann
 		System.out.println("Fertig? [y/n]");
 		try{
@@ -154,6 +157,17 @@ public class RunningKey extends Cipher {
 	} while (!fertig);
 	//TODO schreibe den Schlüssel voller 'a' überall da wo bisher nix drin steht
   }
+
+private void setClearAndKeyText(int[] klartext, int[] schluesseltext, ArrayList<Integer> abschnitt) {
+	String msg;
+	String input;
+	BufferedReader standardInput = launcher.openStandardInput();
+	boolean entscheidung=false;
+	do{
+		msg = "Bitte geben Sie nun die 4 Zeichen des Klartextes ein, die Sie abspeichern möchten";
+		System.out.println(msg);
+	}while(!entscheidung);
+}
 
 private ArrayList<String[]> getPossible4grams(ArrayList<Integer> abschnitt) {
 	ArrayList<String[]> possible4grams = new ArrayList<String[]>();
