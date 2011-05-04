@@ -349,9 +349,6 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
    * @see #writeKey writeKey
    */
   public void makeKey() {
-	  System.out.println(evaluatePart("esse","stet"));
-	  System.exit(0);
-	//if(DEBUG) testMethod();
 	if(DEBUG) System.out.println(">>>makeKey called");
 	
     int alphabetLength = 0; //Laenge des verwendeten Alphabets
