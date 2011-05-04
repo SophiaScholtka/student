@@ -370,9 +370,6 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
    * @see #writeKey writeKey
    */
   public void makeKey() {
-//	  System.out.println(evaluatePart());
-//	  System.exit(0);
-	//if(DEBUG) testMethod();
 	if(DEBUG) System.out.println(">>>makeKey called");
 	
     int alphabetLength = 0; //Laenge des verwendeten Alphabets
@@ -934,7 +931,7 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 		return back;
 	}
 	
-	private double evaluatePart() {
+	private double evaluatePart(String klar, String key) {
 		double back = 0.0;
 		
 		//Erfrage Gewichtungen
@@ -970,6 +967,30 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 		}
 		
 		//Bereite Buchstabensuppe vor
+		String[] cMUni = new String[4]; String[] cKUni = new String[4];
+		String[] cMDi = new String[3]; String[] cKDi = new String[3];
+		String[] cMTri = new String[2]; String[] cKTri = new String[2];
+		for(int i = 0; i < 4; i++) {
+			cMUni[i] = "" + klar.charAt(i);
+			cKUni[i] = "" + key.charAt(i);
+		}
+		for(int i = 0; i < 3; i++) {
+			cMDi[i] = "" + klar.charAt(i) + klar.charAt(i+1);
+			cKDi[i] = "" + key.charAt(i) + key.charAt(i+1);
+		}
+		for(int i = 0; i < 2; i++) {
+			cMTri[i] = "" + klar.charAt(i) + klar.charAt(i+1) + klar.charAt(i+2);
+			cKTri[i] = "" + key.charAt(i) + key.charAt(i+1) + key.charAt(i+2);
+		}
+		System.out.println("Unigramme: " + Arrays.toString(cMUni) + "\t" + Arrays.toString(cKUni));
+		System.out.println("Digramme: " + Arrays.toString(cMDi) + "\t" + Arrays.toString(cKDi));
+		System.out.println("Trigramme: " + Arrays.toString(cMTri) + "\t" + Arrays.toString(cKTri));
+		
+		//Bereite Häufigkeitsvariablen vor
+		String[][] freqUni  = readFrequencyTable("../table/1-grams_programmierer.alph.tab");
+		String[][] freqDi   = readFrequencyTable("../table/2-grams_programmierer.alph.tab");
+		String[][] freqTri  = readFrequencyTable("../table/3-grams_programmierer.alph.tab");
+		
 		double[][] k = new double[3][4];
 		double[][] s = new double[3][4];
 		for(int i = 0; i<k.length;i++) {
@@ -977,15 +998,104 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 			k[1][i] = 0;s[0][i]=0;
 			k[2][i] = 0;s[0][i]=0;
 		}
-
+		
 		//1gram abcd x (a b c d) y
 		//2gram abcd xx xa (ab bc cd) dy yy
 		//3gram abcd xxx xxa xab (abc bcd) cdy dyy yyy
-		//TODO Create relative frequency of cleartext
-		//TODO Create relative frequency of keytext
+		//1gram relative frequencies
+		for(int i = 0; i < cMUni.length;i++) {
+			k[0][i] = findFrequency(cMUni[i], freqUni);
+			s[0][i] = findFrequency(cKUni[i], freqUni);
+		}
+		//2gram relative frequencies 
+		for(int i = 0; i < cMDi.length;i++) {
+			k[1][i] = findFrequency(cMDi[i], freqDi);
+			s[1][i] = findFrequency(cKDi[i], freqDi);
+		}
+		//3gram relative frequencies
+		for(int i = 0; i < cMTri.length;i++) {
+			k[2][i] = findFrequency(cMTri[i], freqTri);
+			s[2][i] = findFrequency(cKTri[i], freqTri);
+		}
 		
+//		if(DEBUG) System.out.println(">>>> Wahrscheinlichkeiten:");
+//		if(DEBUG) System.out.println(Arrays.toString(k[0]) + Arrays.toString(k[1]) + Arrays.toString(k[2]));
+//		if(DEBUG) System.out.println(Arrays.toString(s[0]) + Arrays.toString(s[1]) + Arrays.toString(s[2]));
 		back = evalutateFormula(g, k, s);
 		
 		return back;
 	}
+	
+	private double findFrequency(String s, String[][] freq) {
+		double back = 0.0;
+		
+		for(int i = 0; i < freq.length;i++) {
+			if(freq[i][0].equals(s)) {
+				back = Double.parseDouble(freq[i][1]);
+			}
+		}
+		
+		return back;
+	}
+
+  private String[][] readFrequencyTable(String filename){
+	  String[][] table;
+	  String[][] help;
+	  StringBuffer help1 = new StringBuffer("");
+	  String helper;
+	  try{
+		  BufferedReader file = new BufferedReader(new FileReader(filename));
+		  String line;
+		  int linecount=0;
+			while ((line = file.readLine()) != null) {
+					help1.append(line);
+					help1.append("\n");
+					linecount++;
+				}
+			helper=help1.toString();
+			help = new String[linecount][3];
+			int eol,e0,e1;
+			int i,j;
+			i=0;
+			while(i<linecount){
+				if (helper.length() <=0) break;
+				eol = helper.indexOf("\n");
+				j=eol-1;
+				while(Character.isDigit(helper.charAt(j)) || helper.charAt(j)=='_'){
+				j--;}
+				e1=j;
+				j--;
+				while(Character.isDigit(helper.charAt(j)) || helper.charAt(j)=='.'){j--;}
+				e0=j;
+				//System.out.println("eol="+eol+" e1="+e1+" e0="+e0);
+				if(e0<0 || e1<=e0+1 || eol<=e1+1){
+					if (eol>=0) {
+						helper=helper.substring(eol+1); 
+						continue;
+					}
+				}
+				help[i][0]=helper.substring(0,e0);
+				help[i][1]=helper.substring(e0+1,e1);
+				help[i][2]=helper.substring(e1+1,eol);
+				helper=helper.substring(eol+1);
+//					System.out.println(help[i][0] + " " + help[i][1] + " " + help[i][2]);
+				i++;
+			}
+			linecount=i;
+			//System.out.println(">>>Die Tabelle hat "+linecount+" Zeilen.");
+			if(linecount<1) return null;
+			table = new String[linecount][3];
+			for(i=0;i<linecount;i++){
+				table[i][0]=help[i][0];
+				table[i][1]=help[i][1];
+				table[i][2]=help[i][2];
+				//System.out.println(help[i][0] + " " + help[i][1] + " " + help[i][2]);
+			}
+		file.close();
+		return table;
+	  } catch (IOException e2) {
+			e2.printStackTrace();
+	  }
+	  return null;
+  }
 }
