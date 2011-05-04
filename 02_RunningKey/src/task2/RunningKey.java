@@ -939,19 +939,21 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 			} while (!accepted);
 		}
 		
-		//TODO Create relative frequency of cleartext
+		//Bereite Buchstabensuppe vor
 		double[][] k = new double[3][4];
-				
-		
-		//TODO Create relative frequency of keytext
 		double[][] s = new double[3][4];
-		
-		//TODO entferne Platzhalter für s und k
 		for(int i = 0; i<k.length;i++) {
 			k[0][i] = 0;s[0][i]=0;
 			k[1][i] = 0;s[0][i]=0;
 			k[2][i] = 0;s[0][i]=0;
 		}
+
+		//1gram abcd x (a b c d) y
+		//2gram abcd xx xa (ab bc cd) dy yy
+		//3gram abcd xxx xxa xab (abc bcd) cdy dyy yyy
+		//TODO Create relative frequency of cleartext
+		//TODO Create relative frequency of keytext
+		
 		back = evalutateFormula(g, k, s);
 		
 		return back;
