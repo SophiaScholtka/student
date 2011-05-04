@@ -108,10 +108,8 @@ public class RunningKey extends Cipher {
 	do {
 		//Erfrage die Position und Länge des Ciphertextabschnittes, den der User betrachten möchte
 		int start=0; int laenge=4;
-		int[] enteredIndexes = enterIndexes();
-		start = enteredIndexes[0];
-		laenge = enteredIndexes[1] - enteredIndexes[0] + 1;
-		if(DEBUG) System.out.println("Abschnitt " + enteredIndexes[0] + " - " + enteredIndexes[1] + "(Länge: " + laenge + ")");
+		start = enterIndexes();
+		if(DEBUG) System.out.println("Abschnitt ab " + start + "  (Länge: " + laenge + ")");
 		ArrayList<Integer> abschnitt = getAbschnitt(start,laenge,cipherChars);
 		//Zeige bereits entschlüsselte Abschnitte, falls sie angrenzen/überlappen
 		showClearAndKeyText(start,laenge,klartext,schluesseltext);
@@ -819,10 +817,8 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	  }
 	
 	  
-	private int[] enterIndexes() {
-		int[] back = new int[2];
-		String[] inputA = {"-1","-1"};
-		int input;
+	private int enterIndexes() {
+		int back = 0;
 	    BufferedReader standardInput = launcher.openStandardInput();
 		
 		//Einlesen der Größe des Alphabets
@@ -833,13 +829,13 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	    do {
 	      System.out.print("Geben Sie den Startindex an:");
 	      try {
-			input = Integer.parseInt(standardInput.readLine());
-	        if (input < 0) {
+			back= Integer.parseInt(standardInput.readLine());
+	        if (back < 0) {
 	          System.out.println(
 	        		  "Die Eingabe wurde abgelehnt. Der Startindex muss größer als 0 sein." +
 	        		  "Der Startindex muss eine natürliche Zahl sein.");
 	        } else {
-				msg = "Es wird der Text ab Index " + input + " betrachtet.";
+				msg = "Es wird der Text ab Index " + back + " betrachtet.";
 				System.out.println(msg);
 				accepted = true;	          
 	        }
@@ -851,8 +847,6 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	      }
 	    } while (!accepted);
 	    
-	    back[0] = Integer.parseInt(inputA[0]);
-	    back[1] = Integer.parseInt(inputA[1]);
 		
 		return back;
 	}
