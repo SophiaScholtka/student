@@ -19,6 +19,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.lang.Math;
 
@@ -133,18 +134,59 @@ public class RunningKey extends Cipher {
 			System.out.println(msg);
 			continue;
 		}
+//		double[] weights = enterWeighting();
+//		if(DEBUG){
+//			System.out.println(">>>possible4grams:");
+//			Iterator<String[]> it = possible4grams.iterator();
+//			while(it.hasNext()){
+//				String[] ausgabetmp = it.next();
+//				System.out.println(ausgabetmp[0] + " " + ausgabetmp[1]+" "+evaluatePart(ausgabetmp[0],ausgabetmp[1],weights));
+//			}
+//			System.out.println(">>>ENDE von possible4grams");
+//		}
+		
+		//Sortiere nach Bewertung
 		double[] weights = enterWeighting();
-		if(DEBUG){
-			System.out.println(">>>possible4grams:");
-			Iterator<String[]> it = possible4grams.iterator();
-			while(it.hasNext()){
-				String[] ausgabetmp = it.next();
-				System.out.println(ausgabetmp[0] + " " + ausgabetmp[1]+" "+evaluatePart(ausgabetmp[0],ausgabetmp[1],weights));
-			}
-			System.out.println(">>>ENDE von possible4grams");
+		ArrayList<Double> allWeights = new ArrayList<Double>();
+		for(int i = 0; i < possible4grams.size(); i++) {
+			String[] ausgabetmp = possible4grams.get(i);
+			allWeights.add(evaluatePart(ausgabetmp[0],ausgabetmp[1],weights));
 		}
+		Collections.sort(allWeights);
+		Collections.reverse(allWeights);
+
+		double w = 0.0;
+		ArrayList<String[]> ausgabeNew = new ArrayList<String[]>();
+		Iterator<String[]> it;
+		int j = 0;
+		while(!possible4grams.isEmpty()) {
+			it = possible4grams.iterator();
+			j = 0;
+			while(it.hasNext()) {
+				String[] ausgabetmp = it.next();
+				w = evaluatePart(ausgabetmp[0],ausgabetmp[1],weights);
+				if(w == allWeights.get(0)) {
+					String[] sOut = {ausgabetmp[0],ausgabetmp[1],""+w};
+					ausgabeNew.add(sOut);
+					it.remove();
+					allWeights.remove(0);
+				}
+				j++;
+			}
+		}
+		if(DEBUG) System.out.println("Berechnung der 4-Grammlisten abgeschlossen. Die Anzahl beträgt " + ausgabeNew.size());
+		
 		//Gib dem User die bewerteten 4gram Paare aus
 		
+		System.out.println("Die bewerteten, höchsten 4 Gramme (Ausschnitt aus den " + ausgabeNew.size() + " 4 Grammen:");
+		Iterator<String[]> itOut = ausgabeNew.iterator();
+		int counter = 0;
+		while(itOut.hasNext() && counter < 20){
+			String[] ausgabetmp = itOut.next();
+			System.out.println("\t" + ausgabetmp[0] + "\t" + ausgabetmp[1]+"\t"+ausgabetmp[2]);
+			counter++;
+		}
+	
 		//Bitte den User um eine Auswahl und speichere sein Ergebnis ab
 		setClearAndKeyText(start,klartext,schluesseltext,abschnitt);
 		//Abfrage ob der Text vollständig bearbeitet wurde oder der User schon zufrieden ist, dann
@@ -156,7 +198,12 @@ public class RunningKey extends Cipher {
 			System.err.println(e);
 		}
 	} while (!fertig);
-	//TODO schreibe den Schlüssel voller 'a' überall da wo bisher nix drin steht
+	//Schreibe den Schlüssel voller 'a' überall da wo bisher nix drin steht 
+	for(int i = 0; i < schluesseltext.length; i++) {
+		if(schluesseltext[i] == -1) {
+			schluesseltext[i] = 97;
+		}
+	}
   }
 
 private void setClearAndKeyText(int start,int[] klartext, int[] schluesseltext, ArrayList<Integer> abschnitt) {
