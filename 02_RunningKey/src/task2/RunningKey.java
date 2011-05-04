@@ -144,8 +144,15 @@ public class RunningKey extends Cipher {
 		}
 		//Bitte den User um eine Auswahl und speichere sein Ergebnis ab
 		//Abfrage ob der Text vollständig bearbeitet wurde oder der User schon zufrieden ist, dann
-		fertig=true;
+		System.out.println("Fertig? [y/n]");
+		try{
+			String yesorno = standardInput.readLine();
+			if (yesorno.equalsIgnoreCase("y")) fertig=true;
+		} catch(IOException e) {
+			System.err.println(e);
+		}
 	} while (!fertig);
+	//TODO schreibe den Schlüssel voller 'a' überall da wo bisher nix drin steht
   }
 
 private ArrayList<String[]> getPossible4grams(ArrayList<Integer> abschnitt) {
