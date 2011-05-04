@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.lang.Math;
 
+import de.tubs.cs.iti.jcrypt.chiffre.Chiffre;
 import de.tubs.cs.iti.jcrypt.chiffre.Cipher;
 
 /**
@@ -222,6 +223,12 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	  
 	  if(keyChars.size() >= clearChars.size()) {
 		  doEncipher(keyChars,clearChars,ciphertext);
+		  try {
+			ciphertext.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	  } else {
 		  msg = "Schlüsseldatei ist zu klein! Verschlüsseln wird abgebrochen. " +
 		  		"Empfohlene Mindestlänge des Schlüssels ist " + clearChars.size();
@@ -512,16 +519,18 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 			  
 		  character = (character + shift + modulus) % modulus;
 		  character = charMap.remapChar(character);
+		  System.out.print((char)character);
 		  ciphertext.write(character);
 		  } else {
 			  characterSkipped = true;
 			  useNextKey = false;
+		  }
 	  }
-	  }
+	  System.out.println();
 	  if (characterSkipped) {
-	System.out.println("Warnung: Mindestens ein Zeichen aus der "
-	+ "Klartextdatei ist im Alphabet nicht\nenthalten und wurde "
-	+ "überlesen.");
+		System.out.println("Warnung: Mindestens ein Zeichen aus der "
+		+ "Klartextdatei ist im Alphabet nicht\nenthalten und wurde "
+		+ "überlesen.");
 	  }
 	} catch (IOException e) {
 	  System.err.println("Abbruch: Fehler beim Zugriff auf Klar- oder "
@@ -529,6 +538,8 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	  e.printStackTrace();
 	  System.exit(1);
 	}
+	
+		if(DEBUG) System.out.println(">>>/doEncipher finished");
 		
 	}
 
