@@ -86,6 +86,18 @@ public class RunningKey extends Cipher {
 	} while (!accepted);
 	
 	createLookupTable(modulus);
+	if(DEBUG){
+		Iterator<ArrayList<Integer[]>> it1 = lookup.iterator();
+		while(it1.hasNext()) {
+			ArrayList<Integer[]> list = it1.next();
+			Iterator<Integer[]> it2 = list.iterator();
+			while(it2.hasNext()) {
+				System.out.print(Arrays.toString(it2.next()) + "\t");
+			}
+			System.out.println("---ENDE");
+		}
+		System.out.println();
+	}
 	
 	//Chiffre start
 	msg = "Beginne mit dem Verfahren zum Brechen der Chiffre.";
@@ -109,6 +121,7 @@ public class RunningKey extends Cipher {
 		//Erfrage die Position und Länge des Ciphertextabschnittes, den der User betrachten möchte
 		int start=0; int laenge=4;
 		start = enterIndexes();
+		if(start+laenge>cipherChars.size()) continue;
 		if(DEBUG) System.out.println("Abschnitt ab " + start + "  (Länge: " + laenge + ")");
 		ArrayList<Integer> abschnitt = getAbschnitt(start,laenge,cipherChars);
 		//Zeige bereits entschlüsselte Abschnitte, falls sie angrenzen/überlappen
@@ -132,9 +145,9 @@ private ArrayList<String[]> getPossible4grams(ArrayList<Integer> abschnitt) {
 	char tmp;
 	//gehe für jeden der 4 Ciffre-Buchstaben alle möglichen Paare häufigster Buchstaben durch und bilde alle Kombinationen
 	for(int i=0; i<lookup.get(charMap.mapChar(abschnitt.get(0))).size();i++){
-		for(int j=0; j<lookup.get(charMap.mapChar(abschnitt.get(0))).size();j++){
-			for(int k=0; k<lookup.get(charMap.mapChar(abschnitt.get(0))).size();k++){
-				for(int l=0; l<lookup.get(charMap.mapChar(abschnitt.get(0))).size();l++){
+		for(int j=0; j<lookup.get(charMap.mapChar(abschnitt.get(1))).size();j++){
+			for(int k=0; k<lookup.get(charMap.mapChar(abschnitt.get(2))).size();k++){
+				for(int l=0; l<lookup.get(charMap.mapChar(abschnitt.get(3))).size();l++){
 					//Schreibe aktuelle Kombinationen in Strings und von da aus in possible4grams
 					clear="";
 					key="";
@@ -142,6 +155,12 @@ private ArrayList<String[]> getPossible4grams(ArrayList<Integer> abschnitt) {
 					clear += tmp;
 					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(0))).get(i)[1]);
 					key += tmp;
+					if(DEBUG){
+						System.out.println(">>>"+lookup.get(charMap.mapChar(abschnitt.get(1))));
+						System.out.println(">>>"+lookup.get(charMap.mapChar(abschnitt.get(1))).size());
+						System.out.println(">>>"+lookup.get(charMap.mapChar(abschnitt.get(1))).get(j));
+						System.out.println(">>>"+lookup.get(charMap.mapChar(abschnitt.get(1))).get(j).length);
+					}
 					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(1))).get(j)[0]);
 					clear += tmp;
 					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(1))).get(j)[1]);
