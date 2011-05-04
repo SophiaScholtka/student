@@ -133,12 +133,13 @@ public class RunningKey extends Cipher {
 			System.out.println(msg);
 			continue;
 		}
+		double[] weights = enterWeighting();
 		if(DEBUG){
 			System.out.println(">>>possible4grams:");
 			Iterator<String[]> it = possible4grams.iterator();
 			while(it.hasNext()){
 				String[] ausgabetmp = it.next();
-				System.out.println(ausgabetmp[0] + " " + ausgabetmp[1]+" "+evaluatePart(ausgabetmp[0],ausgabetmp[1]));
+				System.out.println(ausgabetmp[0] + " " + ausgabetmp[1]+" "+evaluatePart(ausgabetmp[0],ausgabetmp[1],weights));
 			}
 			System.out.println(">>>ENDE von possible4grams");
 		}
