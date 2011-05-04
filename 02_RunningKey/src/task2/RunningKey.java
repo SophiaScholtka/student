@@ -148,7 +148,7 @@ public class RunningKey extends Cipher {
 		//Bitte den User um eine Auswahl und speichere sein Ergebnis ab
 		//TODO setClearAndKeyText(klartext,schluesseltext,abschnitt);
 		//Abfrage ob der Text vollständig bearbeitet wurde oder der User schon zufrieden ist, dann
-		System.out.println("Fertig? [y/n]");
+		System.out.println("Möchten Sie die Entschlüsselung beenden? [y/n]");
 		try{
 			String yesorno = standardInput.readLine();
 			if (yesorno.equalsIgnoreCase("y")) fertig=true;
