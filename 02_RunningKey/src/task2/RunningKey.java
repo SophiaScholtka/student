@@ -322,6 +322,8 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
    * @see #writeKey writeKey
    */
   public void makeKey() {
+//	  System.out.println(evaluatePart());
+//	  System.exit(0);
 	//if(DEBUG) testMethod();
 	if(DEBUG) System.out.println(">>>makeKey called");
 	
@@ -820,7 +822,7 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	private int[] enterIndexes() {
 		int[] back = new int[2];
 		String[] inputA = {"-1","-1"};
-		String input;
+		int input;
 	    BufferedReader standardInput = launcher.openStandardInput();
 		
 		//Einlesen der Größe des Alphabets
@@ -829,21 +831,17 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	    		" den Sie betrachten möchten.";
 	    System.out.println(msg);
 	    do {
-	      System.out.print("Geben Sie den Indexbereich mit '-' ein.");
+	      System.out.print("Geben Sie den Startindex an:");
 	      try {
-	        input = standardInput.readLine();
-	        inputA = input.split("-");
-	        if (inputA.length != 2 || Integer.parseInt(inputA[0]) > Integer.parseInt(inputA[1])) {
+			input = Integer.parseInt(standardInput.readLine());
+	        if (input < 0) {
 	          System.out.println(
-	        		  "Die Eingabe wurde abgelehnt. Geben sie zwei Indexzahlen an." +
-	        		  " Die Zahlen werden durch '-' getrennt. " +
-	        		  "Die erste Zahl muss kleiner sein als die zweite.");
+	        		  "Die Eingabe wurde abgelehnt. Der Startindex muss größer als 0 sein." +
+	        		  "Der Startindex muss eine natürliche Zahl sein.");
 	        } else {
-		msg = "Es werden die Zeichen im Bereich von " + 
-			inputA[0] + " bis " + inputA[1] + " betrachtet.";
-		System.out.println(msg);
-		accepted = true;
-	          
+				msg = "Es wird der Text ab Index " + input + " betrachtet.";
+				System.out.println(msg);
+				accepted = true;	          
 	        }
 	      } catch (IOException e) {
 	        System.err
@@ -855,6 +853,92 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	    
 	    back[0] = Integer.parseInt(inputA[0]);
 	    back[1] = Integer.parseInt(inputA[1]);
+		
+		return back;
+	}
+	//TODO passe k und s typen an
+	private double evalutateFormula(double[] g, double[][] k, double[][] s) {
+		double back = 0;
+		
+		double value;
+		double sum;
+		
+		//Klartextausschnitt
+		value = 0;
+		sum = 0;
+		for(int j = 0;j < 3; j++) {
+			sum = 0;
+			for(int i = 0 ; i < 5-j - 1 ; i++) {
+				sum = sum + k[j][i];
+			}
+			value = value + g[j] * sum;
+		}
+		back = back + value;
+		
+		//Schlüsseltextausschnit
+		value = 0;
+		sum = 0;
+		for(int j = 0;j < 3; j++) {
+			sum = 0;
+			for(int i = 0 ; i < 5-j-1 ; i++) {
+				sum = sum + s[j][i];
+			}
+			value = value + g[j] * sum;
+		}
+		back = back + value;
+		
+		return back;
+	}
+	
+	private double evaluatePart() {
+		double back = 0.0;
+		
+		//Erfrage Gewichtungen
+		BufferedReader standardInput = launcher.openStandardInput();
+		boolean accepted = false;
+		double[] g = new double[3];
+		
+		String msg = "Bitte geben sie die Gewichtungen für die NGramme ein:";
+		System.out.println(msg);
+		for(int i = 0; i<g.length;i++) {
+			accepted = false;
+			do {
+				System.out.print("Geben Sie die Gewichtung für " + (i+1) + "-Gramme ein: ");
+				try {
+					g[i] = (double)Integer.parseInt(standardInput.readLine());
+					if (g[i] < 0 || g[i] >= 1000) {
+						System.out.println(
+								"Die Gewichtung muss eine natürliche Zahl zwischen 0 bis 1000 sein.");
+					} else {
+						msg = "Die Gewichtungen für "+(i+1)+"-Gramme lautet " + g[i] + ".";
+						System.out.println(msg);
+						accepted = true;
+					}
+				} catch (NumberFormatException e) {
+					System.out.println("Fehler beim Parsen der Zahl. Bitte korrigieren"
+							+ " Sie Ihre Eingabe.");
+				} catch (IOException e) {
+					System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+					e.printStackTrace();
+					System.exit(1);
+				}
+			} while (!accepted);
+		}
+		
+		//TODO Create relative frequency of cleartext
+		double[][] k = new double[3][4];
+				
+		
+		//TODO Create relative frequency of keytext
+		double[][] s = new double[3][4];
+		
+		//TODO entferne Platzhalter für s und k
+		for(int i = 0; i<k.length;i++) {
+			k[0][i] = 0;s[0][i]=0;
+			k[1][i] = 0;s[0][i]=0;
+			k[2][i] = 0;s[0][i]=0;
+		}
+		back = evalutateFormula(g, k, s);
 		
 		return back;
 	}
