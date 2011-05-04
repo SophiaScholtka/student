@@ -902,7 +902,6 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 		
 		return back;
 	}
-	//TODO passe k und s typen an
 	private double evalutateFormula(double[] g, double[][] k, double[][] s) {
 		double back = 0;
 		
@@ -936,41 +935,9 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 		return back;
 	}
 	
-	private double evaluatePart(String klar, String key) {
+	private double evaluatePart(String klar, String key, double[] g) {
 		double back = 0.0;
-		
-		//Erfrage Gewichtungen
-		BufferedReader standardInput = launcher.openStandardInput();
-		boolean accepted = false;
-		double[] g = new double[3];
-		
-		String msg = "Bitte geben sie die Gewichtungen für die NGramme ein:";
-		System.out.println(msg);
-		for(int i = 0; i<g.length;i++) {
-			accepted = false;
-			do {
-				System.out.print("Geben Sie die Gewichtung für " + (i+1) + "-Gramme ein: ");
-				try {
-					g[i] = (double)Integer.parseInt(standardInput.readLine());
-					if (g[i] < 0 || g[i] >= 1000) {
-						System.out.println(
-								"Die Gewichtung muss eine natürliche Zahl zwischen 0 bis 1000 sein.");
-					} else {
-						msg = "Die Gewichtungen für "+(i+1)+"-Gramme lautet " + g[i] + ".";
-						System.out.println(msg);
-						accepted = true;
-					}
-				} catch (NumberFormatException e) {
-					System.out.println("Fehler beim Parsen der Zahl. Bitte korrigieren"
-							+ " Sie Ihre Eingabe.");
-				} catch (IOException e) {
-					System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
-					e.printStackTrace();
-					System.exit(1);
-				}
-			} while (!accepted);
-		}
-		
+						
 		//Bereite Buchstabensuppe vor
 		String[] cMUni = new String[4]; String[] cKUni = new String[4];
 		String[] cMDi = new String[3]; String[] cKDi = new String[3];
@@ -1102,5 +1069,39 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 			e2.printStackTrace();
 	  }
 	  return null;
+  }
+  
+  private double[] enterWeighting() {
+	  double[] g = new double[3];
+		//Erfrage Gewichtungen
+		BufferedReader standardInput = launcher.openStandardInput();
+		boolean accepted = false;
+		String msg = "Bitte geben sie die Gewichtungen für die NGramme ein:";
+		System.out.println(msg);
+		for(int i = 0; i<g.length;i++) {
+			accepted = false;
+			do {
+				System.out.print("Geben Sie die Gewichtung für " + (i+1) + "-Gramme ein: ");
+				try {
+					g[i] = (double)Integer.parseInt(standardInput.readLine());
+					if (g[i] < 0 || g[i] >= 1000) {
+						System.out.println(
+								"Die Gewichtung muss eine natürliche Zahl zwischen 0 bis 1000 sein.");
+					} else {
+						msg = "Die Gewichtungen für "+(i+1)+"-Gramme lautet " + g[i] + ".";
+						System.out.println(msg);
+						accepted = true;
+					}
+				} catch (NumberFormatException e) {
+					System.out.println("Fehler beim Parsen der Zahl. Bitte korrigieren"
+							+ " Sie Ihre Eingabe.");
+				} catch (IOException e) {
+					System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+					e.printStackTrace();
+					System.exit(1);
+				}
+			} while (!accepted);
+		}
+	return g;
   }
 }
