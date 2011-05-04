@@ -156,7 +156,12 @@ public class RunningKey extends Cipher {
 			System.err.println(e);
 		}
 	} while (!fertig);
-	//TODO schreibe den Schlüssel voller 'a' überall da wo bisher nix drin steht
+	//Schreibe den Schlüssel voller 'a' überall da wo bisher nix drin steht 
+	for(int i = 0; i < schluesseltext.length; i++) {
+		if(schluesseltext[i] == -1) {
+			schluesseltext[i] = 97;
+		}
+	}
   }
 
 private void setClearAndKeyText(int[] klartext, int[] schluesseltext, ArrayList<Integer> abschnitt) {
