@@ -876,7 +876,6 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 		
 		return back;
 	}
-	//TODO passe k und s typen an
 	private double evalutateFormula(double[] g, double[][] k, double[][] s) {
 		double back = 0;
 		
