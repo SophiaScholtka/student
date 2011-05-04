@@ -138,7 +138,7 @@ public class RunningKey extends Cipher {
 			Iterator<String[]> it = possible4grams.iterator();
 			while(it.hasNext()){
 				String[] ausgabetmp = it.next();
-				System.out.println(ausgabetmp[0] + " " + ausgabetmp[1]);
+				System.out.println(ausgabetmp[0] + " " + ausgabetmp[1]+" "+evaluatePart(ausgabetmp[0],ausgabetmp[1]));
 			}
 			System.out.println(">>>ENDE von possible4grams");
 		}
@@ -166,6 +166,11 @@ private void setClearAndKeyText(int[] klartext, int[] schluesseltext, ArrayList<
 	do{
 		msg = "Bitte geben Sie nun die 4 Zeichen des Klartextes ein, die Sie abspeichern möchten";
 		System.out.println(msg);
+		try{ 
+			input=standardInput.readLine();
+		}catch(IOException e) {
+			System.err.println(e);
+		}
 	}while(!entscheidung);
 }
 
