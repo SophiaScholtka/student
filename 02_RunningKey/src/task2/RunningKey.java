@@ -54,6 +54,8 @@ public class RunningKey extends Cipher {
 	keyFilePath = "key_text.txt"; //Datei mit Schlüsseltext
 	writeToFile(keyFilePath, ""); //Legt die Datei für Schlüsseltext an
 	
+	enterIndexes();
+	System.exit(0);
 	
 	//Erfrage vermutete Alphabetgröße/Modulus
 	BufferedReader standardInput = launcher.openStandardInput();
@@ -222,11 +224,10 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	  clearChars = readBufferedReaderToList(cleartext);
 	  
 	  if(keyChars.size() >= clearChars.size()) {
-		  doEncipher(keyChars,clearChars,ciphertext);
-		  try {
+		doEncipher(keyChars,clearChars,ciphertext);
+		try {
 			ciphertext.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	  } else {
@@ -575,9 +576,11 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 		  //Zeige deciphered Klartext
 		  System.out.println("Ausschnitt aus dem Klartext: ");
 		  Iterator<String> newClearIterator = newCleartext.iterator();
-		  for (int i=0; i<100;i++) {
-				System.out.print(newClearIterator.next());
-			  }
+		  int counter = 0;
+		  while(newClearIterator.hasNext() && counter < 100) {
+			System.out.print(newClearIterator.next());
+			counter++;
+		  }
 		  System.out.println();
 		  
 		  if (characterSkipped) {
@@ -734,4 +737,47 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 			  e.printStackTrace();
 		  }
 	  }
+	
+	  
+	private int[] enterIndexes() {
+		int[] back = new int[2];
+		String[] inputA = {"-1","-1"};
+		String input;
+	    BufferedReader standardInput = launcher.openStandardInput();
+		
+		//Einlesen der Größe des Alphabets
+	    boolean accepted = false;
+	    String msg = "Bitte geben Sie Start- und Endindex von dem Textabschnitt an," +
+	    		" den Sie betrachten möchten.";
+	    System.out.println(msg);
+	    do {
+	      System.out.print("Geben Sie den Indexbereich mit '-' ein.");
+	      try {
+	        input = standardInput.readLine();
+	        inputA = input.split("-");
+	        if (inputA.length != 2 || Integer.parseInt(inputA[0]) > Integer.parseInt(inputA[1])) {
+	          System.out.println(
+	        		  "Die Eingabe wurde abgelehnt. Geben sie zwei Indexzahlen an." +
+	        		  " Die Zahlen werden durch '-' getrennt. " +
+	        		  "Die erste Zahl muss kleiner sein als die zweite.");
+	        } else {
+		msg = "Es werden die Zeichen im Bereich von " + 
+			inputA[0] + " bis " + inputA[1] + " betrachtet.";
+		System.out.println(msg);
+		accepted = true;
+	          
+	        }
+	      } catch (IOException e) {
+	        System.err
+	            .println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+	        e.printStackTrace();
+	        System.exit(1);
+	      }
+	    } while (!accepted);
+	    
+	    back[0] = Integer.parseInt(inputA[0]);
+	    back[1] = Integer.parseInt(inputA[1]);
+		
+		return back;
+	}
 }
