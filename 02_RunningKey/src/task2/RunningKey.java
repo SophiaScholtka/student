@@ -114,6 +114,8 @@ public class RunningKey extends Cipher {
 		if(start+laenge>cipherChars.size()) continue;
 		if(DEBUG) System.out.println("Abschnitt ab " + start + "  (Länge: " + laenge + ")");
 		ArrayList<Integer> abschnitt = getAbschnitt(start,laenge,cipherChars);
+		//falls der abschnitt nicht richtig gefüllt wurde ->Neustart
+		if(abschnitt.size()<4)continue;
 		//Zeige bereits entschlüsselte Abschnitte, falls sie angrenzen/überlappen
 		showClearAndKeyText(start,laenge,klartext,schluesseltext);
 		//Analysiere den Abschnitt auf wahrscheinliche Klar & Schlüsseltexte
