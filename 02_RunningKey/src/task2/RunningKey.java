@@ -115,7 +115,7 @@ public class RunningKey extends Cipher {
 		if(DEBUG) System.out.println("Abschnitt ab " + start + "  (Länge: " + laenge + ")");
 		ArrayList<Integer> abschnitt = getAbschnitt(start,laenge,cipherChars);
 		//falls der abschnitt nicht richtig gefüllt wurde ->Neustart
-		if(abschnitt.size()<4)continue;
+		if(abschnitt ==null)continue;
 		//Zeige bereits entschlüsselte Abschnitte, falls sie angrenzen/überlappen
 		showClearAndKeyText(start,laenge,klartext,schluesseltext);
 		//Analysiere den Abschnitt auf wahrscheinliche Klar & Schlüsseltexte
@@ -188,7 +188,7 @@ public class RunningKey extends Cipher {
 		System.out.println("Möchten Sie die Entschlüsselung beenden? [y/n]");
 		try{
 			String yesorno = standardInput.readLine();
-			if (yesorno.equalsIgnoreCase("y")) fertig=true;
+			if (yesorno.equalsIgnoreCase("y")||yesorno.equalsIgnoreCase("")) fertig=true;
 		} catch(IOException e) {
 			System.err.println(e);
 		}
@@ -221,7 +221,10 @@ private void setClearAndKeyText(int start,int[] klartext, int[] schluesseltext, 
 		System.out.println(msg);
 		try{ 
 			input=standardInput.readLine();
-			//TODO Prüfung der inputlänge - nur bei länge 4
+			if(input.length()!=4){
+				System.out.println("Bitte geben Sie GENAU 4 Zeichen ein.");
+				continue;
+			}
 			for(int i=0;i<4;i++){
 				tempo = (charMap.mapChar(abschnitt.get(i))-charMap.mapChar(input.charAt(i)) + modulus)%modulus;				
 				if(DEBUG) {
@@ -240,7 +243,7 @@ private void setClearAndKeyText(int start,int[] klartext, int[] schluesseltext, 
 			msg = "Der passende Schlüsseltext ist "+ String.valueOf(tmp) +"\nEinverstanden? [y/n]";
 			System.out.println(msg);
 			yesorno=standardInput.readLine();
-			if(yesorno.equalsIgnoreCase("y")) {
+			if(yesorno.equalsIgnoreCase("y")||yesorno.equalsIgnoreCase("")) {
 				entscheidung=true;
 				for(int i=0;i<input.length();i++){
 					klartext[i+start]=input.charAt(i);
@@ -258,7 +261,7 @@ private void setClearAndKeyText(int start,int[] klartext, int[] schluesseltext, 
 					msg+="\nMöchten Sie Klar- und Schlüsseltext ab hier tauschen?[y/n]";
 					System.out.println(msg);
 					yesorno=standardInput.readLine();
-					if(yesorno.equalsIgnoreCase("y")) {
+					if(yesorno.equalsIgnoreCase("y")||yesorno.equalsIgnoreCase("")) {
 						int temp;
 						for(int j=start+4;j<klartext.length;j++){
 							temp=klartext[j];
@@ -990,10 +993,12 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 				accepted = true;	          
 	        }
 	      } catch (IOException e) {
-	        System.err
-	            .println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+	    	  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
 	        e.printStackTrace();
 	        System.exit(1);
+	      } catch (NumberFormatException e){
+	    	  System.out.println("Fehler beim Parsen des Startindexes.");
+	    	  accepted = false;
 	      }
 	    } while (!accepted);
 	    
