@@ -208,6 +208,13 @@ public class RunningKey extends Cipher {
 			schluesseltext[i] = 97;
 		}
 	}
+	
+	//Speicher Schlüsseltext
+	ArrayList<Character> brokenKey = new ArrayList<Character>();
+	for (int i = 0; i < schluesseltext.length; i++) {
+		brokenKey.add((char) schluesseltext[i]);
+	}
+	writeToFile(keyFilePath, brokenKey);
   }
 
 private void setClearAndKeyText(int start,int[] klartext, int[] schluesseltext, ArrayList<Integer> abschnitt) {
