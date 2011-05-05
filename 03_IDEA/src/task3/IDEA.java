@@ -52,7 +52,7 @@ public final class IDEA extends BlockCipher {
    * Der FileOutputStream, in den der Chiffretext geschrieben werden soll.
    */
   public void encipher(FileInputStream cleartext, FileOutputStream ciphertext) {
-
+	  
   }
 
   /**
@@ -88,5 +88,25 @@ public final class IDEA extends BlockCipher {
    */
   public void writeKey(BufferedWriter key) {
 
+  }
+  
+  //TODO bitwise XOR	2x 16bit eingaben, 1x 16 bit ausgabe
+  private short calcBitwiseXor(short message, short key) {
+	  return 0;
+  }
+  
+  //TODO Addition mod 2^16	2x 16bit eingaben, 1x 16 bit ausgabe
+  private short calcAdditionMod216(short message, short key) {
+	  return 0;
+  }
+  
+  //TODO Multiplikation in Z*_((2^16)+1)	2x 16bit eingaben, 1x 16 bit ausgabe
+  private short calcMultiplikationZ(short message, short key) {
+	  return 0;
+  }
+  
+  //TODO bitwise XOR mit Block	2x 64bit eingaben, 1x 64 bit ausgabe
+  private short calcBitwiseXORBlock(short message, short key) {
+	  return 0;
   }
 }
