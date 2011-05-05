@@ -287,7 +287,7 @@ private void setClearAndKeyText(int start,int[] klartext, int[] schluesseltext, 
 							klartext[j]=schluesseltext[j];
 							schluesseltext[j]=temp;
 						}
-						System.out.println("Klar- und Schlüsseltext wurden ab Position "+start+4+" getauscht.");
+						System.out.println("Klar- und Schlüsseltext wurden ab Position "+(start+4)+" getauscht.");
 					}
 				} 
 			}
