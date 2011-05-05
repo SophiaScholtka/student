@@ -13,6 +13,7 @@ package task2;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -153,14 +154,17 @@ public class RunningKey extends Cipher {
 		}
 		Collections.sort(allWeights);
 		Collections.reverse(allWeights);
+		
+		if(DEBUG) System.out.println(">>>> Liste wird sortiert.");
+		long timeStart = System.nanoTime();
 
-		double w = 0.0;
+		//FIXME Sortierung: Laufzeit zu lang?
+		//ArrayList<String[]> possible4grams - enthält klar- und key textpaare
+		double w = 0.0; // Bewertung eines klar- und key paares
 		ArrayList<String[]> ausgabeNew = new ArrayList<String[]>();
 		Iterator<String[]> it;
-		int j = 0;
 		while(!possible4grams.isEmpty()) {
 			it = possible4grams.iterator();
-			j = 0;
 			while(it.hasNext()) {
 				String[] ausgabetmp = it.next();
 				w = evaluatePart(ausgabetmp[0],ausgabetmp[1],weights);
@@ -170,14 +174,13 @@ public class RunningKey extends Cipher {
 					it.remove();
 					allWeights.remove(0);
 				}
-				j++;
 			}
 		}
-		if(DEBUG) System.out.println("Berechnung der 4-Grammlisten abgeschlossen. Die Anzahl beträgt " + ausgabeNew.size());
+//		if(DEBUG) System.out.println("Berechnung der 4-Grammlisten abgeschlossen. Die Anzahl beträgt " + ausgabeNew.size());
+		if(DEBUG) System.out.println("Dauer der Sortierung: " + ((System.nanoTime() - timeStart)/(1000000000)) + "s");
 		
 		//Gib dem User die bewerteten 4gram Paare aus
-		
-		System.out.println("Die bewerteten, höchsten 4 Gramme (Ausschnitt aus den " + ausgabeNew.size() + " 4 Grammen:");
+		System.out.println("Die am Höchsten bewerteten 4-Gramme (Ausschnitt aus den " + ausgabeNew.size() + " 4-Grammen):");
 		Iterator<String[]> itOut = ausgabeNew.iterator();
 		int counter = 0;
 		while(itOut.hasNext() && counter < 20){
@@ -185,6 +188,21 @@ public class RunningKey extends Cipher {
 			System.out.println("\t" + ausgabetmp[0] + "\t" + ausgabetmp[1]+"\t"+ausgabetmp[2]);
 			counter++;
 		}
+		//Schreibe alle 4Gramme und ihre Gewichtung in eine Datei
+		String filename = "out" + File.separator + "4gram-sorted.txt";
+		try {
+			FileWriter writer = new FileWriter(filename);
+			BufferedWriter out = new BufferedWriter(writer);
+			itOut = ausgabeNew.iterator();
+			while(itOut.hasNext()){
+				String[] ausgabetmp = itOut.next();
+				out.write(ausgabetmp[0] + "\t" + ausgabetmp[1]+"\t"+ausgabetmp[2] + "\n");
+			}
+			out.close();
+		} catch (IOException e){
+			e.printStackTrace();
+		}		
+		System.out.println("Die komplette Auflistung der sortierten 4-Gramme findet sich unter '" + filename +"'.");
 	
 		//Bitte den User um eine Auswahl und speichere sein Ergebnis ab
 		setClearAndKeyText(start,klartext,schluesseltext,abschnitt);
@@ -197,12 +215,20 @@ public class RunningKey extends Cipher {
 			System.err.println(e);
 		}
 	} while (!fertig);
+	
 	//Schreibe den Schlüssel voller 'a' überall da wo bisher nix drin steht 
 	for(int i = 0; i < schluesseltext.length; i++) {
 		if(schluesseltext[i] == -1) {
 			schluesseltext[i] = 97;
 		}
 	}
+	
+	//Speicher Schlüsseltext
+	ArrayList<Character> brokenKey = new ArrayList<Character>();
+	for (int i = 0; i < schluesseltext.length; i++) {
+		brokenKey.add((char) schluesseltext[i]);
+	}
+	writeToFile(keyFilePath, brokenKey);
   }
 
 private void setClearAndKeyText(int start,int[] klartext, int[] schluesseltext, ArrayList<Integer> abschnitt) {
@@ -218,7 +244,18 @@ private void setClearAndKeyText(int start,int[] klartext, int[] schluesseltext, 
 		try{ 
 			input=standardInput.readLine();
 			for(int i=0;i<4;i++){
-				tempo = (charMap.mapChar(abschnitt.get(i))-charMap.mapChar(input.charAt(i)))%modulus;
+				tempo = (charMap.mapChar(abschnitt.get(i))-charMap.mapChar(input.charAt(i)) + modulus)%modulus;				
+				if(DEBUG) {
+					System.out.print(">>>> Werte prüfen: ");
+					System.out.print(charMap.mapChar(abschnitt.get(i)) + "\t");
+					System.out.print(charMap.mapChar(input.charAt(i)) + "\t");
+					System.out.print((charMap.mapChar(abschnitt.get(i))-charMap.mapChar(input.charAt(i)) + modulus) + "\t");
+					System.out.print((charMap.mapChar(abschnitt.get(i))-charMap.mapChar(input.charAt(i)) + modulus)%modulus + "\t");
+					System.out.print(tempo  + "\t");
+					System.out.print(charMap.remapChar(tempo) + "\t");
+					System.out.print((char)charMap.remapChar(tempo));
+					System.out.println();
+				}
 				tmp[i]=(char) charMap.remapChar(tempo);
 			}
 			msg = "Der passende Schlüsseltext ist "+ String.valueOf(tmp) +"\nEinverstanden? [y/n]";
@@ -384,7 +421,7 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	for(int i=start;i<(start+laenge);i++){
 		abschnitt.add(cipherChars.get(i));
 	}
-	if(DEBUG) System.out.println(">>>> Abschnitt Array: " + abschnitt.toString());
+	//if(DEBUG) System.out.println(">>>> Abschnitt Array: " + abschnitt.toString());
 	return abschnitt;
 }
 
