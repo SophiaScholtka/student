@@ -159,7 +159,8 @@ public class RunningKey extends Cipher {
 		long timeStart = System.nanoTime();
 
 		//FIXME Sortierung: Laufzeit zu lang?
-		double w = 0.0;
+		//ArrayList<String[]> possible4grams - enthält klar- und key textpaare
+		double w = 0.0; // Bewertung eines klar- und key paares
 		ArrayList<String[]> ausgabeNew = new ArrayList<String[]>();
 		Iterator<String[]> it;
 		while(!possible4grams.isEmpty()) {
