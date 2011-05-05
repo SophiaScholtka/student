@@ -140,7 +140,7 @@ public class RunningKey extends Cipher {
 
 		ArrayList<String[]> ausgabeNew = new ArrayList<String[]>();
 		for(int i = 0; i < possible4grams.size();i++) {
-			String[] s = {"","",""};
+			String[] s = {"----","----","0"};
 			ausgabeNew.add(s);
 		}
 				
@@ -150,7 +150,7 @@ public class RunningKey extends Cipher {
 			double w = evaluatePart(ausgabetmp[0],ausgabetmp[1],weights);
 			int index = allWeights.indexOf(w);
 			String[] sOut = {ausgabetmp[0],ausgabetmp[1],""+w};
-			if(index >0) {
+			if(index >=0) {
 				ausgabeNew.set(index,sOut);
 				allWeights.set(index, -1.0);
 			}
