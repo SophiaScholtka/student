@@ -22,9 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.lang.Math;
 
-import de.tubs.cs.iti.jcrypt.chiffre.Chiffre;
 import de.tubs.cs.iti.jcrypt.chiffre.Cipher;
 
 /**
@@ -154,7 +152,7 @@ public class RunningKey extends Cipher {
 				allWeights.set(index, -1.0);
 			}
 		}
-		if(DEBUG) System.out.println("Dauer der Sortierung: " + ((System.nanoTime() - timeStart)/(1000000000)) + "s");
+		if(DEBUG) System.out.println(">>>> Dauer der Sortierung: " + ((System.nanoTime() - timeStart)/(1000000000)) + "s");
 		
 		//Gib dem User die bewerteten 4gram Paare aus
 		System.out.println("Die am Höchsten bewerteten 4-Gramme (Ausschnitt aus den " + ausgabeNew.size() + " 4-Grammen):");
@@ -387,7 +385,6 @@ private void showClearAndKeyText(int start, int laenge, int[] klartext, int[] sc
 }
 
 private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer> cipherChars) {
-	if(DEBUG) System.out.println(">>>getAbschnitt called");
 	//Checken ob Start und Länge zulässig sind
 	if (start<0 || laenge<=0 || start+laenge>cipherChars.size()){
 		System.out.println("Ungültige Eingabe. Start muss zwischen 0 und "+(cipherChars.size()-4)+" sein.");
@@ -398,7 +395,6 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	for(int i=start;i<(start+laenge);i++){
 		abschnitt.add(cipherChars.get(i));
 	}
-	//if(DEBUG) System.out.println(">>>> Abschnitt Array: " + abschnitt.toString());
 	return abschnitt;
 }
 
@@ -591,7 +587,6 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 		  key.write("" + modulus);
 		  key.write(" ");
 		  key.write(keyFilePath);
-		  //key.newLine();
 		  key.close();
 	  } catch (IOException e) {
 		  System.out.println("Abbruch: Fehler beim Schreiben oder Schließen der "
@@ -602,84 +597,11 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
   }
   
   /**
-   * Für Tests
-   */
-  private void testMethod() {
-	  System.out.println(">>>testMethod called");
-
-//	//Tests für replacePartOfArrayList(...)
-//	  ArrayList<Integer> ll;
-//	  ArrayList<Integer> l1,l2;
-//	  l1 = new ArrayList<Integer>();
-//	  l2 = new ArrayList<Integer>();
-//	  for(int i = 0; i < 10; i++) {
-//		  l1.add(i);
-//	  }
-//	  for(int i = 3; i < 6; i++) {
-//		  l2.add(i+100);
-//	  }
-//	  System.out.println("Die Listen:");
-//	  System.out.println(l1.toString());
-//	  System.out.println(l2.toString());
-//	  System.out.println();
-//	  System.out.println("Listen mit ersetztem Inhalt: (0<atStart<list.length)");
-//	  ll = replacePartOfArrayList(l1, l2, 3);
-//	  System.out.println(ll.toString());
-//	  System.out.println("Listen mit ersetztem Inhalt: (list.length<atStart)");
-//	  ll = replacePartOfArrayList(l2, l1, 1);
-//	  System.out.println(ll.toString());
-		  
-//	  //Tests für intersectLists(...)
-//	  ArrayList<ArrayList<Integer>> ll;
-//	  ArrayList<Integer> l1,l2;
-//	  l1 = new ArrayList<Integer>();
-//	  l2 = new ArrayList<Integer>();
-//	  int l = 10;
-//	  for(int i = 0; i < l; i++) {
-//		  l1.add(i);
-//		  l2.add(i+100);
-//	  }
-//	  l1.add(l+1);
-//	  System.out.println("Die Listen:");
-//	  System.out.println(l1.toString());
-//	  System.out.println(l2.toString());
-//	  System.out.println();
-//	  System.out.println("Listen mit getauschtem Inhalt: (0<from<to<Längen)");
-//	  ll = translocateLists(l1, l2, 4, 6);
-//	  System.out.println(ll.get(0).toString());
-//	  System.out.println(ll.get(1).toString());
-//	  System.out.println("Listen mit getauschtem Inhalt: (from < 0)");
-//	  ll = translocateLists(l1, l2, -4, 6);
-//	  System.out.println(ll.get(0).toString());
-//	  System.out.println(ll.get(1).toString());
-//	  System.out.println("Listen mit getauschtem Inhalt: (to < 0)");
-//	  ll = translocateLists(l1, l2, 4, -6);
-//	  System.out.println(ll.get(0).toString());
-//	  System.out.println(ll.get(1).toString());
-//	  System.out.println("Listen mit getauschtem Inhalt: (ListSize1 < to)");
-//	  ll = translocateLists(l1, l2, 4, l1.size() + 4);
-//	  System.out.println(ll.get(0).toString());
-//	  System.out.println(ll.get(1).toString());
-//	  System.out.println("Listen mit getauschtem Inhalt: (ListSize2 < to)");
-//	  ll = translocateLists(l1, l2, 4, l2.size() + 4);
-//	  System.out.println(ll.get(0).toString());
-//	  System.out.println(ll.get(1).toString());
-//	  System.out.println("Listen mit getauschtem Inhalt: (from > to)");
-//	  ll = translocateLists(l1, l2, 6, 4);
-//	  System.out.println(ll.get(0).toString());
-//	  System.out.println(ll.get(1).toString());
-	  	  
-	  System.out.println(">>>/testMethod finished");
-	  System.exit(0);
-  }
-  /**
    * Liest aus einer Datei die einzelnen Zeichen aus und gibt die Zeichen als Liste zurück.
    * @param filePath	Pfad zur auszulesenden Datei
    * @return Liste der einzelnen Zeichen, Zahlenwerte der Zeichen
    */
   private ArrayList<Integer> readFileToList(String filePath) {
-	  //if(DEBUG) System.out.println(">>>readfileToList called");
-	  //if(DEBUG) System.out.println(">>>> filePath=" + filePath);
 	  ArrayList<Integer> back = new ArrayList<Integer>();
   
 	  try {
@@ -721,10 +643,9 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
   	 */
 	private void doEncipher(ArrayList<Integer> keyChars, 
 			ArrayList<Integer> clearChars,BufferedWriter ciphertext) {
-		if(DEBUG) System.out.println(">>>doEncipher called");
 
-	// charMap.setConvertToLowerCase();
-	// charMap.setConvertToUpperCase();
+		// charMap.setConvertToLowerCase();
+		// charMap.setConvertToUpperCase();
 
 		try {
 	  int character;
@@ -770,8 +691,6 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	  System.exit(1);
 	}
 	
-		if(DEBUG) System.out.println(">>>/doEncipher finished");
-		
 	}
 
 	private void doDencipher(ArrayList<Integer> keyChars, 
@@ -1056,9 +975,6 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 			cMTri[i] = "" + klar.charAt(i) + klar.charAt(i+1) + klar.charAt(i+2);
 			cKTri[i] = "" + key.charAt(i) + key.charAt(i+1) + key.charAt(i+2);
 		}
-//		System.out.println("Unigramme: " + Arrays.toString(cMUni) + "\t" + Arrays.toString(cKUni));
-//		System.out.println("Digramme: " + Arrays.toString(cMDi) + "\t" + Arrays.toString(cKDi));
-//		System.out.println("Trigramme: " + Arrays.toString(cMTri) + "\t" + Arrays.toString(cKTri));
 		
 		//Bereite Häufigkeitsvariablen vor
 		String[][] freqUni  = readFrequencyTable("../table/1-grams_programmierer.alph.tab");
@@ -1092,9 +1008,6 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 			s[2][i] = findFrequency(cKTri[i], freqTri);
 		}
 		
-//		if(DEBUG) System.out.println(">>>> Wahrscheinlichkeiten:");
-//		if(DEBUG) System.out.println(Arrays.toString(k[0]) + Arrays.toString(k[1]) + Arrays.toString(k[2]));
-//		if(DEBUG) System.out.println(Arrays.toString(s[0]) + Arrays.toString(s[1]) + Arrays.toString(s[2]));
 		back = evalutateFormula(g, k, s);
 		
 		return back;
@@ -1152,18 +1065,15 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 				help[i][1]=helper.substring(e0+1,e1);
 				help[i][2]=helper.substring(e1+1,eol);
 				helper=helper.substring(eol+1);
-//					System.out.println(help[i][0] + " " + help[i][1] + " " + help[i][2]);
 				i++;
 			}
 			linecount=i;
-			//System.out.println(">>>Die Tabelle hat "+linecount+" Zeilen.");
 			if(linecount<1) return null;
 			table = new String[linecount][3];
 			for(i=0;i<linecount;i++){
 				table[i][0]=help[i][0];
 				table[i][1]=help[i][1];
 				table[i][2]=help[i][2];
-				//System.out.println(help[i][0] + " " + help[i][1] + " " + help[i][2]);
 			}
 		file.close();
 		return table;
