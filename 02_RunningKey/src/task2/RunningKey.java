@@ -87,18 +87,18 @@ public class RunningKey extends Cipher {
 	} while (!accepted);
 	
 	createLookupTable(modulus);
-	if(DEBUG){
-		Iterator<ArrayList<Integer[]>> it1 = lookup.iterator();
-		while(it1.hasNext()) {
-			ArrayList<Integer[]> list = it1.next();
-			Iterator<Integer[]> it2 = list.iterator();
-			while(it2.hasNext()) {
-				System.out.print(Arrays.toString(it2.next()) + "\t");
-			}
-			System.out.println("---ENDE (Elemente: " + list.size() + ")");
-		}
-		System.out.println("Elemente: " + lookup.size());
-	}
+//	if(DEBUG){
+//		Iterator<ArrayList<Integer[]>> it1 = lookup.iterator();
+//		while(it1.hasNext()) {
+//			ArrayList<Integer[]> list = it1.next();
+//			Iterator<Integer[]> it2 = list.iterator();
+//			while(it2.hasNext()) {
+//				System.out.print(Arrays.toString(it2.next()) + "\t");
+//			}
+//			System.out.println("---ENDE (Elemente: " + list.size() + ")");
+//		}
+//		System.out.println("Elemente: " + lookup.size());
+//	}
 	
 	//Chiffre start
 	msg = "Beginne mit dem Verfahren zum Brechen der Chiffre.";
@@ -154,6 +154,9 @@ public class RunningKey extends Cipher {
 		}
 		Collections.sort(allWeights);
 		Collections.reverse(allWeights);
+		
+		if(DEBUG) System.out.println(">>>> Liste wird sortiert.");
+		long timeStart = System.nanoTime();
 
 		double w = 0.0;
 		ArrayList<String[]> ausgabeNew = new ArrayList<String[]>();
@@ -161,7 +164,7 @@ public class RunningKey extends Cipher {
 		int j = 0;
 		while(!possible4grams.isEmpty()) {
 			it = possible4grams.iterator();
-			j = 0;
+//			j = 0;
 			while(it.hasNext()) {
 				String[] ausgabetmp = it.next();
 				w = evaluatePart(ausgabetmp[0],ausgabetmp[1],weights);
@@ -171,10 +174,11 @@ public class RunningKey extends Cipher {
 					it.remove();
 					allWeights.remove(0);
 				}
-				j++;
+//				j++;
 			}
 		}
 		if(DEBUG) System.out.println("Berechnung der 4-Grammlisten abgeschlossen. Die Anzahl beträgt " + ausgabeNew.size());
+		if(DEBUG) System.out.println("Dauer der Sortierung: " + ((System.nanoTime() - timeStart)/(1000000000)) + "s");
 		
 		//Gib dem User die bewerteten 4gram Paare aus
 		
@@ -219,7 +223,18 @@ private void setClearAndKeyText(int start,int[] klartext, int[] schluesseltext, 
 		try{ 
 			input=standardInput.readLine();
 			for(int i=0;i<4;i++){
-				tempo = (charMap.mapChar(abschnitt.get(i))-charMap.mapChar(input.charAt(i)))%modulus;
+				tempo = (charMap.mapChar(abschnitt.get(i))-charMap.mapChar(input.charAt(i)) + modulus)%modulus;				
+				if(DEBUG) {
+					System.out.print("#### ");
+					System.out.print(charMap.mapChar(abschnitt.get(i)) + "\t");
+					System.out.print(charMap.mapChar(input.charAt(i)) + "\t");
+					System.out.print((charMap.mapChar(abschnitt.get(i))-charMap.mapChar(input.charAt(i)) + modulus) + "\t");
+					System.out.print((charMap.mapChar(abschnitt.get(i))-charMap.mapChar(input.charAt(i)) + modulus)%modulus + "\t");
+					System.out.print(tempo);
+					System.out.print(charMap.remapChar(tempo));
+					System.out.print((char)charMap.remapChar(tempo));
+					System.out.println();
+				}
 				tmp[i]=(char) charMap.remapChar(tempo);
 			}
 			msg = "Der passende Schlüsseltext ist "+ String.valueOf(tmp) +"\nEinverstanden? [y/n]";
@@ -385,7 +400,7 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	for(int i=start;i<(start+laenge);i++){
 		abschnitt.add(cipherChars.get(i));
 	}
-	if(DEBUG) System.out.println(">>>> Abschnitt Array: " + abschnitt.toString());
+	//if(DEBUG) System.out.println(">>>> Abschnitt Array: " + abschnitt.toString());
 	return abschnitt;
 }
 
