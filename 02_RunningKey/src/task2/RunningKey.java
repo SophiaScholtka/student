@@ -243,6 +243,7 @@ private void setClearAndKeyText(int start,int[] klartext, int[] schluesseltext, 
 		System.out.println(msg);
 		try{ 
 			input=standardInput.readLine();
+			//TODO Prüfung der inputlänge - nur bei länge 4
 			for(int i=0;i<4;i++){
 				tempo = (charMap.mapChar(abschnitt.get(i))-charMap.mapChar(input.charAt(i)) + modulus)%modulus;				
 				if(DEBUG) {
