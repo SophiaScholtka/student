@@ -35,7 +35,7 @@ import de.tubs.cs.iti.jcrypt.chiffre.Cipher;
  */
 public class RunningKey extends Cipher {
 	
-	final boolean DEBUG = true;
+	final boolean DEBUG = false;
 	
 	//int keyAlphLenght; //modulus
 	String keyFilePath;
@@ -111,7 +111,6 @@ public class RunningKey extends Cipher {
 		//Erfrage die Position und Länge des Ciphertextabschnittes, den der User betrachten möchte
 		int start=0; int laenge=4;
 		start = enterIndexes();
-		if(start+laenge>cipherChars.size()) continue;
 		if(DEBUG) System.out.println("Abschnitt ab " + start + "  (Länge: " + laenge + ")");
 		ArrayList<Integer> abschnitt = getAbschnitt(start,laenge,cipherChars);
 		//falls der abschnitt nicht richtig gefüllt wurde ->Neustart
@@ -390,8 +389,8 @@ private void showClearAndKeyText(int start, int laenge, int[] klartext, int[] sc
 private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer> cipherChars) {
 	if(DEBUG) System.out.println(">>>getAbschnitt called");
 	//Checken ob Start und Länge zulässig sind
-	if (start<0 || laenge<=0 || start+laenge>=cipherChars.size()){
-		System.out.println("Ungültige Eingabe. Start muss zwischen 0 und "+cipherChars.size()+" sein. \n Länge >=1 und Start+Länge <="+cipherChars.size());
+	if (start<0 || laenge<=0 || start+laenge>cipherChars.size()){
+		System.out.println("Ungültige Eingabe. Start muss zwischen 0 und "+(cipherChars.size()-4)+" sein.");
 		return null;
 	}
 	//abschnitt aus dem ciphertext herauskopieren
@@ -422,7 +421,7 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 	  if(keyFilePath == null) {
 		  keyFilePath = "out/out.txt"; //Workaround
 	  }
-	  System.out.println(">>>> keyFilePath=" + keyFilePath);
+	  if (DEBUG) System.out.println(">>>> keyFilePath=" + keyFilePath);
 	  keyChars = readFileToList(keyFilePath);
 	  cipherChars = readBufferedReaderToList(ciphertext);
 	  
