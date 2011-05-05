@@ -13,6 +13,7 @@ package task2;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -176,7 +177,7 @@ public class RunningKey extends Cipher {
 				}
 			}
 		}
-		if(DEBUG) System.out.println("Berechnung der 4-Grammlisten abgeschlossen. Die Anzahl beträgt " + ausgabeNew.size());
+//		if(DEBUG) System.out.println("Berechnung der 4-Grammlisten abgeschlossen. Die Anzahl beträgt " + ausgabeNew.size());
 		if(DEBUG) System.out.println("Dauer der Sortierung: " + ((System.nanoTime() - timeStart)/(1000000000)) + "s");
 		
 		//Gib dem User die bewerteten 4gram Paare aus
@@ -188,6 +189,21 @@ public class RunningKey extends Cipher {
 			System.out.println("\t" + ausgabetmp[0] + "\t" + ausgabetmp[1]+"\t"+ausgabetmp[2]);
 			counter++;
 		}
+		//Schreibe alle 4Gramme und ihre Gewichtung in eine Datei
+		String filename = "out" + File.separator + "4gram-sorted.txt";
+		try {
+			FileWriter writer = new FileWriter(filename);
+			BufferedWriter out = new BufferedWriter(writer);
+			itOut = ausgabeNew.iterator();
+			while(itOut.hasNext()){
+				String[] ausgabetmp = itOut.next();
+				out.write(ausgabetmp[0] + "\t" + ausgabetmp[1]+"\t"+ausgabetmp[2] + "\n");
+			}
+			out.close();
+		} catch (IOException e){
+			e.printStackTrace();
+		}		
+		System.out.println("Die komplette Auflistung der sortierten 4-Gramme findet sich unter '" + filename +"'.");
 	
 		//Bitte den User um eine Auswahl und speichere sein Ergebnis ab
 		setClearAndKeyText(start,klartext,schluesseltext,abschnitt);
@@ -236,8 +252,8 @@ private void setClearAndKeyText(int start,int[] klartext, int[] schluesseltext, 
 					System.out.print(charMap.mapChar(input.charAt(i)) + "\t");
 					System.out.print((charMap.mapChar(abschnitt.get(i))-charMap.mapChar(input.charAt(i)) + modulus) + "\t");
 					System.out.print((charMap.mapChar(abschnitt.get(i))-charMap.mapChar(input.charAt(i)) + modulus)%modulus + "\t");
-					System.out.print(tempo);
-					System.out.print(charMap.remapChar(tempo));
+					System.out.print(tempo  + "\t");
+					System.out.print(charMap.remapChar(tempo) + "\t");
 					System.out.print((char)charMap.remapChar(tempo));
 					System.out.println();
 				}
