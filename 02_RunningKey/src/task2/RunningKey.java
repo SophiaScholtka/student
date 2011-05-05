@@ -158,13 +158,12 @@ public class RunningKey extends Cipher {
 		if(DEBUG) System.out.println(">>>> Liste wird sortiert.");
 		long timeStart = System.nanoTime();
 
+		//FIXME Sortierung: Laufzeit zu lang?
 		double w = 0.0;
 		ArrayList<String[]> ausgabeNew = new ArrayList<String[]>();
 		Iterator<String[]> it;
-		int j = 0;
 		while(!possible4grams.isEmpty()) {
 			it = possible4grams.iterator();
-//			j = 0;
 			while(it.hasNext()) {
 				String[] ausgabetmp = it.next();
 				w = evaluatePart(ausgabetmp[0],ausgabetmp[1],weights);
@@ -174,14 +173,12 @@ public class RunningKey extends Cipher {
 					it.remove();
 					allWeights.remove(0);
 				}
-//				j++;
 			}
 		}
 		if(DEBUG) System.out.println("Berechnung der 4-Grammlisten abgeschlossen. Die Anzahl beträgt " + ausgabeNew.size());
 		if(DEBUG) System.out.println("Dauer der Sortierung: " + ((System.nanoTime() - timeStart)/(1000000000)) + "s");
 		
 		//Gib dem User die bewerteten 4gram Paare aus
-		
 		System.out.println("Die bewerteten, höchsten 4 Gramme (Ausschnitt aus den " + ausgabeNew.size() + " 4 Grammen:");
 		Iterator<String[]> itOut = ausgabeNew.iterator();
 		int counter = 0;
@@ -202,6 +199,7 @@ public class RunningKey extends Cipher {
 			System.err.println(e);
 		}
 	} while (!fertig);
+	
 	//Schreibe den Schlüssel voller 'a' überall da wo bisher nix drin steht 
 	for(int i = 0; i < schluesseltext.length; i++) {
 		if(schluesseltext[i] == -1) {
@@ -232,7 +230,7 @@ private void setClearAndKeyText(int start,int[] klartext, int[] schluesseltext, 
 			for(int i=0;i<4;i++){
 				tempo = (charMap.mapChar(abschnitt.get(i))-charMap.mapChar(input.charAt(i)) + modulus)%modulus;				
 				if(DEBUG) {
-					System.out.print("#### ");
+					System.out.print(">>>> Werte prüfen: ");
 					System.out.print(charMap.mapChar(abschnitt.get(i)) + "\t");
 					System.out.print(charMap.mapChar(input.charAt(i)) + "\t");
 					System.out.print((charMap.mapChar(abschnitt.get(i))-charMap.mapChar(input.charAt(i)) + modulus) + "\t");
