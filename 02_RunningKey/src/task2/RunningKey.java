@@ -88,18 +88,6 @@ public class RunningKey extends Cipher {
 	} while (!accepted);
 	
 	createLookupTable(modulus);
-	/*if(DEBUG){
-		Iterator<ArrayList<Integer[]>> it1 = lookup.iterator();
-		while(it1.hasNext()) {
-			ArrayList<Integer[]> list = it1.next();
-			Iterator<Integer[]> it2 = list.iterator();
-			while(it2.hasNext()) {
-				System.out.print(Arrays.toString(it2.next()) + "\t");
-			}
-			System.out.println("---ENDE (Elemente: " + list.size() + ")");
-		}
-		System.out.println("Elemente: " + lookup.size());
-	}*/
 	
 	//Chiffre start
 	msg = "Beginne mit dem Verfahren zum Brechen der Chiffre.";
@@ -135,16 +123,6 @@ public class RunningKey extends Cipher {
 			System.out.println(msg);
 			continue;
 		}
-//		double[] weights = enterWeighting();
-//		if(DEBUG){
-//			System.out.println(">>>possible4grams:");
-//			Iterator<String[]> it = possible4grams.iterator();
-//			while(it.hasNext()){
-//				String[] ausgabetmp = it.next();
-//				System.out.println(ausgabetmp[0] + " " + ausgabetmp[1]+" "+evaluatePart(ausgabetmp[0],ausgabetmp[1],weights));
-//			}
-//			System.out.println(">>>ENDE von possible4grams");
-//		}
 		
 		//Sortiere nach Bewertung
 		ArrayList<Double> allWeights = new ArrayList<Double>();
@@ -158,25 +136,23 @@ public class RunningKey extends Cipher {
 		if(DEBUG) System.out.println(">>>> Liste wird sortiert.");
 		long timeStart = System.nanoTime();
 
-		//FIXME Sortierung: Laufzeit zu lang?
-		//ArrayList<String[]> possible4grams - enthält klar- und key textpaare
-		double w = 0.0; // Bewertung eines klar- und key paares
 		ArrayList<String[]> ausgabeNew = new ArrayList<String[]>();
-		Iterator<String[]> it;
-		while(!possible4grams.isEmpty()) {
-			it = possible4grams.iterator();
-			while(it.hasNext()) {
-				String[] ausgabetmp = it.next();
-				w = evaluatePart(ausgabetmp[0],ausgabetmp[1],weights);
-				if(w == allWeights.get(0)) {
-					String[] sOut = {ausgabetmp[0],ausgabetmp[1],""+w};
-					ausgabeNew.add(sOut);
-					it.remove();
-					allWeights.remove(0);
-				}
+		for(int i = 0; i < possible4grams.size();i++) {
+			String[] s = {"","",""};
+			ausgabeNew.add(s);
+		}
+				
+		Iterator<String[]> it = possible4grams.iterator();
+		while(it.hasNext()) {
+			String[] ausgabetmp = it.next();
+			double w = evaluatePart(ausgabetmp[0],ausgabetmp[1],weights);
+			int index = allWeights.indexOf(w);
+			String[] sOut = {ausgabetmp[0],ausgabetmp[1],""+w};
+			if(index >0) {
+				ausgabeNew.set(index,sOut);
+				allWeights.set(index, -1.0);
 			}
 		}
-//		if(DEBUG) System.out.println("Berechnung der 4-Grammlisten abgeschlossen. Die Anzahl beträgt " + ausgabeNew.size());
 		if(DEBUG) System.out.println("Dauer der Sortierung: " + ((System.nanoTime() - timeStart)/(1000000000)) + "s");
 		
 		//Gib dem User die bewerteten 4gram Paare aus
@@ -313,12 +289,6 @@ private ArrayList<String[]> getPossible4grams(ArrayList<Integer> abschnitt) {
 					clear += tmp;
 					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(0))).get(i)[1]);
 					key += tmp;
-					/*if(DEBUG){
-						System.out.println(">>>"+lookup.get(charMap.mapChar(abschnitt.get(1))));
-						System.out.println(">>>"+lookup.get(charMap.mapChar(abschnitt.get(1))).size());
-						System.out.println(">>>"+lookup.get(charMap.mapChar(abschnitt.get(1))).get(j));
-						System.out.println(">>>"+lookup.get(charMap.mapChar(abschnitt.get(1))).get(j).length);
-					}*/
 					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(1))).get(j)[0]);
 					clear += tmp;
 					tmp=(char) charMap.remapChar(lookup.get(charMap.mapChar(abschnitt.get(1))).get(j)[1]);
