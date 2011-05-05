@@ -153,7 +153,7 @@ public class RunningKey extends Cipher {
 				allWeights.set(index, -1.0);
 			}
 		}
-		if(DEBUG) System.out.println("Dauer der Sortierung: " + ((System.nanoTime() - timeStart)/(1000000000)) + "s");
+		if(DEBUG) System.out.println(">>>> Dauer der Sortierung: " + ((System.nanoTime() - timeStart)/(1000000000)) + "s");
 		
 		//Gib dem User die bewerteten 4gram Paare aus
 		System.out.println("Die am Höchsten bewerteten 4-Gramme (Ausschnitt aus den " + ausgabeNew.size() + " 4-Grammen):");
