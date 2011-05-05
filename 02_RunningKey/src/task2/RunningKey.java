@@ -88,23 +88,23 @@ public class RunningKey extends Cipher {
 	} while (!accepted);
 	
 	createLookupTable(modulus);
-//	if(DEBUG){
-//		Iterator<ArrayList<Integer[]>> it1 = lookup.iterator();
-//		while(it1.hasNext()) {
-//			ArrayList<Integer[]> list = it1.next();
-//			Iterator<Integer[]> it2 = list.iterator();
-//			while(it2.hasNext()) {
-//				System.out.print(Arrays.toString(it2.next()) + "\t");
-//			}
-//			System.out.println("---ENDE (Elemente: " + list.size() + ")");
-//		}
-//		System.out.println("Elemente: " + lookup.size());
-//	}
+	/*if(DEBUG){
+		Iterator<ArrayList<Integer[]>> it1 = lookup.iterator();
+		while(it1.hasNext()) {
+			ArrayList<Integer[]> list = it1.next();
+			Iterator<Integer[]> it2 = list.iterator();
+			while(it2.hasNext()) {
+				System.out.print(Arrays.toString(it2.next()) + "\t");
+			}
+			System.out.println("---ENDE (Elemente: " + list.size() + ")");
+		}
+		System.out.println("Elemente: " + lookup.size());
+	}*/
 	
 	//Chiffre start
 	msg = "Beginne mit dem Verfahren zum Brechen der Chiffre.";
 	System.out.println(msg);
-	  
+	double[] weights = enterWeighting();
 	//Lese die Buchstaben des Ciphertextes ein
 	  ArrayList<Integer> cipherChars;
 	  cipherChars = readBufferedReaderToList(ciphertext);
@@ -147,7 +147,6 @@ public class RunningKey extends Cipher {
 //		}
 		
 		//Sortiere nach Bewertung
-		double[] weights = enterWeighting();
 		ArrayList<Double> allWeights = new ArrayList<Double>();
 		for(int i = 0; i < possible4grams.size(); i++) {
 			String[] ausgabetmp = possible4grams.get(i);
