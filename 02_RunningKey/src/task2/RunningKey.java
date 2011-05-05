@@ -263,7 +263,7 @@ private void setClearAndKeyText(int start,int[] klartext, int[] schluesseltext, 
 							klartext[j]=schluesseltext[j];
 							schluesseltext[j]=temp;
 						}
-						System.out.println("Klar- und Schlüsseltext wurden ab Position "+start+4+" getauscht.");
+						System.out.println("Klar- und Schlüsseltext wurden ab Position "+(start+4)+" getauscht.");
 					}
 				} 
 			}
@@ -357,25 +357,27 @@ private void showClearAndKeyText(int start, int laenge, int[] klartext, int[] sc
 	if(notext) {
 		System.out.println("Kein bereits entschlüsselter Abschnitt grenzt an den gewählten Abschnitt");
 	} else {
-		//TODO Ausgabe noch mal fixen - momentan wird zu viel ausgegeben
+		//finde bereits entschlüsselte Abschnitte und gib sie aus
 		int j=Math.max(start-1,0);
 		while (j>0 && klartext[j]!=-1 && schluesseltext[j]!=-1){
 			j--;
 		}
 		int i=j;
-		ArrayList<Character> klar=new ArrayList<Character>();
-		ArrayList<Character> schl=new ArrayList<Character>();
 		while(i<klartext.length){
+			ArrayList<Character> klar=new ArrayList<Character>();
+			ArrayList<Character> schl=new ArrayList<Character>();
 			while(klartext[i]!=-1 && schluesseltext[i]!=-1){
 				klar.add((char)klartext[i]);
 				schl.add((char)schluesseltext[i]);
 				i++;
-				if(i>klartext.length) break;
+				if(i>=klartext.length) break;
 			}
-			System.out.println("Bereits entzifferter Klartext\n von Position "+j+" bis Position "+i+":\n"+String.valueOf(klar));
-			System.out.println("Bereits entzifferter Schlüsseltext\n von Position "+j+" bis Position "+i+":\n"+String.valueOf(schl));
+			if(!klar.isEmpty()){
+				System.out.println("Bereits entzifferter Klartext\n von Position "+j+" bis Position "+(i-1)+":\n"+String.valueOf(klar));
+				System.out.println("Bereits entzifferter Schlüsseltext\n von Position "+j+" bis Position "+(i-1)+":\n"+String.valueOf(schl));
+			}
 			j=++i;
-			if(j>Math.min(start+laenge+1,klartext.length)) break;
+			if(j>Math.min(start+5,klartext.length)) break;
 		}
 	}
 }
@@ -969,7 +971,7 @@ private ArrayList<Integer> getAbschnitt(int start, int laenge, ArrayList<Integer
 		
 		//Einlesen der Größe des Alphabets
 	    boolean accepted = false;
-	    String msg = "Bitte geben Sie Start- und Endindex von dem Textabschnitt an," +
+	    String msg = "Bitte geben Sie Startindex von dem Textabschnitt an," +
 	    		" den Sie betrachten möchten.";
 	    System.out.println(msg);
 	    do {
