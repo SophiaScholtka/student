@@ -16,6 +16,8 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
 
@@ -26,6 +28,7 @@ import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
  * @version 1.1 - Sat Apr 03 21:57:35 CEST 2010
  */
 public final class IDEA extends BlockCipher {
+	final boolean DEBUG = true;
 
   /**
    * Entschlüsselt den durch den FileInputStream <code>ciphertext</code>
@@ -38,7 +41,7 @@ public final class IDEA extends BlockCipher {
    * Der FileOutputStream, in den der Klartext geschrieben werden soll.
    */
   public void decipher(FileInputStream ciphertext, FileOutputStream cleartext) {
-
+	  //TODO setze IDEA um. macht da eine eigene Methode Sinn?
   }
 
   /**
@@ -62,8 +65,7 @@ public final class IDEA extends BlockCipher {
    * @see #writeKey writeKey
    */
   public void makeKey() {
-
-    System.out.println("Dummy für die Schlüsselerzeugung.");
+	  
   }
 
   /**
@@ -90,23 +92,98 @@ public final class IDEA extends BlockCipher {
 
   }
   
-  //TODO bitwise XOR	2x 16bit eingaben, 1x 16 bit ausgabe
+  //1 byte = 8 bit; –2^7 bis 2^7 – 1 (–128...127) 
+  //1 short = 2 byte = 16 bit ; 	–2^15 bis 2^15 – 1 (–32768...32767) 
+  //1 char = 2 byte = 16 bit ; 16-Bit Unicode Zeichen (0x0000...0xffff)
+  // ^ bitweises exklusives Oder (Xor)
+  // | bitweises Oder
+  // & bitweises Und
+  
+  /**
+   * Bitweise XOR	2x 16bit eingaben, 1x 16 bit ausgabe
+   * @param message
+   * @param key
+   * @return
+   */
   private short calcBitwiseXor(short message, short key) {
-	  return 0;
+	  short back;
+	  back = (short) (message ^ key);
+	  
+	  return back;
   }
   
-  //TODO Addition mod 2^16	2x 16bit eingaben, 1x 16 bit ausgabe
+  /**
+   * Addition mod 2^16	2x 16bit eingaben, 1x 16 bit ausgabe
+   * @param message
+   * @param key
+   * @return
+   */
   private short calcAdditionMod216(short message, short key) {
-	  return 0;
+	  short back;
+	  back = (short) ((message + key) % Math.pow(2, 16));
+	  
+	  return back;
   }
   
   //TODO Multiplikation in Z*_((2^16)+1)	2x 16bit eingaben, 1x 16 bit ausgabe
   private short calcMultiplikationZ(short message, short key) {
+	  short back;
+	  int mod = (int) (Math.pow(2, 16) +1);
+	  back = (short) ((message * key) % mod);
+	  
 	  return 0;
   }
   
   //TODO bitwise XOR mit Block	2x 64bit eingaben, 1x 64 bit ausgabe
-  private short calcBitwiseXORBlock(short message, short key) {
+  private short calcBitwiseXORBlock(short[] message, short[] key) {
 	  return 0;
   }
+  
+  /**
+   * Berechnet den ggT von a und b
+   * @param a
+   * @param b
+   * @return
+   */
+  private int getGCD(int a, int b)
+  {
+	 int tmp;
+	 if(a<b) {
+		 tmp = a;
+		 a = b;
+		 b = tmp;
+	 }
+     while (b!=0){
+    	 tmp=a%b;
+    	 a=b;
+    	 b=tmp;
+     }
+     return a;
+  }
+  
+  /**
+   * Reduzierte Menge der Reste modulo mod
+   */
+  private int[] getReducedRest(short mod) {
+	  ArrayList<Integer> remainders = new ArrayList<Integer>();
+	  
+	  //Füge alle mit ggT(a,mod)==1 der Rückgabe hinzu
+	  for(int i = 0; i < mod; i++) {
+		  if(getGCD(i,mod)==1) {
+			  remainders.add(i);
+		  }
+	  }
+	  
+	  //Erstelle Rückgabe aus der Liste
+	  int[] back = new int[remainders.size()];
+	  Iterator<Integer> it = remainders.iterator();
+	  int i = 0;
+	  while (it.hasNext()) {
+		  back[i] = it.next();
+		  i++;
+	  }
+	  
+	  return back;
+  }
+ 
 }
