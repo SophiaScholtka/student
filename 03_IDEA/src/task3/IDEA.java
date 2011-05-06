@@ -46,7 +46,21 @@ public final class IDEA extends BlockCipher {
 	  //TODO nimm den schlüssel und setze die Tabelle auf Seite 59 um, um daraus den dechiffrier-Schlüssel zu erhalten
 	  //TODO benutze dann einfach encipher mit dem Dechiffrierschlüssel
   }
-
+  
+  private short[] hexIVtoShortBlock(String iv){
+	  short[] block = new short[4];
+	  if (iv.length()<16){
+		  System.out.println("Initialisierungsvektor ist zu kurz! Abbruch.");
+		  System.exit(0);
+	  }
+	  try {
+		  //TODO 16 Zeichen hex-string in 4 shorts umrechnen
+	  } catch (NumberFormatException e){
+		  System.out.println("Fehler beim Parsen des IV! Abbruch.");
+		  System.exit(0);
+	  }
+	  return block;
+  }
   /**
    * Verschlüsselt den durch den FileInputStream <code>cleartext</code>
    * gegebenen Klartext und schreibt den Chiffretext in den FileOutputStream
