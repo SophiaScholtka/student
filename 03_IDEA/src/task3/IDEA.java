@@ -59,6 +59,25 @@ public final class IDEA extends BlockCipher {
    */
   public void encipher(FileInputStream cleartext, FileOutputStream ciphertext) {
 	  
+	  //CBC
+	  //TODO CBC: Umrechnung der Strings in shorts
+	  //FIXME CBC: Muss ingesamt später angepasst werden, gerade Variablen
+	  String iv = "ddc3a8f6c66286d2";
+	  String sClear = "abcdefghijklmnopqrstuvwxyz";
+	  short[][] vM = new short[1][4]; //n-Bit Klartextblöcke M1...Mt
+	  short[][] vC = new short[vM.length][4];
+	  
+	  short[][] keyExp = expandKey(ideaKey);
+	  vC[0] = stringKeytoShortKey(iv); //Setze c[0] = iv, iv 64 bit lang
+	  for(int i = 1; i < vM.length; i++) {
+		  short[] xored = new short[4];
+		  for(int j = 0; j < 4; j++) {
+			  xored[j] = calcBitwiseXor(vM[i][j], vC[i-1][j]); //M_i XOR C_(i-1)
+		  }
+		  vC[i-1] = doIDEA(xored, keyExp);
+	  }
+	  
+	  //Was nu mit vC? Irgendwohin ausgeben.
   }
 
   /**
