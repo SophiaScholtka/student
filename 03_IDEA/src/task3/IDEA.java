@@ -16,7 +16,9 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
@@ -29,7 +31,7 @@ import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
  */
 public final class IDEA extends BlockCipher {
 	final boolean DEBUG = true;
-
+	short[] ideaKey = new short[8];
   /**
    * Entschlüsselt den durch den FileInputStream <code>ciphertext</code>
    * gegebenen Chiffretext und schreibt den Klartext in den FileOutputStream
@@ -69,12 +71,26 @@ public final class IDEA extends BlockCipher {
 	  //User fragen ob eigener oder Zufallskey
 	  //128-bit = 8 char Schlüssel einlesen oder auswürfeln
 	  String originalKey = "abcdefghijklmnop";
-	  short[] Key = stringKeytoShortKey(originalKey);
-	  //Schlüsselexpansion nach Algorithmus 4.1
-	  short[] Keys = new short[52];
+	  ideaKey = stringKeytoShortKey(originalKey);
+	  if (DEBUG) {
+		  System.out.print(">>>Schlüssel:");
+		  for (int i=0;i<ideaKey.length;i++) System.out.print(" " + ideaKey[i]);
+		  System.out.println();
+	  }
+  }
+  /** 
+   * Schlüsselexpansion nach Algorithmus 4.1
+   * @param tmpKey
+   * @return
+   */
+  private short[][] expandKey(short[] tmpKey) {
+	  short[][] expandedKey=new short[9][6];
+	  int index1,index2;
 	  //Teile Key in acht 16-Bit-Teilschlüssel auf und weise diese direkt den ersten 8 Teilschlüsseln zu
 	  for(int i=0;i<8;i++){
-		  Keys[i]=(short) Key[i];
+		  index1=i/6;
+		  index2=i%6;
+		  expandedKey[index1][index2]=(short) tmpKey[i];
 	  }
 	  /* while noch nicht alle 52 teilschlüssel zugewiesen,
 	   * führe auf Key einen zyklischen Linksshift um 25 Positionen durch,
@@ -84,22 +100,40 @@ public final class IDEA extends BlockCipher {
 	  
 	  //Ich schreib es lieber nicht als while sondern als for-Schleife - Schlüssel 8 bis 47
 	  for (int i=1;i<6;i++){
-		  Key = shiftKey(Key);
+		  tmpKey = shiftKey(tmpKey);
 		  for (int j=0;j<8;j++){
-			  Keys[8*i+j]=Key[j];
+			  index1=(i*8+j)/6;
+			  index2=(i*8+j)%6;
+			  expandedKey[index1][index2]=tmpKey[j];
 		  }
 	  }
 	  //Schlüssel 48 bis 52
-	  Key=shiftKey(Key);
+	  tmpKey=shiftKey(tmpKey);
 	  for (int i=0;i<4;i++){
-		  Keys[47+i]=Key[i];
+		  expandedKey[8][i]=tmpKey[i];
 	  }
-	  //TODO fertigen Schlüssel Keys irgendwie sinnvoll abspeichern
+	  if (DEBUG) {
+		  System.out.print(">>>Expandierter Schlüssel:");
+		  for (int i=0;i<9;i++) {for(int j=0;j<6;j++) System.out.print(" " + expandedKey[i][j]);}
+		  System.out.println();
+	  }
+	  return expandedKey;
   }
 
+  //1 short = 2 byte = 16 bit ; 	–2^15 bis 2^15 – 1 (–32768...32767) 
   private short[] shiftKey(short[] key) {
 	  short[] back=key;
-	// TODO key (Länge ist 8) zyklisch um 25 bits nach links verschieben und zurück geben
+	  short tmp;
+	  int l=back.length;
+	// zyklisch um 25 = 16+9 bits nach links verschieben und zurück geben
+	  for(int i=0;i<l;i++){
+		  //ganzzahlige div, schreibt die hinteren 7 bits von key[i+1] nach vorne in back[i] (restliche 9 bits sind 0)
+		  back[i]= (short) (key[(i+1)%l]/((int) Math.pow(2, 9)));
+		  //modulus, schreibt die vorderen 9 bits von key[i+2] in tmp
+		  tmp= (short) (key[(i+2)%l]%((int)Math.pow(2, 9)));
+		  //multiplikation, schreibt die 9 bits aus tmp an position 7 bis 15 von back[i] (vordere 7 bits sind 0)
+		  back[i] += (short)(tmp*((int)Math.pow(2, 7)));
+	  }
 	return back;
 }
 
@@ -113,8 +147,8 @@ private short[] stringKeytoShortKey(String originalKey) {
 	for (int i=0;i<8;i++){
 		t1=(byte) originalKey.charAt(2*i);
 		t2=(byte) originalKey.charAt(2*i+1);
-		//schreibe 2 Byte hintereinander in ein Short, indem das zweite mit 2^8 multipliziert wird
-		back[i]=(short) (t1+ (int) Math.pow(2, 8)*t2);
+		//schreibe 2 Byte hintereinander in ein Short, indem das erste mit 2^8 multipliziert wird
+		back[i]=(short) ((int) Math.pow(2, 8)*t1 + t2);
 	}
 	return back;
 }
@@ -128,7 +162,18 @@ private short[] stringKeytoShortKey(String originalKey) {
    * @see #writeKey writeKey
    */
   public void readKey(BufferedReader key) {
-
+	  try {
+		  for(int i=0;i<8;i++){
+			  ideaKey[i] = Short.parseShort(key.readLine());
+		  }
+	  } catch (IOException e){
+		  System.out.println("Fehler beim Parsen der Schlüsseldatei.");
+		  System.exit(0);
+	  }
+	  if (DEBUG) {
+		 System.out.println(">>>Schlüssel: " + Arrays.toString(ideaKey));
+		 expandKey(ideaKey);
+	  }
   }
 
   /**
@@ -140,7 +185,15 @@ private short[] stringKeytoShortKey(String originalKey) {
    * @see #readKey readKey
    */
   public void writeKey(BufferedWriter key) {
-
+	  try {
+		  for (int i=0;i<ideaKey.length;i++){
+			  key.write(ideaKey[i] + "\n");
+		  }
+		  key.close();
+	  } catch (IOException e) {
+		  e.printStackTrace();
+		  System.exit(0);
+	  }
   }
   
   //1 byte = 8 bit; –2^7 bis 2^7 – 1 (–128...127) 
