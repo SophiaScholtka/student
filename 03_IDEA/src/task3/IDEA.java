@@ -138,52 +138,5 @@ public final class IDEA extends BlockCipher {
   private short calcBitwiseXORBlock(short[] message, short[] key) {
 	  return 0;
   }
-  
-  /**
-   * Berechnet den ggT von a und b
-   * @param a
-   * @param b
-   * @return
-   */
-  private int getGCD(int a, int b)
-  {
-	 int tmp;
-	 if(a<b) {
-		 tmp = a;
-		 a = b;
-		 b = tmp;
-	 }
-     while (b!=0){
-    	 tmp=a%b;
-    	 a=b;
-    	 b=tmp;
-     }
-     return a;
-  }
-  
-  /**
-   * Reduzierte Menge der Reste modulo mod
-   */
-  private int[] getReducedRest(short mod) {
-	  ArrayList<Integer> remainders = new ArrayList<Integer>();
-	  
-	  //Füge alle mit ggT(a,mod)==1 der Rückgabe hinzu
-	  for(int i = 0; i < mod; i++) {
-		  if(getGCD(i,mod)==1) {
-			  remainders.add(i);
-		  }
-	  }
-	  
-	  //Erstelle Rückgabe aus der Liste
-	  int[] back = new int[remainders.size()];
-	  Iterator<Integer> it = remainders.iterator();
-	  int i = 0;
-	  while (it.hasNext()) {
-		  back[i] = it.next();
-		  i++;
-	  }
-	  
-	  return back;
-  }
- 
+
 }
