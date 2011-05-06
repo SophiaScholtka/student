@@ -125,18 +125,44 @@ public final class IDEA extends BlockCipher {
 	  return back;
   }
   
-  //TODO Multiplikation in Z*_((2^16)+1)	2x 16bit eingaben, 1x 16 bit ausgabe
+  /**
+   * Multiplikation in Z*_((2^16)+1)	2x 16bit eingaben, 1x 16 bit ausgabe
+   * @param message
+   * @param key
+   * @return
+   */
   private short calcMultiplikationZ(short message, short key) {
 	  short back;
+	  int b;
+	  int m = message;
+	  int k = key;
+	  //Sonderfälle, wenn 0 eingegeben wird, ersetze durch 2^16
+	  if (m==0) m=(int) Math.pow(2,16);
+	  if (k==0) k=(int) Math.pow(2, 16);
+	  //eigentliche Rechnung
 	  int mod = (int) (Math.pow(2, 16) +1);
-	  back = (short) ((message * key) % mod);
-	  
-	  return 0;
+	  b = ((message * key) % mod);
+	  //Sonderfall, wenn 2^16 heraus kommt, ersetze durch 0
+	  if (b==Math.pow(2, 16)) b=0;
+	  back= (short) b;
+	  return back;
   }
   
-  //TODO bitwise XOR mit Block	2x 64bit eingaben, 1x 64 bit ausgabe
-  private short calcBitwiseXORBlock(short[] message, short[] key) {
-	  return 0;
+  /**
+   * Bitwise XOR mit Block	2x 64bit eingaben, 1x 64 bit ausgabe
+   * @param message
+   * @param key
+   * @return
+   */
+  private short[] calcBitwiseXORBlock(short[] message, short[] key) {
+	  if (message.length != 4 || key.length !=4){
+		  System.out.println("XOR Blöcke haben die falsche Länge! Abbruch.");
+		  System.exit(0);
+	  }
+	  short[] back = new short[4];
+	  for (int i=0;i<back.length;i++)
+		  back[i]=calcBitwiseXor(message[i],key[i]);
+	  return back;
   }
   
   /**
