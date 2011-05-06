@@ -269,13 +269,81 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  }
 	  
 	  //Runde 9, Ausgabetransformation
-	  vC[1] = calcMultiplikationZ(vZ[1], vK[9][1]);	//Z1 MultZ K1[9]	> T51
-	  vC[2] = calcAdditionMod216(vZ[2], vK[9][2]);	//Z2 Add216 K2[9]	> T52
-	  vC[3] = calcAdditionMod216(vZ[3], vK[9][3]);	//Z3 Add216 K3[9]	> T53
-	  vC[4] = calcMultiplikationZ(vZ[4], vK[9][4]);	//Z4 MultZ K4[9]	> T54
+	  vC[1] = calcMultiplikationZ(vZ[1], vK[8][1]);	//Z1 MultZ K1[9]	> T51
+	  vC[2] = calcAdditionMod216(vZ[2], vK[8][2]);	//Z2 Add216 K2[9]	> T52
+	  vC[3] = calcAdditionMod216(vZ[3], vK[8][3]);	//Z3 Add216 K3[9]	> T53
+	  vC[4] = calcMultiplikationZ(vZ[4], vK[8][4]);	//Z4 MultZ K4[9]	> T54
 	  
 	  //Rückgabe
 	  return vC;
   }
 
+  private short[][] reverseKey(short[][] key) {
+	  short[][] vR = key.clone();
+	  short mod = (short) (Math.pow(2,16));
+	  short mod1 = (short) (mod + 1);
+	  
+	  //Schlüssel der Runden 1-9
+	  for(int r = 0; r < 9; r++) {
+		  vR[r][1] = calcModInv(key[10-r-1][1],mod1);	//K1'=(K1^(10-r)) ^ (-1)
+		  vR[r][2] = calcModNeg(key[10-r-1][2],mod);	//K2'=-(K2^(10-r))
+		  vR[r][3] = calcModNeg(key[10-r-1][3], mod);	//K3'=-(K3^(10-r))
+		  vR[r][4] = calcModInv(key[10-r-1][4], mod1);	//K4'=(K4^(10-r)) ^ (-1)
+		  
+		  //Runde 2-8: Schlüssel K3 <-> K2 tauschen
+		  if(r > 0 && r < 8) {
+			  short tmp = vR[r][3];
+			  vR[r][3] = vR[r][2];
+			  vR[r][2] = tmp;
+		  }
+		  
+		  //nur für Runde 1-8 Schlüssel 5 und 6
+		  if(r < 8) {
+			vR[r][5] = key[9-r-1][5];	//K5'=K5^(9-r)
+			vR[r][6] = key[9-r-1][6];	//K6'=K6^(9-r)
+		  }
+	  }
+	  
+	  return vR;
+  }
+  
+  /**
+   * Berechnet die modulare Invese x für x = a^ (-1) mod n
+   * @param a
+   * @param n
+   * @return
+   */
+  private short calcModInv(short a, short n) {
+	  for (short x = 0; x < n; x++) {
+		  if(getGCD(x,n)==1 && (a * x) % n == 1) {
+			  return x;
+		  }
+	  }
+	  return -1;
+  }
+  
+  /**
+   * Berechnet -x = (n - a) mod n
+   * @param a
+   * @param n
+   * @return
+   */
+  private short calcModNeg(short a, short n) {
+	  return (short) ((n - a) % n);
+  }
+  
+  private int getGCD(int a, int b) {
+	int tmp;
+	if(a<b) {
+		tmp = a;
+		a = b;
+		b = tmp;
+	}
+	while (b!=0){
+		 tmp=a%b;
+		 a=b;
+		 b=tmp;
+	}
+	return a;
+  }
 }
