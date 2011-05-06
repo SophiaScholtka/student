@@ -41,7 +41,8 @@ public final class IDEA extends BlockCipher {
    * Der FileOutputStream, in den der Klartext geschrieben werden soll.
    */
   public void decipher(FileInputStream ciphertext, FileOutputStream cleartext) {
-	  //TODO setze IDEA um. macht da eine eigene Methode Sinn?
+	  //TODO nimm den schlüssel und setze die Tabelle auf Seite 59 um, um daraus den dechiffrier-Schlüssel zu erhalten
+	  //TODO benutze dann einfach encipher mit dem Dechiffrierschlüssel
   }
 
   /**
@@ -65,10 +66,60 @@ public final class IDEA extends BlockCipher {
    * @see #writeKey writeKey
    */
   public void makeKey() {
+	  //User fragen ob eigener oder Zufallskey
+	  //128-bit = 8 char Schlüssel einlesen oder auswürfeln
+	  String originalKey = "abcdefghijklmnop";
+	  short[] Key = stringKeytoShortKey(originalKey);
+	  //Schlüsselexpansion nach Algorithmus 4.1
+	  short[] Keys = new short[52];
+	  //Teile Key in acht 16-Bit-Teilschlüssel auf und weise diese direkt den ersten 8 Teilschlüsseln zu
+	  for(int i=0;i<8;i++){
+		  Keys[i]=(short) Key[i];
+	  }
+	  /* while noch nicht alle 52 teilschlüssel zugewiesen,
+	   * führe auf Key einen zyklischen Linksshift um 25 Positionen durch,
+	   * teile das Ergebnis in acht 16-Bit-Blöcke ein
+	   * weise das Ergebnis den nächsten 8 (oder im letzten Schritt 4) Teilschlüsseln zu
+	   */
 	  
+	  //Ich schreib es lieber nicht als while sondern als for-Schleife - Schlüssel 8 bis 47
+	  for (int i=1;i<6;i++){
+		  Key = shiftKey(Key);
+		  for (int j=0;j<8;j++){
+			  Keys[8*i+j]=Key[j];
+		  }
+	  }
+	  //Schlüssel 48 bis 52
+	  Key=shiftKey(Key);
+	  for (int i=0;i<4;i++){
+		  Keys[47+i]=Key[i];
+	  }
+	  //TODO fertigen Schlüssel Keys irgendwie sinnvoll abspeichern
   }
 
-  /**
+  private short[] shiftKey(short[] key) {
+	  short[] back=key;
+	// TODO key (Länge ist 8) zyklisch um 25 bits nach links verschieben und zurück geben
+	return back;
+}
+
+private short[] stringKeytoShortKey(String originalKey) {
+	if(originalKey.length() != 16){
+		System.out.println("Fehler: Falsche Schlüssellänge! Abbruch.");
+		System.exit(0);
+	}
+	short[] back = new short[8];
+	byte t1,t2; //Jedes Ascii-Zeichen ist max 1 Byte groß
+	for (int i=0;i<8;i++){
+		t1=(byte) originalKey.charAt(2*i);
+		t2=(byte) originalKey.charAt(2*i+1);
+		//schreibe 2 Byte hintereinander in ein Short, indem das zweite mit 2^8 multipliziert wird
+		back[i]=(short) (t1+ (int) Math.pow(2, 8)*t2);
+	}
+	return back;
+}
+
+/**
    * Liest den Schlüssel mit dem Reader <code>key</code>.
    * 
    * @param key
@@ -155,11 +206,11 @@ public final class IDEA extends BlockCipher {
    * @return
    */
   private short[] calcBitwiseXORBlock(short[] message, short[] key) {
-	  if (message.length != 4 || key.length !=4){
+	  if (message.length != 8 || key.length !=8){
 		  System.out.println("XOR Blöcke haben die falsche Länge! Abbruch.");
 		  System.exit(0);
 	  }
-	  short[] back = new short[4];
+	  short[] back = new short[key.length];
 	  for (int i=0;i<back.length;i++)
 		  back[i]=calcBitwiseXor(message[i],key[i]);
 	  return back;
