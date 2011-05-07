@@ -409,22 +409,22 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  
 	  //Schlüssel der Runden 1-9
 	  for(int r = 0; r < 9; r++) {
-		  vR[r][1] = calcModInv(key[10-r-1][1],mod1);	//K1'=(K1^(10-r)) ^ (-1)
-		  vR[r][2] = calcModNeg(key[10-r-1][2],mod);	//K2'=-(K2^(10-r))
-		  vR[r][3] = calcModNeg(key[10-r-1][3], mod);	//K3'=-(K3^(10-r))
-		  vR[r][4] = calcModInv(key[10-r-1][4], mod1);	//K4'=(K4^(10-r)) ^ (-1)
+		  vR[r][0] = calcModInv(key[10-r-1][0],mod1);	//K1'=(K1^(10-r)) ^ (-1)
+		  vR[r][1] = calcModNeg(key[10-r-1][1],mod);	//K2'=-(K2^(10-r))
+		  vR[r][2] = calcModNeg(key[10-r-1][2], mod);	//K3'=-(K3^(10-r))
+		  vR[r][3] = calcModInv(key[10-r-1][3], mod1);	//K4'=(K4^(10-r)) ^ (-1)
 		  
 		  //Runde 2-8: Schlüssel K3 <-> K2 tauschen
 		  if(r > 0 && r < 8) {
-			  short tmp = vR[r][3];
-			  vR[r][3] = vR[r][2];
-			  vR[r][2] = tmp;
+			  short tmp = vR[r][2];
+			  vR[r][2] = vR[r][1];
+			  vR[r][1] = tmp;
 		  }
 		  
 		  //nur für Runde 1-8 Schlüssel 5 und 6
 		  if(r < 8) {
-			vR[r][5] = key[9-r-1][5];	//K5'=K5^(9-r)
-			vR[r][6] = key[9-r-1][6];	//K6'=K6^(9-r)
+			vR[r][4] = key[9-r-1][4];	//K5'=K5^(9-r)
+			vR[r][5] = key[9-r-1][5];	//K6'=K6^(9-r)
 		  }
 	  }
 	  
