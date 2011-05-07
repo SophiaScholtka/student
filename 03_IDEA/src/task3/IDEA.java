@@ -101,6 +101,8 @@ public final class IDEA extends BlockCipher {
    * @see #writeKey writeKey
    */
   public void makeKey() {
+	  makeStringToShort("ab");
+	  System.exit(0);
 	  //User fragen ob eigener oder Zufallskey
 	  //128-bit = 8 char Schlüssel einlesen oder auswürfeln
 	  String originalKey = "abcdefghijklmnop";
@@ -432,4 +434,18 @@ private short[] stringKeytoShortKey(String originalKey) {
 	}
 	return a;
   }
+  
+  
+  private short[] makeStringToShort(String string) {
+	  short[] back = new short[string.length()];
+	  
+	  for(int i = 0; i< string.length();i++) {
+		  char c = string.charAt(i);
+		  back[i] = (short)c;
+		  System.out.println(c + "\t" + (int)c + "\t" + (short)c);
+	  }
+	  
+	  return null;
+  }
+  
 }
