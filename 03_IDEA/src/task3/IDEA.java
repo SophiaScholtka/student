@@ -119,7 +119,12 @@ public final class IDEA extends BlockCipher {
 		  vC[i-1] = doIDEA(xored, keyExp);
 	  }
 	  
-	  //Was nu mit vC? Irgendwohin ausgeben.
+	  //TODO Ausgabe Ciphertext / Was nu mit vC? Irgendwohin ausgeben.
+	  for(int i = 0; i < vC.length; i++) {
+		  for(int j = 0; j < vC[i].length;j++) {
+//			  writeCipher(ciphertext, vC[i][j]);
+		  }
+	  }
   }
 
   /**
