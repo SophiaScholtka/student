@@ -99,10 +99,10 @@ public final class IDEA extends BlockCipher {
 	  Iterator<Short> listIt = biList.iterator();
 	  int counter = 0;
 	  while(listIt.hasNext()) {
-		  vM[counter][0] = listIt.next();
-		  vM[counter][1] = listIt.next();
-		  vM[counter][2] = listIt.next();
-		  vM[counter][3] = listIt.next();
+		  vM[counter][0] = listIt.hasNext() ? listIt.next() : 0;
+		  vM[counter][1] = listIt.hasNext() ? listIt.next() : 0;
+		  vM[counter][2] = listIt.hasNext() ? listIt.next() : 0;
+		  vM[counter][3] = listIt.hasNext() ? listIt.next() : 0;
 		  counter++;
 	  }
 	  
@@ -120,10 +120,15 @@ public final class IDEA extends BlockCipher {
 	  }
 	  
 	  //TODO Ausgabe Ciphertext / Was nu mit vC? Irgendwohin ausgeben.
-	  for(int i = 0; i < vC.length; i++) {
-		  for(int j = 0; j < vC[i].length;j++) {
-//			  writeCipher(ciphertext, vC[i][j]);
+	  try{
+		  for(int i = 0; i < vC.length; i++) {
+			  for(int j = 0; j < vC[i].length;j++) {
+				  ciphertext.write(vC[i][j]);
+			  }
 		  }
+		  ciphertext.close();
+	  } catch(IOException e) {
+		  System.err.println("!!Tja. Error.");
 	  }
   }
 
@@ -362,36 +367,36 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  
 	  //Runde r 1 bis 8
 	  for(int r = 0; r < 8; r++) {
-		  vT[1][1] = calcMultiplikationZ(vZ[1], vK[r][1]);	//Z1 MultZ K1[r]  	> T11
-		  vT[1][2] = calcAdditionMod216(vZ[2], vK[r][2]);	//Z2 Add216 K2[r] 	> T12
-		  vT[1][3] = calcAdditionMod216(vZ[3], vK[r][3]);	//Z3 Add216 K3[r] 	> T13
-		  vT[1][4] = calcMultiplikationZ(vZ[4], vK[r][4]);	//Z4 MultZ K4[r]  	> T14
+		  vT[0][0] = calcMultiplikationZ(vZ[0], vK[r][0]);	//Z1 MultZ K1[r]  	> T11
+		  vT[0][1] = calcAdditionMod216(vZ[1], vK[r][1]);	//Z2 Add216 K2[r] 	> T12
+		  vT[0][2] = calcAdditionMod216(vZ[2], vK[r][2]);	//Z3 Add216 K3[r] 	> T13
+		  vT[0][3] = calcMultiplikationZ(vZ[3], vK[r][3]);	//Z4 MultZ K4[r]  	> T14
 		  
-		  vT[2][1] = calcBitwiseXor(vT[1][1], vT[1][3]);	//T11 XOR T13 	> T21
-		  vT[2][2] = calcBitwiseXor(vT[1][2], vT[1][4]);	//T12 XOR T14 	> T22
+		  vT[1][0] = calcBitwiseXor(vT[0][0], vT[0][2]);	//T11 XOR T13 	> T21
+		  vT[1][1] = calcBitwiseXor(vT[0][1], vT[0][3]);	//T12 XOR T14 	> T22
 		  
-		  vT[3][1] = calcMultiplikationZ(vT[2][1], vK[r][5]);	//T21 MultZ K5[r] 	> T31
-		  vT[3][2] = calcAdditionMod216(vT[3][1], vT[2][2]);	//T31 Add216 T22  	> T32
-		  vT[3][3] = calcMultiplikationZ(vT[3][2], vK[r][6]);	//T32 MultZ K6[r] 	> T33
-		  vT[3][4] = calcAdditionMod216(vT[3][1], vT[3][4]);	//T31 Add216 T34  	> T34
+		  vT[2][0] = calcMultiplikationZ(vT[1][0], vK[r][4]);	//T21 MultZ K5[r] 	> T31
+		  vT[2][1] = calcAdditionMod216(vT[2][0], vT[1][1]);	//T31 Add216 T22  	> T32
+		  vT[2][2] = calcMultiplikationZ(vT[2][1], vK[r][5]);	//T32 MultZ K6[r] 	> T33
+		  vT[2][3] = calcAdditionMod216(vT[2][0], vT[2][3]);	//T31 Add216 T34  	> T34
 		  
-		  vT[4][1] = calcBitwiseXor(vT[1][1], vT[3][3]); //T11 XOR T33	> T41
-		  vT[4][2] = calcBitwiseXor(vT[1][3], vT[3][3]); //T13 XOR T33	> T42
-		  vT[4][3] = calcBitwiseXor(vT[1][2], vT[3][4]); //T12 XOR T34	> T43
-		  vT[4][4] = calcBitwiseXor(vT[1][4], vT[3][4]); //T14 XOR T34	> T44
+		  vT[3][0] = calcBitwiseXor(vT[0][0], vT[2][2]); //T11 XOR T33	> T41
+		  vT[3][1] = calcBitwiseXor(vT[0][2], vT[2][2]); //T13 XOR T33	> T42
+		  vT[3][2] = calcBitwiseXor(vT[0][1], vT[2][3]); //T12 XOR T34	> T43
+		  vT[3][3] = calcBitwiseXor(vT[0][3], vT[2][3]); //T14 XOR T34	> T44
 
 		  //Setze Zwischenwerte
-		  vZ[1] = vT[4][1]; // Z1 = T41
-		  vZ[2] = vT[4][3]; // Z2 = T43
-		  vZ[3] = vT[4][2]; // Z3 = T42
-		  vZ[4] = vT[4][4]; // Z4 = T44
+		  vZ[0] = vT[3][0]; // Z1 = T41
+		  vZ[1] = vT[3][2]; // Z2 = T43
+		  vZ[2] = vT[3][1]; // Z3 = T42
+		  vZ[3] = vT[3][3]; // Z4 = T44
 	  }
 	  
 	  //Runde 9, Ausgabetransformation
-	  vC[1] = calcMultiplikationZ(vZ[1], vK[8][1]);	//Z1 MultZ K1[9]	> T51
-	  vC[2] = calcAdditionMod216(vZ[2], vK[8][2]);	//Z2 Add216 K2[9]	> T52
-	  vC[3] = calcAdditionMod216(vZ[3], vK[8][3]);	//Z3 Add216 K3[9]	> T53
-	  vC[4] = calcMultiplikationZ(vZ[4], vK[8][4]);	//Z4 MultZ K4[9]	> T54
+	  vC[0] = calcMultiplikationZ(vZ[0], vK[8][0]);	//Z1 MultZ K1[9]	> T51
+	  vC[1] = calcAdditionMod216(vZ[1], vK[8][1]);	//Z2 Add216 K2[9]	> T52
+	  vC[2] = calcAdditionMod216(vZ[2], vK[8][2]);	//Z3 Add216 K3[9]	> T53
+	  vC[3] = calcMultiplikationZ(vZ[3], vK[8][3]);	//Z4 MultZ K4[9]	> T54
 	  
 	  //Rückgabe
 	  return vC;
