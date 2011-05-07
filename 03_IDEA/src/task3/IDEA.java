@@ -17,11 +17,14 @@ import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
 import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
+import de.tubs.cs.iti.jcrypt.chiffre.BlockCipherUtil;
 
 /**
  * Dummy-Klasse für den International Data Encryption Algorithm (IDEA).
@@ -76,9 +79,34 @@ public final class IDEA extends BlockCipher {
 	  //CBC
 	  //TODO CBC: Umrechnung der Strings in shorts
 	  //FIXME CBC: Muss ingesamt später angepasst werden, gerade Variablen
-	  String iv = "ddc3a8f6c66286d2";
+	  String iv = "ddc3a8f6c66286d2"; //Hex
 	  String sClear = "abcdefghijklmnopqrstuvwxyz";
-	  short[][] vM = new short[1][4]; //n-Bit Klartextblöcke M1...Mt
+	  
+	  //Lese Klartext ein
+	  ArrayList<Short> biList = new ArrayList<Short>();
+	  Short symbol;
+	  try {
+		while((symbol = (short)cleartext.read()) != -1) {
+			  biList.add(symbol);
+		  }
+	  } catch (IOException e) {
+		e.printStackTrace();
+	  }
+	  
+	  //Bereite Klartext vor
+	  int listLength = (int) Math.ceil(biList.size() / 4.0);
+	  short[][] vM = new short[listLength][4]; //64-Bit Klartextblöcke M1...Mt
+	  Iterator<Short> listIt = biList.iterator();
+	  int counter = 0;
+	  while(listIt.hasNext()) {
+		  vM[counter][0] = listIt.next();
+		  vM[counter][1] = listIt.next();
+		  vM[counter][2] = listIt.next();
+		  vM[counter][3] = listIt.next();
+		  counter++;
+	  }
+	  
+	  //Bereite Ciphertext vor
 	  short[][] vC = new short[vM.length][4];
 	  
 	  short[][] keyExp = expandKey(ideaKey);
@@ -442,7 +470,20 @@ private short[] stringKeytoShortKey(String originalKey) {
 		  back[i] = (short)c;
 	  }
 	  
-	  return null;
+	  return back;
   }
   
+  private ArrayList<Short> readInputStreamToList(FileInputStream fis) {
+	  ArrayList<Short> back = new ArrayList<Short>();
+	  try {
+		  while(fis.available()>0) {
+			  short c = (short) fis.read();
+			  back.add(c);
+		  }
+	  } catch (IOException e) {
+		  e.printStackTrace();
+	  }
+	  
+	  return back;
+  }
 }
