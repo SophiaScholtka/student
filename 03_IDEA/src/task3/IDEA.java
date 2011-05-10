@@ -22,9 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
 import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
-import de.tubs.cs.iti.jcrypt.chiffre.BlockCipherUtil;
 
 /**
  * Dummy-Klasse für den International Data Encryption Algorithm (IDEA).
@@ -76,9 +74,18 @@ public final class IDEA extends BlockCipher {
    */
   public void encipher(FileInputStream cleartext, FileOutputStream ciphertext) {
 	  
+	  /* //Test für readClear
+	   * Liest blocksize-2 Zeichen aus (8 bit, 1 Byte) 
+	   * Hängt 8 bit bzw. 1 Byte hinten an mit der Anzahl der Zeichen
+	   * Führende Nullen werden links nicht dargestellt
+	   * Die Anzahl könnte durch Rechtsshift um 8 Bits entfernt werden
+	   * Die Anzahl dient vermutlich der Rückwandlung durch writeCipher, 
+	   * um die Anzahl der enthaltenen Buchstaben zu kennen.
+	   */
 	  //TODO CBC: Umrechnung der Strings in shorts
 	  //FIXME CBC: Muss ingesamt später angepasst werden, gerade Variablen
 	  String iv = "ddc3a8f6c66286d2"; //Hex
+	  BigInteger biIV = new BigInteger(iv, 16);
 	  String sClear = "abcdefghijklmnopqrstuvwxyz";
 	  
 	  //Lese Klartext ein
