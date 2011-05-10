@@ -81,6 +81,9 @@ public final class IDEA extends BlockCipher {
 	   * Die Anzahl könnte durch Rechtsshift um 8 Bits entfernt werden
 	   * Die Anzahl dient vermutlich der Rückwandlung durch writeCipher, 
 	   * um die Anzahl der enthaltenen Buchstaben zu kennen.
+	   * 16 Bits: blocksize=3, dh. 1 Zeichen, 1x Anzahl
+	   * 64 Bits: blocksize=9, dh. 7 Zeichen, 1x Anzahl
+	   * Ohne die Anzahl erhöht sich die Blicksize um jeweils 1.
 	   */
 	  //TODO CBC: Umrechnung der Strings in shorts
 	  //FIXME CBC: Muss ingesamt später angepasst werden, gerade Variablen
