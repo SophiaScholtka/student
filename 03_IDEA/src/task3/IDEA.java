@@ -76,7 +76,6 @@ public final class IDEA extends BlockCipher {
    */
   public void encipher(FileInputStream cleartext, FileOutputStream ciphertext) {
 	  
-	  //CBC
 	  //TODO CBC: Umrechnung der Strings in shorts
 	  //FIXME CBC: Muss ingesamt später angepasst werden, gerade Variablen
 	  String iv = "ddc3a8f6c66286d2"; //Hex
@@ -108,7 +107,8 @@ public final class IDEA extends BlockCipher {
 	  
 	  //Bereite Ciphertext vor
 	  short[][] vC = new short[vM.length][4];
-	  
+
+	  //CBC
 	  short[][] keyExp = expandKey(ideaKey);
 	  vC[0] = stringKeytoShortKey(iv); //Setze c[0] = iv, iv 64 bit lang
 	  for(int i = 1; i < vM.length; i++) {
