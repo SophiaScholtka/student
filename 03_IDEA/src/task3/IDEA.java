@@ -34,8 +34,9 @@ public final class IDEA extends BlockCipher {
 	final boolean DEBUG = true;
 	
 	//Konstante Rechenwerte
-	final BigInteger MOD_216_ = new BigInteger("" + Math.pow(2, 16)); //Mod 2^16
-	final BigInteger MOD_MULT_Z_= new BigInteger("" + (Math.pow(2, 16)+1)); //Mod 2^16+1
+	final BigInteger MOD_2 = new BigInteger("2");
+	final BigInteger MOD_216_ = new BigInteger("" + MOD_2.pow(16)); //Mod 2^16
+	final BigInteger MOD_MULT_Z_= new BigInteger("" + MOD_216_.add(BigInteger.ONE)); //Mod 2^16+1
 	
 	short[] ideaKey = new short[8];
 	
@@ -93,9 +94,12 @@ public final class IDEA extends BlockCipher {
 	  //CBC
 	  short[][] keyExp = expandKey(ideaKey);
 	  vC[0] = transformIv(iv); //Setze c[0] = iv, iv 64 bit lang
+//	  System.out.println("### " + vM.length + "\t" + vC.length);
 	  for(int i = 1; i < vM.length; i++) {
 		  BigInteger[] xored = new BigInteger[4];
 		  for(int j = 0; j < 4; j++) {
+			  //FIXME NullPointerException, weil vC[i-1][j] null ist (noch nicht gesetzt)
+//			  System.out.println(vM[i][j] + "\t" + i + "\t" + j + "\t" + vC[i-1][j]);
 			  xored[j] = calcBitwiseXor(vM[i][j], vC[i-1][j]); //M_i XOR C_(i-1)
 		  }
 		  //TODO keyExp muss BigInteger sein! erst dann wird doIDEA freigegeben
@@ -497,7 +501,8 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  }
 	  //Erweiter Liste auf Vielfaches von 4
 	  if(list.size() % 4 != 0) {
-		  for(int i = 0; i < (4-(list.size() % 4)); i++) {
+		  int to = 4 - (list.size() % 4);
+		  for(int i = 0; i < to; i++) {
 			  list.add(BigInteger.ZERO);
 		  }
 	  }
