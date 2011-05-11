@@ -107,16 +107,11 @@ public final class IDEA extends BlockCipher {
 	  
 	  //TODO Ausgabe Ciphertext / Was nu mit vC? Irgendwohin ausgeben.
 	  //Speicher Ciphertext
-	  try{
-		  for(int i = 0; i < vC.length; i++) {
-			  for(int j = 0; j < vC[i].length;j++) {
-				  BigInteger write = new BigInteger(vC[i][j].toString(2) + "00000100",2);
-				  writeCipher(ciphertext, write);
-			  }
+	  for(int i = 0; i < vC.length; i++) {
+		  for(int j = 0; j < vC[i].length;j++) {
+			  BigInteger write = new BigInteger(vC[i][j].toString(2) + "00000100",2);
+			  writeCipher(ciphertext, write);
 		  }
-		  ciphertext.close();
-	  } catch(IOException e) {
-		  System.err.println("!!Tja. Error.");
 	  }
   }
 
@@ -469,7 +464,6 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  
 	  //Schlüssel der Runden 1-9
 	  for(int r = 0; r < 9; r++) {
-		  //TODO wieder freigeben und Fehler entfernen
 		  vR[r][0] = calcModInv(key[10-r-1][0],MOD_MULT_Z216_);	//K1'=(K1^(10-r)) ^ (-1)
 		  vR[r][1] = calcModNeg(key[10-r-1][1],MOD_216_);	//K2'=-(K2^(10-r))
 		  vR[r][2] = calcModNeg(key[10-r-1][2], MOD_216_);	//K3'=-(K3^(10-r))
@@ -626,4 +620,5 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  }
 	  return string;
   }
+  
 }
