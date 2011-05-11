@@ -109,7 +109,8 @@ public final class IDEA extends BlockCipher {
 	  //Speicher Ciphertext
 	  for(int i = 0; i < vC.length; i++) {
 		  for(int j = 0; j < vC[i].length;j++) {
-			  BigInteger write = new BigInteger(vC[i][j].toString(2) + "00000100",2);
+			  BigInteger write = new BigInteger(vC[i][j].toString(2) + "00000010",2);
+//			  System.out.println(fillZeros(write.toString(2),8) + "\t" + write.bitLength() + "\t" + write);
 			  writeCipher(ciphertext, write);
 		  }
 	  }
