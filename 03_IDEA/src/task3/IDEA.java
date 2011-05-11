@@ -80,6 +80,15 @@ public final class IDEA extends BlockCipher {
    * Der FileOutputStream, in den der Chiffretext geschrieben werden soll.
    */
   public void encipher(FileInputStream cleartext, FileOutputStream ciphertext) {
+//	  BigInteger read = readClear(cleartext, 4);
+//	  System.out.println(read.toString(2));
+//	  BigInteger write1 = new BigInteger("110000101100010",2);
+//	  BigInteger write2 = new BigInteger("11000010110001000000010",2);
+//	  System.out.println(read.equals(write2));
+//	  writeCipher(ciphertext, write2);
+////	  writeClear(ciphertext,write2);
+//	  
+//	  System.exit(0);
 	  
 	  //TODO lese IV ein (momentan Hardcoded)
 	  String iv = "ddc3a8f6c66286d2"; //Hex
@@ -109,9 +118,9 @@ public final class IDEA extends BlockCipher {
 	  //Speicher Ciphertext
 	  for(int i = 0; i < vC.length; i++) {
 		  for(int j = 0; j < vC[i].length;j++) {
-			  BigInteger write = new BigInteger(vC[i][j].toString(2) + "00000010",2);
+			  BigInteger write = new BigInteger(vC[i][j].toString(2) + "00000100",2);
 //			  System.out.println(fillZeros(write.toString(2),8) + "\t" + write.bitLength() + "\t" + write);
-			  writeCipher(ciphertext, write);
+			  writeClear(ciphertext, write);
 		  }
 	  }
   }
