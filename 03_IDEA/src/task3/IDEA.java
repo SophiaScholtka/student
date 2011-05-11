@@ -34,9 +34,9 @@ public final class IDEA extends BlockCipher {
 	final boolean DEBUG = true;
 	
 	//Konstante Rechenwerte
-	final BigInteger MOD_2 = new BigInteger("2");
+	final BigInteger MOD_2 = new BigInteger("2"); //2
 	final BigInteger MOD_216_ = new BigInteger("" + MOD_2.pow(16)); //Mod 2^16
-	final BigInteger MOD_MULT_Z_= new BigInteger("" + MOD_216_.add(BigInteger.ONE)); //Mod 2^16+1
+	final BigInteger MOD_MULT_Z216_= new BigInteger("" + MOD_216_.add(BigInteger.ONE)); //Mod 2^16+1
 	
 	BigInteger[] ideaKey = new BigInteger[8];
 	
@@ -378,7 +378,7 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  //eigentliche Rechnung m1*m2 mod 2^16+1
 	  BigInteger back; //return value
 	  back = message1.multiply(message2);
-	  back = back.mod(MOD_MULT_Z_);
+	  back = back.mod(MOD_MULT_Z216_);
 	  
 	  //Sonderfall, wenn 2^16 heraus kommt, ersetze durch 0
 	  if (back.equals(MOD_216_)) back=BigInteger.ZERO;
@@ -464,22 +464,20 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  return vC;
   }
 
-  private short[][] reverseKey(short[][] key) {
-	  short[][] vR = key.clone();
-	  short mod = (short) (Math.pow(2,16));
-	  short mod1 = (short) (mod + 1);
+  private BigInteger[][] reverseKey(BigInteger[][] key) {
+	  BigInteger[][] vR = key.clone();
 	  
 	  //Schlüssel der Runden 1-9
 	  for(int r = 0; r < 9; r++) {
 		  //TODO wieder freigeben und Fehler entfernen
-//		  vR[r][0] = calcModInv(key[10-r-1][0],mod1);	//K1'=(K1^(10-r)) ^ (-1)
-//		  vR[r][1] = calcModNeg(key[10-r-1][1],mod);	//K2'=-(K2^(10-r))
-//		  vR[r][2] = calcModNeg(key[10-r-1][2], mod);	//K3'=-(K3^(10-r))
-//		  vR[r][3] = calcModInv(key[10-r-1][3], mod1);	//K4'=(K4^(10-r)) ^ (-1)
+		  vR[r][0] = calcModInv(key[10-r-1][0],MOD_MULT_Z216_);	//K1'=(K1^(10-r)) ^ (-1)
+		  vR[r][1] = calcModNeg(key[10-r-1][1],MOD_216_);	//K2'=-(K2^(10-r))
+		  vR[r][2] = calcModNeg(key[10-r-1][2], MOD_216_);	//K3'=-(K3^(10-r))
+		  vR[r][3] = calcModInv(key[10-r-1][3], MOD_MULT_Z216_);	//K4'=(K4^(10-r)) ^ (-1)
 		  
 		  //Runde 2-8: Schlüssel K3 <-> K2 tauschen
 		  if(r > 0 && r < 8) {
-			  short tmp = vR[r][2];
+			  BigInteger tmp = vR[r][2];
 			  vR[r][2] = vR[r][1];
 			  vR[r][1] = tmp;
 		  }
@@ -502,12 +500,6 @@ private short[] stringKeytoShortKey(String originalKey) {
    */
   private BigInteger calcModInv(BigInteger a, BigInteger n) {
 	  return a.modInverse(n);
-//	  for (short x = 0; x < n; x++) {
-//		  if(getGCD(x,n)==1 && (a * x) % n == 1) {
-//			  return x;
-//		  }
-//	  }
-//	  return -1;
   }
   
   /**
@@ -516,8 +508,12 @@ private short[] stringKeytoShortKey(String originalKey) {
    * @param n
    * @return
    */
-  private short calcModNeg(short a, short n) {
-	  return (short) ((n - a) % n);
+  private BigInteger calcModNeg(BigInteger a, BigInteger n) {
+	  BigInteger neg;
+	  //(n-a) mod n
+	  neg = n.subtract(a);
+	  neg = neg.mod(n);
+	  return neg;
   }
   
   private int getGCD(int a, int b) {
