@@ -34,9 +34,9 @@ public final class IDEA extends BlockCipher {
 	final boolean DEBUG = true;
 	
 	//Konstante Rechenwerte
-	final BigInteger MOD_2 = new BigInteger("2");
+	final BigInteger MOD_2 = new BigInteger("2"); //2
 	final BigInteger MOD_216_ = new BigInteger("" + MOD_2.pow(16)); //Mod 2^16
-	final BigInteger MOD_MULT_Z_= new BigInteger("" + MOD_216_.add(BigInteger.ONE)); //Mod 2^16+1
+	final BigInteger MOD_MULT_Z216_= new BigInteger("" + MOD_216_.add(BigInteger.ONE)); //Mod 2^16+1
 	
 	BigInteger[] ideaKey = new BigInteger[8];
 	
@@ -80,10 +80,18 @@ public final class IDEA extends BlockCipher {
    * Der FileOutputStream, in den der Chiffretext geschrieben werden soll.
    */
   public void encipher(FileInputStream cleartext, FileOutputStream ciphertext) {
+//	  BigInteger read = readClear(cleartext, 4);
+//	  System.out.println(read.toString(2));
+//	  BigInteger write1 = new BigInteger("110000101100010",2);
+//	  BigInteger write2 = new BigInteger("11000010110001000000010",2);
+//	  System.out.println(read.equals(write2));
+//	  writeCipher(ciphertext, write2);
+////	  writeClear(ciphertext,write2);
+//	  
+//	  System.exit(0);
 	  
 	  //TODO lese IV ein (momentan Hardcoded)
 	  String iv = "ddc3a8f6c66286d2"; //Hex
-	  
 	  
 	  //Lese Klartext ein (BigInteger[64bit][16bit])
 	  BigInteger[][] vM = getClear(cleartext);
@@ -94,35 +102,26 @@ public final class IDEA extends BlockCipher {
 	  //CBC
 	  BigInteger[][] keyExp = expandKey(ideaKey);
 	  vC[0] = transformIv(iv); //Setze c[0] = iv, iv 64 bit lang
-//	  System.out.println("### " + vM.length + "\t" + vC.length);
 	  for(int i = 1; i < vM.length; i++) {
 		  BigInteger[] xored = new BigInteger[4];
 		  for(int j = 0; j < 4; j++) {
-			  //FIXME NullPointerException, weil vC[i-1][j] null ist (noch nicht gesetzt)
 			  xored[j] = calcBitwiseXor(vM[i][j], vC[i-1][j]); //M_i XOR C_(i-1)
 		  }
-		  //TODO keyExp muss BigInteger sein! erst dann wird doIDEA freigegeben
 		  BigInteger[] bi = new BigInteger[4];
 		  for (int j = 0; j < bi.length; j++) {
 			bi[j] = new BigInteger("-1");
 		  }
-		  vC[i] = bi; //temporär, bis IDEA geht
-//		  vC[i] = doIDEA(xored, keyExp);
+		  vC[i] = doIDEA(xored, keyExp);
 	  }
 	  
 	  //TODO Ausgabe Ciphertext / Was nu mit vC? Irgendwohin ausgeben.
 	  //Speicher Ciphertext
-	  try{
-		  for(int i = 0; i < vC.length; i++) {
-			  for(int j = 0; j < vC[i].length;j++) {
-				  BigInteger write = new BigInteger(vC[i][j].toString(2) + "00000100",2);
-				  writeCipher(ciphertext, write);
-				  //ciphertext.write(vC[i][j]);
-			  }
+	  for(int i = 0; i < vC.length; i++) {
+		  for(int j = 0; j < vC[i].length;j++) {
+			  BigInteger write = new BigInteger(vC[i][j].toString(2) + "00000100",2);
+//			  System.out.println(fillZeros(write.toString(2),8) + "\t" + write.bitLength() + "\t" + write);
+			  writeClear(ciphertext, write);
 		  }
-		  ciphertext.close();
-	  } catch(IOException e) {
-		  System.err.println("!!Tja. Error.");
 	  }
   }
 
@@ -385,7 +384,7 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  //eigentliche Rechnung m1*m2 mod 2^16+1
 	  BigInteger back; //return value
 	  back = message1.multiply(message2);
-	  back = back.mod(MOD_MULT_Z_);
+	  back = back.mod(MOD_MULT_Z216_);
 	  
 	  //Sonderfall, wenn 2^16 heraus kommt, ersetze durch 0
 	  if (back.equals(MOD_216_)) back=BigInteger.ZERO;
@@ -447,7 +446,7 @@ private short[] stringKeytoShortKey(String originalKey) {
 		  vT[2][0] = calcMultiplikationZ(vT[1][0], vK[r][4]);	//T21 MultZ K5[r] 	> T31
 		  vT[2][1] = calcAdditionMod216(vT[2][0], vT[1][1]);	//T31 Add216 T22  	> T32
 		  vT[2][2] = calcMultiplikationZ(vT[2][1], vK[r][5]);	//T32 MultZ K6[r] 	> T33
-		  vT[2][3] = calcAdditionMod216(vT[2][0], vT[2][3]);	//T31 Add216 T34  	> T34
+		  vT[2][3] = calcAdditionMod216(vT[2][0], vT[2][2]);	//T31 Add216 T33  	> T34
 		  
 		  vT[3][0] = calcBitwiseXor(vT[0][0], vT[2][2]); //T11 XOR T33	> T41
 		  vT[3][1] = calcBitwiseXor(vT[0][2], vT[2][2]); //T13 XOR T33	> T42
@@ -471,22 +470,19 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  return vC;
   }
 
-  private short[][] reverseKey(short[][] key) {
-	  short[][] vR = key.clone();
-	  short mod = (short) (Math.pow(2,16));
-	  short mod1 = (short) (mod + 1);
+  private BigInteger[][] reverseKey(BigInteger[][] key) {
+	  BigInteger[][] vR = key.clone();
 	  
 	  //Schlüssel der Runden 1-9
 	  for(int r = 0; r < 9; r++) {
-		  //TODO wieder freigeben und Fehler entfernen
-//		  vR[r][0] = calcModInv(key[10-r-1][0],mod1);	//K1'=(K1^(10-r)) ^ (-1)
-//		  vR[r][1] = calcModNeg(key[10-r-1][1],mod);	//K2'=-(K2^(10-r))
-//		  vR[r][2] = calcModNeg(key[10-r-1][2], mod);	//K3'=-(K3^(10-r))
-//		  vR[r][3] = calcModInv(key[10-r-1][3], mod1);	//K4'=(K4^(10-r)) ^ (-1)
+		  vR[r][0] = calcModInv(key[10-r-1][0],MOD_MULT_Z216_);	//K1'=(K1^(10-r)) ^ (-1)
+		  vR[r][1] = calcModNeg(key[10-r-1][1],MOD_216_);	//K2'=-(K2^(10-r))
+		  vR[r][2] = calcModNeg(key[10-r-1][2], MOD_216_);	//K3'=-(K3^(10-r))
+		  vR[r][3] = calcModInv(key[10-r-1][3], MOD_MULT_Z216_);	//K4'=(K4^(10-r)) ^ (-1)
 		  
 		  //Runde 2-8: Schlüssel K3 <-> K2 tauschen
 		  if(r > 0 && r < 8) {
-			  short tmp = vR[r][2];
+			  BigInteger tmp = vR[r][2];
 			  vR[r][2] = vR[r][1];
 			  vR[r][1] = tmp;
 		  }
@@ -509,12 +505,6 @@ private short[] stringKeytoShortKey(String originalKey) {
    */
   private BigInteger calcModInv(BigInteger a, BigInteger n) {
 	  return a.modInverse(n);
-//	  for (short x = 0; x < n; x++) {
-//		  if(getGCD(x,n)==1 && (a * x) % n == 1) {
-//			  return x;
-//		  }
-//	  }
-//	  return -1;
   }
   
   /**
@@ -523,8 +513,12 @@ private short[] stringKeytoShortKey(String originalKey) {
    * @param n
    * @return
    */
-  private short calcModNeg(short a, short n) {
-	  return (short) ((n - a) % n);
+  private BigInteger calcModNeg(BigInteger a, BigInteger n) {
+	  BigInteger neg;
+	  //(n-a) mod n
+	  neg = n.subtract(a);
+	  neg = neg.mod(n);
+	  return neg;
   }
   
   private int getGCD(int a, int b) {
@@ -637,4 +631,5 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  }
 	  return string;
   }
+  
 }
