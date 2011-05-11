@@ -99,14 +99,15 @@ public final class IDEA extends BlockCipher {
 		  BigInteger[] xored = new BigInteger[4];
 		  for(int j = 0; j < 4; j++) {
 			  //FIXME NullPointerException, weil vC[i-1][j] null ist (noch nicht gesetzt)
-//			  System.out.println(vM[i][j] + "\t" + i + "\t" + j + "\t" + vC[i-1][j]);
-			  System.out.print(i + "\t" + j + "\t" + (i-1));
-			  System.out.print("\t");
-			  System.out.println(vM[i][j] + "\t" + vC[i-1][j]); //vM[2][0] vC[1][0]
 			  xored[j] = calcBitwiseXor(vM[i][j], vC[i-1][j]); //M_i XOR C_(i-1)
 		  }
 		  //TODO keyExp muss BigInteger sein! erst dann wird doIDEA freigegeben
-//		  vC[i-1] = doIDEA(xored, keyExp);
+		  BigInteger[] bi = new BigInteger[4];
+		  for (int j = 0; j < bi.length; j++) {
+			bi[j] = new BigInteger("-1");
+		  }
+		  vC[i] = bi; //temporär, bis IDEA geht
+//		  vC[i] = doIDEA(xored, keyExp);
 	  }
 	  
 	  //TODO Ausgabe Ciphertext / Was nu mit vC? Irgendwohin ausgeben.
