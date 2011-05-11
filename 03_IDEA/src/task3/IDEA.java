@@ -85,6 +85,7 @@ public final class IDEA extends BlockCipher {
 	  String iv = "ddc3a8f6c66286d2"; //Hex
 //	  BigInteger[] biIv = transformIv(iv);
 	  
+	  
 	  //Lese Klartext ein (BigInteger[64bit][16bit])
 	  BigInteger[][] vM = getClear(cleartext);
 	  
@@ -402,10 +403,11 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  
 	  //Schlüssel der Runden 1-9
 	  for(int r = 0; r < 9; r++) {
-		  vR[r][0] = calcModInv(key[10-r-1][0],mod1);	//K1'=(K1^(10-r)) ^ (-1)
-		  vR[r][1] = calcModNeg(key[10-r-1][1],mod);	//K2'=-(K2^(10-r))
-		  vR[r][2] = calcModNeg(key[10-r-1][2], mod);	//K3'=-(K3^(10-r))
-		  vR[r][3] = calcModInv(key[10-r-1][3], mod1);	//K4'=(K4^(10-r)) ^ (-1)
+		  //TODO wieder freigeben und Fehler entfernen
+//		  vR[r][0] = calcModInv(key[10-r-1][0],mod1);	//K1'=(K1^(10-r)) ^ (-1)
+//		  vR[r][1] = calcModNeg(key[10-r-1][1],mod);	//K2'=-(K2^(10-r))
+//		  vR[r][2] = calcModNeg(key[10-r-1][2], mod);	//K3'=-(K3^(10-r))
+//		  vR[r][3] = calcModInv(key[10-r-1][3], mod1);	//K4'=(K4^(10-r)) ^ (-1)
 		  
 		  //Runde 2-8: Schlüssel K3 <-> K2 tauschen
 		  if(r > 0 && r < 8) {
@@ -430,13 +432,14 @@ private short[] stringKeytoShortKey(String originalKey) {
    * @param n
    * @return
    */
-  private short calcModInv(short a, short n) {
-	  for (short x = 0; x < n; x++) {
-		  if(getGCD(x,n)==1 && (a * x) % n == 1) {
-			  return x;
-		  }
-	  }
-	  return -1;
+  private BigInteger calcModInv(BigInteger a, BigInteger n) {
+	  return a.modInverse(n);
+//	  for (short x = 0; x < n; x++) {
+//		  if(getGCD(x,n)==1 && (a * x) % n == 1) {
+//			  return x;
+//		  }
+//	  }
+//	  return -1;
   }
   
   /**
@@ -533,5 +536,31 @@ private short[] stringKeytoShortKey(String originalKey) {
 		  back[i] = new BigInteger(sT, 16);
 	  }
 	  return back;
+  }
+  
+  private BigInteger transformString(String string) {
+	  String s = "";
+	  BigInteger bigInteger;
+	  char character;
+	  for(int i = 0; i < string.length();i++) {
+		  character = string.charAt(i);
+		  bigInteger = new BigInteger(""+ (int)character);
+		  s = s + fillZeros(bigInteger.toString(2), 8);
+		  System.out.println("s: \t" + s);
+	  }
+	  
+	  return new BigInteger(s,2);
+  }
+  
+  /**
+   * Ergänzt die Nullen für 8 Bit Darstellung
+   * @param string	String mit binärer Zahlendarstellung
+   * @return	gibt den mit Nullen erweiterten String zurück
+   */
+  private String fillZeros(String string,int length) {
+	  while(string.length() % length != 0) {
+		  string = "0" + string;
+	  }
+	  return string;
   }
 }
