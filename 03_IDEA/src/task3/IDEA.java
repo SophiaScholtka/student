@@ -83,7 +83,6 @@ public final class IDEA extends BlockCipher {
 	  
 	  //TODO lese IV ein (momentan Hardcoded)
 	  String iv = "ddc3a8f6c66286d2"; //Hex
-//	  BigInteger[] biIv = transformIv(iv);
 	  
 	  
 	  //Lese Klartext ein (BigInteger[64bit][16bit])
@@ -101,6 +100,9 @@ public final class IDEA extends BlockCipher {
 		  for(int j = 0; j < 4; j++) {
 			  //FIXME NullPointerException, weil vC[i-1][j] null ist (noch nicht gesetzt)
 //			  System.out.println(vM[i][j] + "\t" + i + "\t" + j + "\t" + vC[i-1][j]);
+			  System.out.print(i + "\t" + j + "\t" + (i-1));
+			  System.out.print("\t");
+			  System.out.println(vM[i][j] + "\t" + vC[i-1][j]); //vM[2][0] vC[1][0]
 			  xored[j] = calcBitwiseXor(vM[i][j], vC[i-1][j]); //M_i XOR C_(i-1)
 		  }
 		  //TODO keyExp muss BigInteger sein! erst dann wird doIDEA freigegeben
@@ -546,7 +548,6 @@ private short[] stringKeytoShortKey(String originalKey) {
 		  character = string.charAt(i);
 		  bigInteger = new BigInteger(""+ (int)character);
 		  s = s + fillZeros(bigInteger.toString(2), 8);
-		  System.out.println("s: \t" + s);
 	  }
 	  
 	  return new BigInteger(s,2);
