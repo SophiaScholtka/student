@@ -93,19 +93,15 @@ public final class IDEA extends BlockCipher {
 	  //CBC
 	  BigInteger[][] keyExp = expandKey(ideaKey);
 	  vC[0] = transformIv(iv); //Setze c[0] = iv, iv 64 bit lang
-//	  System.out.println("### " + vM.length + "\t" + vC.length);
 	  for(int i = 1; i < vM.length; i++) {
 		  BigInteger[] xored = new BigInteger[4];
 		  for(int j = 0; j < 4; j++) {
-			  //FIXME NullPointerException, weil vC[i-1][j] null ist (noch nicht gesetzt)
 			  xored[j] = calcBitwiseXor(vM[i][j], vC[i-1][j]); //M_i XOR C_(i-1)
 		  }
-		  //TODO keyExp muss BigInteger sein! erst dann wird doIDEA freigegeben
 		  BigInteger[] bi = new BigInteger[4];
 		  for (int j = 0; j < bi.length; j++) {
 			bi[j] = new BigInteger("-1");
 		  }
-//		  vC[i] = bi; //temporär, bis IDEA geht
 		  vC[i] = doIDEA(xored, keyExp);
 	  }
 	  
@@ -116,7 +112,6 @@ public final class IDEA extends BlockCipher {
 			  for(int j = 0; j < vC[i].length;j++) {
 				  BigInteger write = new BigInteger(vC[i][j].toString(2) + "00000100",2);
 				  writeCipher(ciphertext, write);
-				  //ciphertext.write(vC[i][j]);
 			  }
 		  }
 		  ciphertext.close();
