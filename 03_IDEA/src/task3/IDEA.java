@@ -32,7 +32,13 @@ import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
  */
 public final class IDEA extends BlockCipher {
 	final boolean DEBUG = true;
+	
+	//Konstante Rechenwerte
+	final BigInteger MOD_216_ = new BigInteger("" + Math.pow(2, 16)); //Mod 2^16
+	final BigInteger MOD_MULT_Z_= new BigInteger("" + (Math.pow(2, 16)+1)); //Mod 2^16+1
+	
 	short[] ideaKey = new short[8];
+	
   /**
    * Entschlüsselt den durch den FileInputStream <code>ciphertext</code>
    * gegebenen Chiffretext und schreibt den Klartext in den FileOutputStream
@@ -74,66 +80,36 @@ public final class IDEA extends BlockCipher {
    */
   public void encipher(FileInputStream cleartext, FileOutputStream ciphertext) {
 	  
-	  /* //Test für readClear
-	   * Liest blocksize-2 Zeichen aus (8 bit, 1 Byte) 
-	   * Hängt 8 bit bzw. 1 Byte hinten an mit der Anzahl der Zeichen
-	   * Führende Nullen werden links nicht dargestellt
-	   * Die Anzahl könnte durch Rechtsshift um 8 Bits entfernt werden
-	   * Die Anzahl dient vermutlich der Rückwandlung durch writeCipher, 
-	   * um die Anzahl der enthaltenen Buchstaben zu kennen.
-	   * 16 Bits: blocksize=3, dh. 1 Zeichen, 1x Anzahl
-	   * 64 Bits: blocksize=9, dh. 7 Zeichen, 1x Anzahl
-	   * Ohne die Anzahl erhöht sich die Blicksize um jeweils 1.
-	   */
-	  //TODO CBC: Umrechnung der Strings in shorts
-	  //FIXME CBC: Muss ingesamt später angepasst werden, gerade Variablen
+	  //TODO lese IV ein (momentan Hardcoded)
 	  String iv = "ddc3a8f6c66286d2"; //Hex
-	  BigInteger biIV = new BigInteger(iv, 16);
-	  String sClear = "abcdefghijklmnopqrstuvwxyz";
+//	  BigInteger[] biIv = transformIv(iv);
 	  
-	  //Lese Klartext ein
-	  ArrayList<Short> biList = new ArrayList<Short>();
-	  Short symbol;
-	  try {
-		while((symbol = (short)cleartext.read()) != -1) {
-			  biList.add(symbol);
-		  }
-	  } catch (IOException e) {
-		e.printStackTrace();
-	  }
-	  
-	  //Bereite Klartext vor
-	  int listLength = (int) Math.ceil(biList.size() / 4.0);
-	  short[][] vM = new short[listLength][4]; //64-Bit Klartextblöcke M1...Mt
-	  Iterator<Short> listIt = biList.iterator();
-	  int counter = 0;
-	  while(listIt.hasNext()) {
-		  vM[counter][0] = listIt.hasNext() ? listIt.next() : 0;
-		  vM[counter][1] = listIt.hasNext() ? listIt.next() : 0;
-		  vM[counter][2] = listIt.hasNext() ? listIt.next() : 0;
-		  vM[counter][3] = listIt.hasNext() ? listIt.next() : 0;
-		  counter++;
-	  }
+	  //Lese Klartext ein (BigInteger[64bit][16bit])
+	  BigInteger[][] vM = getClear(cleartext);
 	  
 	  //Bereite Ciphertext vor
-	  short[][] vC = new short[vM.length][4];
+	  BigInteger[][] vC = new BigInteger[vM.length][4];
 
 	  //CBC
 	  short[][] keyExp = expandKey(ideaKey);
-	  vC[0] = stringKeytoShortKey(iv); //Setze c[0] = iv, iv 64 bit lang
+	  vC[0] = transformIv(iv); //Setze c[0] = iv, iv 64 bit lang
 	  for(int i = 1; i < vM.length; i++) {
-		  short[] xored = new short[4];
+		  BigInteger[] xored = new BigInteger[4];
 		  for(int j = 0; j < 4; j++) {
 			  xored[j] = calcBitwiseXor(vM[i][j], vC[i-1][j]); //M_i XOR C_(i-1)
 		  }
-		  vC[i-1] = doIDEA(xored, keyExp);
+		  //TODO keyExp muss BigInteger sein! erst dann wird doIDEA freigegeben
+//		  vC[i-1] = doIDEA(xored, keyExp);
 	  }
 	  
 	  //TODO Ausgabe Ciphertext / Was nu mit vC? Irgendwohin ausgeben.
+	  //Speicher Ciphertext
 	  try{
 		  for(int i = 0; i < vC.length; i++) {
 			  for(int j = 0; j < vC[i].length;j++) {
-				  ciphertext.write(vC[i][j]);
+				  BigInteger write = new BigInteger(vC[i][j].toString(2) + "00000100",2);
+				  writeCipher(ciphertext, write);
+				  //ciphertext.write(vC[i][j]);
 			  }
 		  }
 		  ciphertext.close();
@@ -290,9 +266,9 @@ private short[] stringKeytoShortKey(String originalKey) {
    * @param key
    * @return
    */
-  private short calcBitwiseXor(short message1, short message2) {
-	  short back;
-	  back = (short) (message1 ^ message2);
+  private BigInteger calcBitwiseXor(BigInteger message1, BigInteger message2) {
+	  BigInteger back;
+	  back = message1.xor(message2);
 	  
 	  return back;
   }
@@ -303,9 +279,11 @@ private short[] stringKeytoShortKey(String originalKey) {
    * @param message2
    * @return
    */
-  private short calcAdditionMod216(short message1, short message2) {
-	  short back;
-	  back = (short) ((message1 + message2) % Math.pow(2, 16));
+  private BigInteger calcAdditionMod216(BigInteger message1, BigInteger message2) {
+	  BigInteger back;
+	  //(m1 + m2) % 2^16
+	  back = message1.add(message2);
+	  back = back.mod(MOD_216_);
 	  
 	  return back;
   }
@@ -316,20 +294,21 @@ private short[] stringKeytoShortKey(String originalKey) {
    * @param message2
    * @return
    */
-  private short calcMultiplikationZ(short message1, short message2) {
-	  short back;
-	  int b;
-	  int m = message1;
-	  int k = message2;
+  private BigInteger calcMultiplikationZ(BigInteger message1, BigInteger message2) {
 	  //Sonderfälle, wenn 0 eingegeben wird, ersetze durch 2^16
-	  if (m==0) m=(int) Math.pow(2,16);
-	  if (k==0) k=(int) Math.pow(2, 16);
-	  //eigentliche Rechnung
-	  int mod = (int) (Math.pow(2, 16) +1);
-	  b = ((message1 * message2) % mod);
+	  if (message1.equals(BigInteger.ZERO)) {
+		  message1 = new BigInteger(""+ Math.pow(2,16));
+	  }
+	  if (message2.equals(BigInteger.ZERO)) {
+		  message2 = new BigInteger(""+ Math.pow(2,16));
+	  }
+	  //eigentliche Rechnung m1*m2 mod 2^16+1
+	  BigInteger back; //return value
+	  back = message1.multiply(message2);
+	  back = back.mod(MOD_MULT_Z_);
+	  
 	  //Sonderfall, wenn 2^16 heraus kommt, ersetze durch 0
-	  if (b==Math.pow(2, 16)) b=0;
-	  back= (short) b;
+	  if (back.equals(MOD_216_)) back=BigInteger.ZERO;
 	  return back;
   }
   
@@ -339,12 +318,12 @@ private short[] stringKeytoShortKey(String originalKey) {
    * @param key
    * @return
    */
-  private short[] calcBitwiseXORBlock(short[] message, short[] key) {
+  private BigInteger[] calcBitwiseXORBlock(BigInteger[] message, BigInteger[] key) {
 	  if (message.length != 8 || key.length !=8){
 		  System.out.println("XOR Blöcke haben die falsche Länge! Abbruch.");
 		  System.exit(0);
 	  }
-	  short[] back = new short[key.length];
+	  BigInteger[] back = new BigInteger[key.length];
 	  for (int i=0;i<back.length;i++)
 		  back[i]=calcBitwiseXor(message[i],key[i]);
 	  return back;
@@ -353,11 +332,11 @@ private short[] stringKeytoShortKey(String originalKey) {
   /**
    * Umsetzung des IDEA
    */
-  private short[] doIDEA(short[] m,short[][] k) {
-	  short[][] vK = new short[9][6]; //Temporär, Parameterübergabe
-	  short[][] vT = new short[5][4]; //Zwischenwerte des Algorithmus'
-	  short[] vZ = new short[4]; //Zwischenwerte der Nachrichten
-	  short[] vC = new short[4]; //Rückgabe
+  private BigInteger[] doIDEA(BigInteger[] m,BigInteger[][] k) {
+	  BigInteger[][] vK = new BigInteger[9][6]; //Temporär, Parameterübergabe
+	  BigInteger[][] vT = new BigInteger[5][4]; //Zwischenwerte des Algorithmus'
+	  BigInteger[] vZ = new BigInteger[4]; //Zwischenwerte der Nachrichten
+	  BigInteger[] vC = new BigInteger[4]; //Rückgabe
 	  
 	  //Prüfe Eingaben
 	  if(m.length != 4 || k.length != 9) {
@@ -504,6 +483,50 @@ private short[] stringKeytoShortKey(String originalKey) {
 		  e.printStackTrace();
 	  }
 	  
+	  return back;
+  }
+
+  private BigInteger[][] getClear(FileInputStream cleartext) {
+	  
+	  //Lese Stream aus
+	  ArrayList<BigInteger> list = new ArrayList<BigInteger>();
+	  BigInteger read;
+	  while((read = readClear(cleartext, 4)) != null) {
+		  read = read.shiftRight(8); //Entfernt die Anzahl (immer 4)
+		  list.add(read);
+	  }
+	  //Erweiter Liste auf Vielfaches von 4
+	  if(list.size() % 4 != 0) {
+		  for(int i = 0; i < (4-(list.size() % 4)); i++) {
+			  list.add(BigInteger.ZERO);
+		  }
+	  }
+	  
+	  BigInteger[][] back = new BigInteger[list.size() / 4][4]; //return value
+	  Iterator<BigInteger> it = list.iterator();
+	  int counter = 0;
+	  while (it.hasNext()) {
+		  //Füge jeweils 16 bit in den Array
+		  back[counter][0] = it.next();
+		  back[counter][1] = it.next();
+		  back[counter][2] = it.next();
+		  back[counter][3] = it.next();
+		  counter++;
+	  }
+	  
+	  return back;
+  }
+
+  private BigInteger[] transformIv(String iv) {
+	  BigInteger[] back = new BigInteger[4];
+	  if(iv.length() != 16){
+		  System.out.println("Fehler: Falsche Schlüssellänge! Abbruch.");
+		  System.exit(1);
+	  }
+	  for(int i = 0; i < 4;i++) {
+		  String sT = iv.substring(i*4, i*4+4);
+		  back[i] = new BigInteger(sT, 16);
+	  }
 	  return back;
   }
 }
