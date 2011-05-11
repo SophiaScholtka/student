@@ -38,7 +38,7 @@ public final class IDEA extends BlockCipher {
 	final BigInteger MOD_216_ = new BigInteger("" + MOD_2.pow(16)); //Mod 2^16
 	final BigInteger MOD_MULT_Z_= new BigInteger("" + MOD_216_.add(BigInteger.ONE)); //Mod 2^16+1
 	
-	short[] ideaKey = new short[8];
+	BigInteger[] ideaKey = new BigInteger[8];
 	
   /**
    * Entschlüsselt den durch den FileInputStream <code>ciphertext</code>
@@ -92,7 +92,7 @@ public final class IDEA extends BlockCipher {
 	  BigInteger[][] vC = new BigInteger[vM.length][4];
 
 	  //CBC
-	  short[][] keyExp = expandKey(ideaKey);
+	  BigInteger[][] keyExp = expandKey(ideaKey);
 	  vC[0] = transformIv(iv); //Setze c[0] = iv, iv 64 bit lang
 //	  System.out.println("### " + vM.length + "\t" + vC.length);
 	  for(int i = 1; i < vM.length; i++) {
@@ -135,7 +135,7 @@ public final class IDEA extends BlockCipher {
 	  //User fragen ob eigener oder Zufallskey
 	  //128-bit = 8 char Schlüssel einlesen oder auswürfeln
 	  String originalKey = "abcdefghijklmnop";
-	  ideaKey = stringKeytoShortKey(originalKey);
+	  ideaKey = stringKeytoBigIntKey(originalKey);
 	  if (DEBUG) {
 		  System.out.print(">>>Schlüssel:");
 		  for (int i=0;i<ideaKey.length;i++) System.out.print(" " + ideaKey[i]);
@@ -147,6 +147,61 @@ public final class IDEA extends BlockCipher {
    * @param tmpKey
    * @return
    */
+  private BigInteger[][] expandKey(BigInteger[] tmpKey) {
+	  BigInteger[][] expandedKey=new BigInteger[9][6];
+	  int index1,index2;
+	  //Teile Key in acht 16-Bit-Teilschlüssel auf und weise diese direkt den ersten 8 Teilschlüsseln zu
+	  for(int i=0;i<8;i++){
+		  index1=i/6;
+		  index2=i%6;
+		  expandedKey[index1][index2]= tmpKey[i];
+	  }
+	  /* while noch nicht alle 52 teilschlüssel zugewiesen,
+	   * führe auf Key einen zyklischen Linksshift um 25 Positionen durch,
+	   * teile das Ergebnis in acht 16-Bit-Blöcke ein
+	   * weise das Ergebnis den nächsten 8 (oder im letzten Schritt 4) Teilschlüsseln zu
+	   */
+	  
+	  //Ich schreib es lieber nicht als while sondern als for-Schleife - Schlüssel 8 bis 47
+	  for (int i=1;i<6;i++){
+		  tmpKey = shiftKey(tmpKey);
+		  for (int j=0;j<8;j++){
+			  index1=(i*8+j)/6;
+			  index2=(i*8+j)%6;
+			  expandedKey[index1][index2]=tmpKey[j];
+		  }
+	  }
+	  //Schlüssel 48 bis 52
+	  tmpKey=shiftKey(tmpKey);
+	  for (int i=0;i<4;i++){
+		  expandedKey[8][i]=tmpKey[i];
+	  }
+	  if (DEBUG) {
+		  System.out.print(">>>Expandierter Schlüssel:");
+		  for (int i=0;i<9;i++) {for(int j=0;j<6;j++) System.out.print(" " + expandedKey[i][j]);}
+		  System.out.println();
+	  }
+	  return expandedKey;
+  }
+ 
+  private BigInteger[] shiftKey(BigInteger[] key) {
+	  BigInteger[] back=key;
+	  BigInteger tmp;
+	  int l=back.length;
+	// zyklisch um 25 = 16+9 bits nach links verschieben und zurück geben
+	  for(int i=0;i<l;i++){
+		  //ganzzahlige div, schreibt die hinteren 7 bits von key[i+1] nach vorne in back[i] (restliche 9 bits sind 0)
+		  back[i]= key[(i+1)%l].shiftLeft(9);
+		  //modulus, schreibt die vorderen 9 bits von key[i+2] in tmp
+		  tmp= key[(i+2)%l].shiftRight(7);
+		  //multiplikation, schreibt die 9 bits aus tmp an position 7 bis 15 von back[i] (vordere 7 bits sind 0)
+		  back[i]=back[i].add(tmp);
+	  }
+	return back;
+  }
+  
+  
+  //fürs Archiv nochmal die Methode in short
   private short[][] expandKey(short[] tmpKey) {
 	  short[][] expandedKey=new short[9][6];
 	  int index1,index2;
@@ -154,7 +209,7 @@ public final class IDEA extends BlockCipher {
 	  for(int i=0;i<8;i++){
 		  index1=i/6;
 		  index2=i%6;
-		  expandedKey[index1][index2]=(short) tmpKey[i];
+		  expandedKey[index1][index2]= tmpKey[i];
 	  }
 	  /* while noch nicht alle 52 teilschlüssel zugewiesen,
 	   * führe auf Key einen zyklischen Linksshift um 25 Positionen durch,
@@ -201,6 +256,22 @@ public final class IDEA extends BlockCipher {
 	return back;
 }
 
+private BigInteger[] stringKeytoBigIntKey(String originalKey) {
+	if(originalKey.length() != 16){
+		System.out.println("Fehler: Falsche Schlüssellänge! Abbruch.");
+		System.exit(0);
+	}
+	BigInteger[] back = new BigInteger[8];
+	byte t1,t2; //Jedes Ascii-Zeichen ist max 1 Byte groß
+	for (int i=0;i<8;i++){
+		t1=(byte) originalKey.charAt(2*i);
+		t2=(byte) originalKey.charAt(2*i+1);
+		//schreibe 2 Byte hintereinander in ein Short, indem das erste mit 2^8 multipliziert wird
+		back[i]=BigInteger.valueOf((int) Math.pow(2, 8)*t1 + t2);
+	}
+	return back;
+}
+
 private short[] stringKeytoShortKey(String originalKey) {
 	if(originalKey.length() != 16){
 		System.out.println("Fehler: Falsche Schlüssellänge! Abbruch.");
@@ -228,7 +299,7 @@ private short[] stringKeytoShortKey(String originalKey) {
   public void readKey(BufferedReader key) {
 	  try {
 		  for(int i=0;i<8;i++){
-			  ideaKey[i] = Short.parseShort(key.readLine());
+			  ideaKey[i] = BigInteger.valueOf(Short.parseShort(key.readLine()));
 		  }
 	  } catch (IOException e){
 		  System.out.println("Fehler beim Parsen der Schlüsseldatei.");
