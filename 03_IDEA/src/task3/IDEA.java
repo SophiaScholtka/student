@@ -84,7 +84,6 @@ public final class IDEA extends BlockCipher {
 	  //TODO lese IV ein (momentan Hardcoded)
 	  String iv = "ddc3a8f6c66286d2"; //Hex
 	  
-	  
 	  //Lese Klartext ein (BigInteger[64bit][16bit])
 	  BigInteger[][] vM = getClear(cleartext);
 	  
@@ -106,8 +105,8 @@ public final class IDEA extends BlockCipher {
 		  for (int j = 0; j < bi.length; j++) {
 			bi[j] = new BigInteger("-1");
 		  }
-		  vC[i] = bi; //temporär, bis IDEA geht
-//		  vC[i] = doIDEA(xored, keyExp);
+//		  vC[i] = bi; //temporär, bis IDEA geht
+		  vC[i] = doIDEA(xored, keyExp);
 	  }
 	  
 	  //TODO Ausgabe Ciphertext / Was nu mit vC? Irgendwohin ausgeben.
@@ -446,7 +445,7 @@ private short[] stringKeytoShortKey(String originalKey) {
 		  vT[2][0] = calcMultiplikationZ(vT[1][0], vK[r][4]);	//T21 MultZ K5[r] 	> T31
 		  vT[2][1] = calcAdditionMod216(vT[2][0], vT[1][1]);	//T31 Add216 T22  	> T32
 		  vT[2][2] = calcMultiplikationZ(vT[2][1], vK[r][5]);	//T32 MultZ K6[r] 	> T33
-		  vT[2][3] = calcAdditionMod216(vT[2][0], vT[2][3]);	//T31 Add216 T34  	> T34
+		  vT[2][3] = calcAdditionMod216(vT[2][0], vT[2][2]);	//T31 Add216 T33  	> T34
 		  
 		  vT[3][0] = calcBitwiseXor(vT[0][0], vT[2][2]); //T11 XOR T33	> T41
 		  vT[3][1] = calcBitwiseXor(vT[0][2], vT[2][2]); //T13 XOR T33	> T42
