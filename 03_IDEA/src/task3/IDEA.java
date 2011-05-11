@@ -136,6 +136,10 @@ public final class IDEA extends BlockCipher {
 	  //User fragen ob eigener oder Zufallskey
 	  //128-bit = 8 char Schlüssel einlesen oder auswürfeln
 	  String originalKey = "abcdefghijklmnop";
+	  if (DEBUG) {
+		  short testkey[]= stringKeytoShortKey(originalKey);
+		  System.out.println(">>>expandingTestkey: ");
+		  expandKey(testkey);}
 	  ideaKey = stringKeytoBigIntKey(originalKey);
 	  if (DEBUG) {
 		  System.out.print(">>>Schlüssel:");
@@ -187,16 +191,13 @@ public final class IDEA extends BlockCipher {
  
   private BigInteger[] shiftKey(BigInteger[] key) {
 	  BigInteger[] back=key;
-	  BigInteger tmp;
-	  int l=back.length;
-	// zyklisch um 25 = 16+9 bits nach links verschieben und zurück geben
-	  for(int i=0;i<l;i++){
-		  //ganzzahlige div, schreibt die hinteren 7 bits von key[i+1] nach vorne in back[i] (restliche 9 bits sind 0)
-		  back[i]= key[(i+1)%l].shiftLeft(9);
-		  //modulus, schreibt die vorderen 9 bits von key[i+2] in tmp
-		  tmp= key[(i+2)%l].shiftRight(7);
-		  //multiplikation, schreibt die 9 bits aus tmp an position 7 bis 15 von back[i] (vordere 7 bits sind 0)
-		  back[i]=back[i].add(tmp);
+	  short[] tmpkey = new short[key.length];
+	  for(int i=0;i<key.length;i++){
+		  tmpkey[i]=key[i].shortValue();
+	  }
+	  tmpkey=shiftKey(tmpkey);
+	  for(int i=0;i<key.length;i++){
+		  back[i]=BigInteger.valueOf(tmpkey[i]);
 	  }
 	return back;
   }
