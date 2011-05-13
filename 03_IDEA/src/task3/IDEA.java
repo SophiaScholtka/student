@@ -32,7 +32,7 @@ import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
  */
 public final class IDEA extends BlockCipher {
 	final boolean DEBUG = true;
-	final boolean DEBUG_IDEA = true;
+	final boolean DEBUG_IDEA = false;
 	
 	private FileOutputStream tFos_;
 	
@@ -87,15 +87,6 @@ public final class IDEA extends BlockCipher {
    */
   public void encipher(FileInputStream cleartext, FileOutputStream ciphertext) {
 	  tFos_ = ciphertext; //XXX remove (test)
-//	  BigInteger read = readClear(cleartext, 4);
-//	  System.out.println(read.toString(2));
-//	  BigInteger write1 = new BigInteger("110000101100010",2);
-//	  BigInteger write2 = new BigInteger("11000010110001000000010",2);
-//	  System.out.println(read.equals(write2));
-////	  writeCipher(ciphertext, write2);
-//	  writeClear(ciphertext,write2);
-//	  
-//	  System.exit(0);
 	  
 	  //TODO lese IV ein (momentan Hardcoded)
 	  String iv = "ddc3a8f6c66286d2"; //Hex
@@ -104,29 +95,47 @@ public final class IDEA extends BlockCipher {
 	  BigInteger[][] vM = getClear(cleartext);
 	  
 	  //Bereite Ciphertext vor
-	  BigInteger[][] vC = new BigInteger[vM.length][4];
+	  BigInteger[][] vC = new BigInteger[vM.length+1][4];
 
 	  //Bereite Schüsselteile vor
 	  //FIXME muss sich ideaKey in expandKey verändern?
 	  if(DEBUG) System.out.println(">>>> ideaKey vor expandKey: \t" + Arrays.toString(ideaKey));
 	  BigInteger[][] keyExp = expandKey(ideaKey);
 	  if(DEBUG) System.out.println(">>>> ideaKey nach expandKey: \t" + Arrays.toString(ideaKey));
-	  
+
 	  //CBC
 	  vC[0] = transformIv(iv); //Setze c[0] = iv, iv 64 bit lang
-	  for(int i = 1; i < vM.length; i++) {
+	  writeCipher(ciphertext, new BigInteger("2",16));
+	  for(int i = 1; i < vC.length; i++) {
 		  BigInteger[] xored = new BigInteger[4];
 		  for(int j = 0; j < 4; j++) {
-			  xored[j] = calcBitwiseXor(vM[i][j], vC[i-1][j]); //M_i XOR C_(i-1)
-		  }
-		  BigInteger[] bi = new BigInteger[4];
-		  for (int j = 0; j < bi.length; j++) {
-			bi[j] = new BigInteger("-1");
+			  xored[j] = calcBitwiseXor(vM[i-1][j], vC[i-1][j]); //M_i XOR C_(i-1)
 		  }
 		  vC[i] = doIDEA(xored, keyExp);
 	  }
-	  
+
 	  //TODO Ausgabe Ciphertext überarbeiten
+	  //Zeige Ciphertext (IV, Ciphertext und Vollständig)
+	  System.out.print("Ciphertext (IV):      \t");
+	  for(int j = 0; j < vC[0].length;j++) {
+		  System.out.print(vC[0][j].toString(16));
+	  }
+	  System.out.println();
+	  System.out.print("Ciphertext:            \t");
+	  for(int i = 1; i < vC.length; i++) {
+		  for(int j = 0; j < vC[i].length;j++) {
+			  System.out.print(vC[i][j].toString(16));
+		  }
+	  }
+	  System.out.println();
+	  System.out.print("Ciphertext (Vollst.): \t");
+	  for(int i = 0; i < vC.length; i++) {
+		  for(int j = 0; j < vC[i].length;j++) {
+			  System.out.print(vC[i][j].toString(16));
+		  }
+	  }
+	  System.out.println();
+	  
 	  //Speicher Ciphertext
 	  for(int i = 0; i < vC.length; i++) {
 		  for(int j = 0; j < vC[i].length;j++) {
