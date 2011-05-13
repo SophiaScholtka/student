@@ -32,6 +32,9 @@ import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
  */
 public final class IDEA extends BlockCipher {
 	final boolean DEBUG = true;
+	final boolean DEBUG_IDEA = true;
+	
+	private FileOutputStream tFos_;
 	
 	//Konstante Rechenwerte
 	final BigInteger MOD_2 = new BigInteger("2"); //2
@@ -51,30 +54,9 @@ public final class IDEA extends BlockCipher {
    * Der FileOutputStream, in den der Klartext geschrieben werden soll.
    */
   public void decipher(FileInputStream ciphertext, FileOutputStream cleartext) {
-	  //TODO Entferne IDEA Tests
-	  BigInteger bi1 	= new BigInteger("00100100",2);//36
-	  BigInteger bi2 	= new BigInteger("00010101",2);//21
-	  BigInteger biXor 	= new BigInteger("00110001",2);//49
-	  BigInteger biAdd 	= new BigInteger("00111001",2);//57
-	  BigInteger biMult	= new BigInteger("1011110100",2);//756
-	  
-	  System.out.println(bi1.toString(2) + "\t" + "bi1");
-	  System.out.println(bi2.toString(2) + "\t" + "bi2");
-	  //Test XOR
-	  BigInteger calcBiXor = calcBitwiseXor(bi1, bi2);
-	  boolean bBiXor = calcBiXor.equals(biXor);
-	  System.out.println(calcBiXor.toString(2) + "\t" + "XOR" + "\t" + bBiXor);
-	  //Test Add Mod2^16
-	  BigInteger calcAdd = calcAdditionMod216(bi1, bi2);
-	  boolean bBiAdd = calcAdd.equals(biAdd);
-	  System.out.println(calcAdd.toString(2) + "\t" + "Add" + "\t" + bBiAdd);
-	  //Test Add Mod2^16
-	  BigInteger calcMult = calcMultiplikationZ(bi1, bi2);
-	  boolean bBiMult = calcMult.equals(biMult);
-	  System.out.println(calcMult.toString(2) + "\t" + "Mult" + "\t" + bBiMult);
-	  
-	  System.exit(0);
-	  
+	  BigInteger read = readCipher(ciphertext);
+	  System.out.println(read.toString(2) + "\t" + read + "\t" + read.bitLength());
+	  writeCipher(cleartext, read);
 	  //TODO nimm den schlüssel und setze die Tabelle auf Seite 59 um, um daraus den dechiffrier-Schlüssel zu erhalten
 	  //TODO benutze dann einfach encipher mit dem Dechiffrierschlüssel
   }
@@ -104,13 +86,14 @@ public final class IDEA extends BlockCipher {
    * Der FileOutputStream, in den der Chiffretext geschrieben werden soll.
    */
   public void encipher(FileInputStream cleartext, FileOutputStream ciphertext) {
+	  tFos_ = ciphertext; //XXX remove (test)
 //	  BigInteger read = readClear(cleartext, 4);
 //	  System.out.println(read.toString(2));
 //	  BigInteger write1 = new BigInteger("110000101100010",2);
 //	  BigInteger write2 = new BigInteger("11000010110001000000010",2);
 //	  System.out.println(read.equals(write2));
-//	  writeCipher(ciphertext, write2);
-////	  writeClear(ciphertext,write2);
+////	  writeCipher(ciphertext, write2);
+//	  writeClear(ciphertext,write2);
 //	  
 //	  System.exit(0);
 	  
@@ -123,8 +106,13 @@ public final class IDEA extends BlockCipher {
 	  //Bereite Ciphertext vor
 	  BigInteger[][] vC = new BigInteger[vM.length][4];
 
-	  //CBC
+	  //Bereite Schüsselteile vor
+	  //FIXME muss sich ideaKey in expandKey verändern?
+	  if(DEBUG) System.out.println(">>>> ideaKey vor expandKey: \t" + Arrays.toString(ideaKey));
 	  BigInteger[][] keyExp = expandKey(ideaKey);
+	  if(DEBUG) System.out.println(">>>> ideaKey nach expandKey: \t" + Arrays.toString(ideaKey));
+	  
+	  //CBC
 	  vC[0] = transformIv(iv); //Setze c[0] = iv, iv 64 bit lang
 	  for(int i = 1; i < vM.length; i++) {
 		  BigInteger[] xored = new BigInteger[4];
@@ -138,13 +126,13 @@ public final class IDEA extends BlockCipher {
 		  vC[i] = doIDEA(xored, keyExp);
 	  }
 	  
-	  //TODO Ausgabe Ciphertext / Was nu mit vC? Irgendwohin ausgeben.
+	  //TODO Ausgabe Ciphertext überarbeiten
 	  //Speicher Ciphertext
 	  for(int i = 0; i < vC.length; i++) {
 		  for(int j = 0; j < vC[i].length;j++) {
-			  BigInteger write = new BigInteger(vC[i][j].toString(2) + "00000100",2);
-//			  System.out.println(fillZeros(write.toString(2),8) + "\t" + write.bitLength() + "\t" + write);
-			  writeClear(ciphertext, write);
+//			  BigInteger write = new BigInteger(vC[i][j].toString(2) + "00000010",2);
+			  BigInteger write = new BigInteger(vC[i][j].toString(2),2);
+			  writeCipher(ciphertext, write);
 		  }
 	  }
   }
@@ -457,6 +445,7 @@ private short[] stringKeytoShortKey(String originalKey) {
 		  vZ[i] = m[i];
 	  }
 	  
+	  if(DEBUG_IDEA) System.out.println("{doIDEA}");
 	  //Runde r 1 bis 8
 	  for(int r = 0; r < 8; r++) {
 		  vT[0][0] = calcMultiplikationZ(vZ[0], vK[r][0]);	//Z1 MultZ K1[r]  	> T11
@@ -489,6 +478,8 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  vC[1] = calcAdditionMod216(vZ[1], vK[8][1]);	//Z2 Add216 K2[9]	> T52
 	  vC[2] = calcAdditionMod216(vZ[2], vK[8][2]);	//Z3 Add216 K3[9]	> T53
 	  vC[3] = calcMultiplikationZ(vZ[3], vK[8][3]);	//Z4 MultZ K4[9]	> T54
+	  
+	  if(DEBUG_IDEA) System.out.println("{/doIDEA}");
 	  
 	  //Rückgabe
 	  return vC;
@@ -576,7 +567,7 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  //Lese Stream aus
 	  ArrayList<BigInteger> list = new ArrayList<BigInteger>();
 	  BigInteger read;
-	  while((read = readClear(cleartext, 4)) != null) {
+	  while((read = readClear(cleartext, 4)) != null) { //liest immer 2 Zeichen aus
 		  read = read.shiftRight(8); //Entfernt die Anzahl (immer 4)
 		  list.add(read);
 	  }
