@@ -34,8 +34,6 @@ public final class IDEA extends BlockCipher {
 	final boolean DEBUG = true;
 	final boolean DEBUG_IDEA = false;
 	
-	private FileOutputStream tFos_;
-	
 	//Konstante Rechenwerte
 	final BigInteger MOD_2 = new BigInteger("2"); //2
 	final BigInteger MOD_216_ = new BigInteger("" + MOD_2.pow(16)); //Mod 2^16
@@ -86,8 +84,6 @@ public final class IDEA extends BlockCipher {
    * Der FileOutputStream, in den der Chiffretext geschrieben werden soll.
    */
   public void encipher(FileInputStream cleartext, FileOutputStream ciphertext) {
-	  tFos_ = ciphertext; //XXX remove (test)
-	  
 	  //TODO lese IV ein (momentan Hardcoded)
 	  String iv = "ddc3a8f6c66286d2"; //Hex
 	  
@@ -105,7 +101,6 @@ public final class IDEA extends BlockCipher {
 
 	  //CBC
 	  vC[0] = transformIv(iv); //Setze c[0] = iv, iv 64 bit lang
-	  writeCipher(ciphertext, new BigInteger("2",16));
 	  for(int i = 1; i < vC.length; i++) {
 		  BigInteger[] xored = new BigInteger[4];
 		  for(int j = 0; j < 4; j++) {
@@ -329,7 +324,7 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  }
 	  if (DEBUG) {
 		 System.out.println(">>>Schlüssel: " + Arrays.toString(ideaKey));
-		 expandKey(ideaKey);
+//		 expandKey(ideaKey); 
 	  }
   }
 
