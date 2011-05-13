@@ -51,6 +51,30 @@ public final class IDEA extends BlockCipher {
    * Der FileOutputStream, in den der Klartext geschrieben werden soll.
    */
   public void decipher(FileInputStream ciphertext, FileOutputStream cleartext) {
+	  //TODO Entferne IDEA Tests
+	  BigInteger bi1 	= new BigInteger("00100100",2);//36
+	  BigInteger bi2 	= new BigInteger("00010101",2);//21
+	  BigInteger biXor 	= new BigInteger("00110001",2);//49
+	  BigInteger biAdd 	= new BigInteger("00111001",2);//57
+	  BigInteger biMult	= new BigInteger("1011110100",2);//756
+	  
+	  System.out.println(bi1.toString(2) + "\t" + "bi1");
+	  System.out.println(bi2.toString(2) + "\t" + "bi2");
+	  //Test XOR
+	  BigInteger calcBiXor = calcBitwiseXor(bi1, bi2);
+	  boolean bBiXor = calcBiXor.equals(biXor);
+	  System.out.println(calcBiXor.toString(2) + "\t" + "XOR" + "\t" + bBiXor);
+	  //Test Add Mod2^16
+	  BigInteger calcAdd = calcAdditionMod216(bi1, bi2);
+	  boolean bBiAdd = calcAdd.equals(biAdd);
+	  System.out.println(calcAdd.toString(2) + "\t" + "Add" + "\t" + bBiAdd);
+	  //Test Add Mod2^16
+	  BigInteger calcMult = calcMultiplikationZ(bi1, bi2);
+	  boolean bBiMult = calcMult.equals(biMult);
+	  System.out.println(calcMult.toString(2) + "\t" + "Mult" + "\t" + bBiMult);
+	  
+	  System.exit(0);
+	  
 	  //TODO nimm den schlüssel und setze die Tabelle auf Seite 59 um, um daraus den dechiffrier-Schlüssel zu erhalten
 	  //TODO benutze dann einfach encipher mit dem Dechiffrierschlüssel
   }
@@ -393,18 +417,18 @@ private short[] stringKeytoShortKey(String originalKey) {
   
   /**
    * Bitwise XOR mit Block	2x 64bit eingaben, 1x 64 bit ausgabe
-   * @param message
-   * @param key
+   * @param message1
+   * @param message2
    * @return
    */
-  private BigInteger[] calcBitwiseXORBlock(BigInteger[] message, BigInteger[] key) {
-	  if (message.length != 8 || key.length !=8){
+  private BigInteger[] calcBitwiseXORBlock(BigInteger[] message1, BigInteger[] message2) {
+	  if (message1.length != 8 || message2.length !=8){
 		  System.out.println("XOR Blöcke haben die falsche Länge! Abbruch.");
-		  System.exit(0);
+		  System.exit(1);
 	  }
-	  BigInteger[] back = new BigInteger[key.length];
+	  BigInteger[] back = new BigInteger[message2.length];
 	  for (int i=0;i<back.length;i++)
-		  back[i]=calcBitwiseXor(message[i],key[i]);
+		  back[i]=calcBitwiseXor(message1[i],message2[i]);
 	  return back;
   }
   
@@ -519,21 +543,6 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  neg = n.subtract(a);
 	  neg = neg.mod(n);
 	  return neg;
-  }
-  
-  private int getGCD(int a, int b) {
-	int tmp;
-	if(a<b) {
-		tmp = a;
-		a = b;
-		b = tmp;
-	}
-	while (b!=0){
-		 tmp=a%b;
-		 a=b;
-		 b=tmp;
-	}
-	return a;
   }
   
   
