@@ -623,20 +623,26 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  for(int i = 0; i < string.length();i++) {
 		  character = string.charAt(i);
 		  bigInteger = new BigInteger(""+ (int)character);
-		  s = s + fillZeros(bigInteger.toString(2), 8);
+		  s = s + fillStringLeft(bigInteger.toString(2), 8,"");
 	  }
 	  
 	  return new BigInteger(s,2);
   }
   
   /**
-   * Ergänzt die Nullen für 8 Bit Darstellung
+   * Füllt den String links um ein gewünsches Zeichen auf die gegebene Länge auf.
+   * Es wird nur das erste Zeichen des Symbols beachtet. Ist der String leer, 
+   * wird "0" verwendet.
    * @param string	String mit binärer Zahlendarstellung
+   * @param length	die gewünschte Länge des Strings
+   * @param symbol	das zu verwendende Symbol (genau 1 Zeichen)
    * @return	gibt den mit Nullen erweiterten String zurück
    */
-  private String fillZeros(String string,int length) {
+  private String fillStringLeft(String string,int length, String symbol) {
+	  if(symbol.length() < 1) symbol = "0";
+	  if(symbol.length() > 1) symbol = ""+ symbol.charAt(0);
 	  while(string.length() % length != 0) {
-		  string = "0" + string;
+		  string = symbol + string;
 	  }
 	  return string;
   }
