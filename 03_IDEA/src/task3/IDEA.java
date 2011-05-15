@@ -149,12 +149,12 @@ public final class IDEA extends BlockCipher {
    */
   public void makeKey() {
 	  //User fragen ob eigener oder Zufallskey
-	  //128-bit = 8 char Schlüssel einlesen oder auswürfeln
+	  //128-bit = 16 char Schlüssel einlesen oder auswürfeln
 	  String originalKey = "abcdefghijklmnop";
-	  if (DEBUG) {
+	  /*if (DEBUG) {
 		  short testkey[]= stringKeytoShortKey(originalKey);
 		  System.out.println(">>>expandingTestkey: ");
-		  expandKey(testkey);}
+		  expandKey(testkey);}*/
 	  ideaKey = stringKeytoBigIntKey(originalKey);
 	  if (DEBUG) {
 		  System.out.print(">>>Schlüssel:");
@@ -284,10 +284,10 @@ private BigInteger[] stringKeytoBigIntKey(String originalKey) {
 		System.exit(0);
 	}
 	BigInteger[] back = new BigInteger[8];
-	byte t1,t2; //Jedes Ascii-Zeichen ist max 1 Byte groß
+	int t1,t2; //Jedes Ascii-Zeichen ist max 1 Byte groß, trotzdem lieber nicht auf byte casten, sonst wirds u.u negativ
 	for (int i=0;i<8;i++){
-		t1=(byte) originalKey.charAt(2*i);
-		t2=(byte) originalKey.charAt(2*i+1);
+		t1 = originalKey.charAt(2*i)%((int) Math.pow(2, 8));
+		t2 = originalKey.charAt(2*i+1)%((int) Math.pow(2, 8));
 		//schreibe 2 Byte hintereinander in ein Short, indem das erste mit 2^8 multipliziert wird
 		back[i]=BigInteger.valueOf((int) Math.pow(2, 8)*t1 + t2);
 	}
@@ -300,10 +300,10 @@ private short[] stringKeytoShortKey(String originalKey) {
 		System.exit(0);
 	}
 	short[] back = new short[8];
-	byte t1,t2; //Jedes Ascii-Zeichen ist max 1 Byte groß
+	int t1,t2; //Jedes Ascii-Zeichen ist max 1 Byte groß
 	for (int i=0;i<8;i++){
-		t1=(byte) originalKey.charAt(2*i);
-		t2=(byte) originalKey.charAt(2*i+1);
+		t1 = originalKey.charAt(2*i)%((int) Math.pow(2, 8));
+		t2 = originalKey.charAt(2*i+1)%((int) Math.pow(2, 8));
 		//schreibe 2 Byte hintereinander in ein Short, indem das erste mit 2^8 multipliziert wird
 		back[i]=(short) ((int) Math.pow(2, 8)*t1 + t2);
 	}
@@ -321,7 +321,11 @@ private short[] stringKeytoShortKey(String originalKey) {
   public void readKey(BufferedReader key) {
 	  try {
 		  for(int i=0;i<8;i++){
-			  ideaKey[i] = BigInteger.valueOf(Short.parseShort(key.readLine()));
+			  ideaKey[i] = BigInteger.valueOf(Integer.parseInt(key.readLine()));
+			  if(ideaKey[i].compareTo(MOD_216_)>0){
+				  System.out.println("Fehler beim Parsen der Schlüsseldatei. Zahlenwerte zu groß.");
+				  System.exit(0);
+			  }
 		  }
 	  } catch (IOException e){
 		  System.out.println("Fehler beim Parsen der Schlüsseldatei.");
