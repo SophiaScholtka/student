@@ -94,7 +94,6 @@ public final class IDEA extends BlockCipher {
 	  BigInteger[][] vC = new BigInteger[vM.length+1][4];
 
 	  //Bereite Schüsselteile vor
-	  //FIXME muss sich ideaKey in expandKey verändern?
 	  BigInteger[][] keyExp = expandKey(ideaKey);
 
 	  //CBC
