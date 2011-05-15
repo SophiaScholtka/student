@@ -54,12 +54,102 @@ public final class IDEA extends BlockCipher {
   public void decipher(FileInputStream ciphertext, FileOutputStream cleartext) {
 	  BigInteger read = readCipher(ciphertext);
 	  System.out.println(read.toString(2) + "\t" + read + "\t" + read.bitLength());
-	  writeCipher(cleartext, read);
-	  //TODO nimm den schlüssel und setze die Tabelle auf Seite 59 um, um daraus den dechiffrier-Schlüssel zu erhalten
-	  //TODO benutze dann einfach encipher mit dem Dechiffrierschlüssel
+	  //nimm den schlüssel und setze die Tabelle auf Seite 59 um, um daraus den dechiffrier-Schlüssel zu erhalten
+	  BigInteger[][] dekey = reverseKey(expandKey(ideaKey));
+	  //benutze dann einfach encipher mit dem Dechiffrierschlüssel
+	  //TODO lese IV ein (momentan Hardcoded)
+	  String iv = "ddc3a8f6c66286d2"; //Hex
+	  
+	  //Lese Ciphertext ein (BigInteger[64bit][16bit])
+	  BigInteger[][] vC = getCiper(ciphertext);
+	  
+	  //Bereite Klartext vor
+	  BigInteger[][] vM = new BigInteger[vC.length+1][4];
+
+	  //Bereite Schüsselteile vor
+	  if(DEBUG) System.out.println(">>>> ideaKey vor expandKey: \t" + Arrays.toString(ideaKey));
+	  BigInteger[][] keyExp = expandKey(ideaKey);
+	  if(DEBUG) System.out.println(">>>> ideaKey nach expandKey: \t" + Arrays.toString(ideaKey));
+
+	  //CBC
+	  vM[0] = transformIv(iv); //Setze c[0] = iv, iv 64 bit lang
+	  for(int i = 1; i < vM.length; i++) {
+		  BigInteger[] xored = new BigInteger[4];
+		  for(int j = 0; j < 4; j++) {
+			  xored[j] = calcBitwiseXor(vC[i-1][j], vM[i-1][j]); //M_i XOR C_(i-1)
+		  }
+		  vM[i] = doIDEA(xored, keyExp);
+	  }
+
+	  //TODO Ausgabe Ciphertext überarbeiten
+	  //Zeige Ciphertext (IV, Ciphertext und Vollständig)
+	  System.out.print("Messagetext (IV): \t");
+	  for(int j = 0; j < vM[0].length;j++) {
+		  System.out.print(vM[0][j].toString(16));
+	  }
+	  System.out.println();
+	  System.out.print("Messagetext: \t");
+	  int text1, text2;
+	  BigInteger mod2to8 = new BigInteger(""+(int) Math.pow(2,8));
+	  for(int i = 1; i < vM.length; i++) {
+		  for(int j = 0; j < vM[i].length;j++) {
+			  text1=vM[i][j].mod(mod2to8).intValue();
+			  text2=vM[i][j].divide(mod2to8).intValue();
+			  System.out.print(""+ (char)text1 +""+ (char)text2);
+		  }
+	  }
+	  System.out.println();
+	  System.out.print("Messagetext (Vollst.): \t");
+	  for(int i = 0; i < vM.length; i++) {
+		  for(int j = 0; j < vM[i].length;j++) {
+			  System.out.print(vM[i][j].toString(16));
+		  }
+	  }
+	  System.out.println();
+	  System.out.println("Should be iv + \t\t\t\t 6162636465666768696a6b6c6d6e6f707172737475767778797a");
+	  
+	  //Speicher Ciphertext
+	  for(int i = 0; i < vM.length; i++) {
+		  for(int j = 0; j < vM[i].length;j++) {
+//			  BigInteger write = new BigInteger(vC[i][j].toString(2) + "00000010",2);
+//			  BigInteger write = new BigInteger(vC[i][j].toString());
+			  writeCipher(cleartext, vM[i][j]);
+		  }
+	  }
   }
   
-  private short[] hexIVtoShortBlock(String iv){
+  private BigInteger[][] getCiper(FileInputStream ciphertext) {
+
+	  //Lese Stream aus
+	  ArrayList<BigInteger> list = new ArrayList<BigInteger>();
+	  BigInteger read;
+	  while((read = readCipher(ciphertext)) != null) { //liest je einen bigInt //Entfernt die Anzahl (immer 4)
+		  list.add(read);
+	  }
+	  //Erweiter Liste auf Vielfaches von 4
+	  if(list.size() % 4 != 0) {
+		  int to = 4 - (list.size() % 4);
+		  for(int i = 0; i < to; i++) {
+			  list.add(BigInteger.ZERO);
+		  }
+	  }
+	  
+	  BigInteger[][] back = new BigInteger[list.size() / 4][4]; //return value
+	  Iterator<BigInteger> it = list.iterator();
+	  int counter = 0;
+	  while (it.hasNext()) {
+		  //Füge jeweils 16 bit in den Array
+		  back[counter][0] = it.next();
+		  back[counter][1] = it.next();
+		  back[counter][2] = it.next();
+		  back[counter][3] = it.next();
+		  counter++;
+	  }
+	  
+	  return back;
+}
+
+private short[] hexIVtoShortBlock(String iv){
 	  short[] block = new short[4];
 	  if (iv.length()<16){
 		  System.out.println("Initialisierungsvektor ist zu kurz! Abbruch.");
@@ -156,8 +246,8 @@ public final class IDEA extends BlockCipher {
 	  for(int i = 0; i < vC.length; i++) {
 		  for(int j = 0; j < vC[i].length;j++) {
 //			  BigInteger write = new BigInteger(vC[i][j].toString(2) + "00000010",2);
-			  BigInteger write = new BigInteger(vC[i][j].toString(2),2);
-			  writeCipher(ciphertext, write);
+//			  BigInteger write = new BigInteger(vC[i][j].toString());
+			  writeCipher(ciphertext, vC[i][j]);
 		  }
 	  }
   }
@@ -280,7 +370,7 @@ public final class IDEA extends BlockCipher {
   
   /** 
    * Schlüsselexpansion nach Algorithmus 4.1
-   * @param tmpKey
+   * @param theideakey
    * @return
    */
   private BigInteger[][] expandKey(BigInteger[] theideakey) {
@@ -326,70 +416,42 @@ public final class IDEA extends BlockCipher {
   }
  
   private BigInteger[] shiftKey(BigInteger[] key) {
-	  BigInteger[] back=key;
-	  short[] tmpkey = new short[key.length];
-	  for(int i=0;i<key.length;i++){
-		  tmpkey[i]=key[i].shortValue();
-	  }
-	  tmpkey=shiftKey(tmpkey);
-	  for(int i=0;i<key.length;i++){
-		  back[i]=BigInteger.valueOf(tmpkey[i]);
+	  BigInteger[] back= new BigInteger[key.length];
+	  BigInteger mod2to7= BigInteger.valueOf((int)Math.pow(2,7));
+	  BigInteger mod2to9= BigInteger.valueOf((int)Math.pow(2,9));
+	  int l=back.length;
+	// zyklisch um 25 = 16+9 bits nach links verschieben und zurück geben
+	  for(int i=0;i<l;i++){
+		  //schreibt die hinteren 7 bits von key[i+1] nach vorne in back[i]
+		  BigInteger temp1 = new BigInteger("0");
+		  temp1 = temp1.add(key[(i+1)%l]);
+		  back[i] = new BigInteger("0");
+		  back[i] = back[i].add(temp1.mod(mod2to7).multiply(mod2to9).mod(MOD_216_));
+		  //schreibt die vorderen 9 von key[i+2] an position 7 bis 15 von back[i] (vordere 7 bits sind 0)
+		  BigInteger temp2 = new BigInteger("0");
+		  temp2 = temp2.add(key[(i+2)%l]);
+		  temp2 = temp2.divide(mod2to7).mod(mod2to9);
+		  back[i] = back[i].add(temp2);
 	  }
 	return back;
   }
   
   
-  //fürs Archiv nochmal die Methode in short
-  private short[][] expandKey(short[] tmpKey) {
-	  short[][] expandedKey=new short[9][6];
-	  int index1,index2;
-	  //Teile Key in acht 16-Bit-Teilschlüssel auf und weise diese direkt den ersten 8 Teilschlüsseln zu
-	  for(int i=0;i<8;i++){
-		  index1=i/6;
-		  index2=i%6;
-		  expandedKey[index1][index2]= tmpKey[i];
-	  }
-	  /* while noch nicht alle 52 teilschlüssel zugewiesen,
-	   * führe auf Key einen zyklischen Linksshift um 25 Positionen durch,
-	   * teile das Ergebnis in acht 16-Bit-Blöcke ein
-	   * weise das Ergebnis den nächsten 8 (oder im letzten Schritt 4) Teilschlüsseln zu
-	   */
-	  
-	  //Ich schreib es lieber nicht als while sondern als for-Schleife - Schlüssel 8 bis 47
-	  for (int i=1;i<6;i++){
-		  tmpKey = shiftKey(tmpKey);
-		  for (int j=0;j<8;j++){
-			  index1=(i*8+j)/6;
-			  index2=(i*8+j)%6;
-			  expandedKey[index1][index2]=tmpKey[j];
-		  }
-	  }
-	  //Schlüssel 48 bis 52
-	  tmpKey=shiftKey(tmpKey);
-	  for (int i=0;i<4;i++){
-		  expandedKey[8][i]=tmpKey[i];
-	  }
-	  if (DEBUG) {
-		  System.out.print(">>>Expandierter Schlüssel:");
-		  for (int i=0;i<9;i++) {for(int j=0;j<6;j++) System.out.print(" " + expandedKey[i][j]);}
-		  System.out.println();
-	  }
-	  return expandedKey;
-  }
+
 
   //1 short = 2 byte = 16 bit ; 	–2^15 bis 2^15 – 1 (–32768...32767) 
-  private short[] shiftKey(short[] key) {
-	  short[] back=key;
-	  short tmp;
+  private int[] shiftKey(int[] key) {
+	  int[] back=key;
+	  int tmp;
 	  int l=back.length;
 	// zyklisch um 25 = 16+9 bits nach links verschieben und zurück geben
 	  for(int i=0;i<l;i++){
 		  //ganzzahlige div, schreibt die hinteren 7 bits von key[i+1] nach vorne in back[i] (restliche 9 bits sind 0)
-		  back[i]= (short) (key[(i+1)%l]/((int) Math.pow(2, 9)));
+		  back[i]= (key[(i+1)%l]/((int) Math.pow(2, 9)))%((int) Math.pow(2, 16));
 		  //modulus, schreibt die vorderen 9 bits von key[i+2] in tmp
-		  tmp= (short) (key[(i+2)%l]%((int)Math.pow(2, 9)));
+		  tmp = (key[(i+2)%l]%((int)Math.pow(2, 9)));
 		  //multiplikation, schreibt die 9 bits aus tmp an position 7 bis 15 von back[i] (vordere 7 bits sind 0)
-		  back[i] += (short)(tmp*((int)Math.pow(2, 7)));
+		  back[i] += (tmp*((int)Math.pow(2, 7)));
 	  }
 	return back;
 }
@@ -619,10 +681,10 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  
 	  //Schlüssel der Runden 1-9
 	  for(int r = 0; r < 9; r++) {
-		  vR[r][0] = calcModInv(key[10-r-1][0],MOD_MULT_Z216_);	//K1'=(K1^(10-r)) ^ (-1)
-		  vR[r][1] = calcModNeg(key[10-r-1][1],MOD_216_);	//K2'=-(K2^(10-r))
-		  vR[r][2] = calcModNeg(key[10-r-1][2], MOD_216_);	//K3'=-(K3^(10-r))
-		  vR[r][3] = calcModInv(key[10-r-1][3], MOD_MULT_Z216_);	//K4'=(K4^(10-r)) ^ (-1)
+		  vR[r][0] = calcModInv(key[8-r][0],MOD_MULT_Z216_);	//K1'=(K1^(10-r)) ^ (-1)
+		  vR[r][1] = calcModNeg(key[8-r][1],MOD_216_);	//K2'=-(K2^(10-r))
+		  vR[r][2] = calcModNeg(key[8-r][2], MOD_216_);	//K3'=-(K3^(10-r))
+		  vR[r][3] = calcModInv(key[8-r][3], MOD_MULT_Z216_);	//K4'=(K4^(10-r)) ^ (-1)
 		  
 		  //Runde 2-8: Schlüssel K3 <-> K2 tauschen
 		  if(r > 0 && r < 8) {
@@ -633,8 +695,8 @@ private short[] stringKeytoShortKey(String originalKey) {
 		  
 		  //nur für Runde 1-8 Schlüssel 5 und 6
 		  if(r < 8) {
-			vR[r][4] = key[9-r-1][4];	//K5'=K5^(9-r)
-			vR[r][5] = key[9-r-1][5];	//K6'=K6^(9-r)
+			vR[r][4] = key[7-r][4];	//K5'=K5^(9-r)
+			vR[r][5] = key[7-r][5];	//K6'=K6^(9-r)
 		  }
 	  }
 	  
