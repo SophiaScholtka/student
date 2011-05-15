@@ -95,9 +95,7 @@ public final class IDEA extends BlockCipher {
 
 	  //Bereite Schüsselteile vor
 	  //FIXME muss sich ideaKey in expandKey verändern?
-	  if(DEBUG) System.out.println(">>>> ideaKey vor expandKey: \t" + Arrays.toString(ideaKey));
 	  BigInteger[][] keyExp = expandKey(ideaKey);
-	  if(DEBUG) System.out.println(">>>> ideaKey nach expandKey: \t" + Arrays.toString(ideaKey));
 
 	  //CBC
 	  vC[0] = transformIv(iv); //Setze c[0] = iv, iv 64 bit lang
