@@ -114,6 +114,7 @@ public final class IDEA extends BlockCipher {
 	  }
 	  System.out.println();
 	  System.out.print("Ciphertext:            \t");
+	  System.out.print("                ");
 	  for(int i = 1; i < vC.length; i++) {
 		  for(int j = 0; j < vC[i].length;j++) {
 			  System.out.print(vC[i][j].toString(16));
