@@ -167,7 +167,12 @@ public final class IDEA extends BlockCipher {
    * @param tmpKey
    * @return
    */
-  private BigInteger[][] expandKey(BigInteger[] tmpKey) {
+  private BigInteger[][] expandKey(BigInteger[] theideakey) {
+	  //call by reference umgehen indem selbst eine Kopie angelegt wird
+	  BigInteger[] tmpKey = new BigInteger[theideakey.length];
+	  for(int i=0; i<theideakey.length; i++){
+		  tmpKey[i]=theideakey[i];
+	  }
 	  BigInteger[][] expandedKey=new BigInteger[9][6];
 	  int index1,index2;
 	  //Teile Key in acht 16-Bit-Teilschlüssel auf und weise diese direkt den ersten 8 Teilschlüsseln zu
@@ -392,10 +397,10 @@ private short[] stringKeytoShortKey(String originalKey) {
   private BigInteger calcMultiplikationZ(BigInteger message1, BigInteger message2) {
 	  //Sonderfälle, wenn 0 eingegeben wird, ersetze durch 2^16
 	  if (message1.equals(BigInteger.ZERO)) {
-		  message1 = new BigInteger(""+ Math.pow(2,16));
+		  message1 = new BigInteger(""+ (int) Math.pow(2,16));
 	  }
 	  if (message2.equals(BigInteger.ZERO)) {
-		  message2 = new BigInteger(""+ Math.pow(2,16));
+		  message2 = new BigInteger(""+ (int) Math.pow(2,16));
 	  }
 	  //eigentliche Rechnung m1*m2 mod 2^16+1
 	  BigInteger back; //return value
