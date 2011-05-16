@@ -33,6 +33,7 @@ import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
 public final class IDEA extends BlockCipher {
 	final boolean DEBUG = true;
 	final boolean DEBUG_IDEA = false;
+	final boolean TEST = true;
 	
 	//Konstante Rechenwerte
 	final BigInteger MOD_2 = new BigInteger("2"); //2
@@ -182,7 +183,16 @@ private short[] hexIVtoShortBlock(String iv){
 	  
 	  //Bereite Ciphertext vor
 	  BigInteger[][] vC = new BigInteger[vM.length+1][4];
-
+	  
+	  //TEST Werte
+	  if(TEST) {
+		  BigInteger[] tmpIdeaKey = new BigInteger[8];
+		  for (int i = 0; i < tmpIdeaKey.length; i++) {
+			  tmpIdeaKey[i] = new BigInteger("" + (i+1));
+		  }
+		  ideaKey = tmpIdeaKey;
+	  }
+	  
 	  //Bereite Schüsselteile vor
 	  BigInteger[][] keyExp;
 	  keyExp = expandKey(ideaKey);
@@ -197,17 +207,17 @@ private short[] hexIVtoShortBlock(String iv){
 //		  }
 //	  }
 //	  if(DEBUG) System.out.println();System.out.println();
-	  keyExp = generateKeyParts(ideaKey);
-//	  if(DEBUG) {
-//		  for (int i = 0; i < keyExp.length; i++) {
-//			  System.out.print(i + "\t");
-//			  for (int j = 0; j < keyExp[i].length; j++) {
-//				  if(i < 8 || (i==8 && j<4))
-//				  System.out.print(fillStringLeft(keyExp[i][j].toString(2),20," ") + "\t");
-//			  }
-//			  System.out.println();
-//		  }
-//	  }
+	  //TEST 
+	  if(TEST) {
+		  System.out.println("TTT| Ausgabe der Teilschlüssel (Hexadezimal)");
+		  for (int i = 0; i < keyExp.length; i++) {
+			  System.out.print("TTT| " + i);
+			  for (int j = 0; j < keyExp[i].length; j++) {
+				  System.out.print("\t" + fillStringLeft(keyExp[i][j].toString(16),4,"0"));
+			  }
+			  System.out.println();
+		  }
+	  }
 	  
 	  //CBC
 	  vC[0] = transformIv(iv); //Setze c[0] = iv, iv 64 bit lang
@@ -274,71 +284,6 @@ private short[] hexIVtoShortBlock(String iv){
 	  }
   }
   
-  private BigInteger[][] generateKeyParts(BigInteger[] theideakey) {
-	  //call by reference umgehen indem selbst eine Kopie angelegt wird
-	  BigInteger[] tmpKey = theideakey.clone();
-	  BigInteger[][] keyParts = new BigInteger[9][6];
-	  
-	  //fülle keyParts mit 0
-	  for (int i = 0; i < keyParts.length; i++) {
-		  for (int j = 0; j < keyParts[i].length; j++) {
-			keyParts[i][j] = new BigInteger("0");
-		}
-	  }
-	  
-	  // Teile K in acht 16-Bit-Teilschlüssel auf - liegt als ideaKey vor
-	  // weise diese direkt den ersten 8 Teilschlüsseln K(j)(1),...,K(j+1)(2)...
-	  int indexSub = 0; // K_indexSub^indexTop
-	  int indexTop = 0; // K_indexSub^indexTop
-	  for (int i = 0; i < tmpKey.length; i++) {
-		  keyParts[indexTop][indexSub] = tmpKey[i];
-		  indexSub = indexSub + 1;
-		  if(indexSub %6 == 0) {
-			  indexSub = 0;
-			  indexTop = indexTop + 1;
-		  }
-	  }
-	  
-	  BigInteger key = combineKey(tmpKey);
-	  // WHILE noch nicht alle 52 Teilschlüssel zugewiesen sind DO
-	  while((indexSub < 6 && indexTop < 9)) {
-		  // führe auf K einen zyklischen Linksshift um 25 Positionen durch
-		  key = key.shiftLeft(25); 				 // 25 bit Shift nach links
-		  String sCarry = key.toString(2).substring(0, 25); // Übertragungsbits
-		  key = key.add(new BigInteger(sCarry,2)); // Addiere Übertragungsbits
-		  String sKeep = key.toString(2).substring(25); // Entferne Übertragbits vorne
-		  key = new BigInteger(sKeep,2);
-		  // teile das Ergebnis in acht 16-bit Blöcke ein
-		  BigInteger[] blocks = partKey(key);
-		  // weise das Ergebnis den nächsten 8 Teilschlüsseln zu
-		  for (int i = 0; i < blocks.length; i++) {
-			  keyParts[indexTop][indexSub] = blocks[i];
-			  indexSub = indexSub + 1;
-			  if(indexSub!=0 && indexSub %6 == 0) {
-				  indexSub = 0;
-				  indexTop = indexTop + 1;
-			  }
-			  if(indexTop > 8) {
-				  break;
-			  }
-		  }
-		  
-		  //nächste Runde
-		  key = combineKey(blocks);
-	  } //while end
-	  
-	  if (DEBUG) {
-		  System.out.print(">>>52 Teilschlüssel:      ");
-		  for (int i=0;i<9;i++) {
-			  for(int j=0;j<6;j++) {
-				  System.out.print(" " + keyParts[i][j]);
-			  }
-		  }
-		  System.out.println();
-	  }
-	  
-	  return keyParts;
-  }
   
   private BigInteger combineKey(BigInteger[] key) {
 	  BigInteger[] tmpKey = key.clone();
@@ -380,6 +325,13 @@ private short[] hexIVtoShortBlock(String iv){
 		  tmpKey[i]=theideakey[i];
 	  }
 	  BigInteger[][] expandedKey=new BigInteger[9][6];
+	  //Fülle expandedKey mit Platzhaltern (0)
+	  for (int i = 0; i < expandedKey.length; i++) {
+		  for (int j = 0; j < expandedKey[i].length; j++) {
+			  expandedKey[i][j] = BigInteger.ZERO;
+		  }
+	  }
+	  
 	  int index1,index2;
 	  //Teile Key in acht 16-Bit-Teilschlüssel auf und weise diese direkt den ersten 8 Teilschlüsseln zu
 	  for(int i=0;i<8;i++){
