@@ -180,6 +180,7 @@ private short[] hexIVtoShortBlock(String iv){
 	  
 	  //Lese Klartext ein (BigInteger[64bit][16bit])
 	  BigInteger[][] vM = getClear(cleartext);
+
 	  //TEST Werte Klartext
 	  if(TEST) {
 		  System.out.print("TTT| Genutzter Klartext: ");
@@ -190,9 +191,6 @@ private short[] hexIVtoShortBlock(String iv){
 		  }
 		  System.out.println();
 	  }
-	  
-	  //Bereite Ciphertext vor
-	  BigInteger[][] vC = new BigInteger[vM.length+1][4];
 	  
 	  //TEST Werte
 	  if(TEST) {
@@ -232,6 +230,9 @@ private short[] hexIVtoShortBlock(String iv){
 		  }
 		  System.out.println();
 	  }
+
+	  //Bereite Ciphertext vor
+	  BigInteger[][] vC = new BigInteger[vM.length+1][4];
 	  
 	  //CBC
 	  vC[0] = transformIv(iv); //Setze c[0] = iv, iv 64 bit lang
@@ -242,7 +243,7 @@ private short[] hexIVtoShortBlock(String iv){
 		  }
 		  vC[i] = doIDEA(xored, keyExp);
 	  }
-
+	  
 	  //TODO Ausgabe Ciphertext überarbeiten
 	  //Zeige Ciphertext (IV, Ciphertext und Vollständig)
 	  System.out.print("Ciphertext (IV):      \t");
@@ -254,14 +255,16 @@ private short[] hexIVtoShortBlock(String iv){
 	  System.out.print("                ");
 	  for(int i = 1; i < vC.length; i++) {
 		  for(int j = 0; j < vC[i].length;j++) {
-			  System.out.print(vC[i][j].toString(16));
+			  //fillStringLeft füllt die durch toString weggelassenen "0" nach
+			  System.out.print(fillStringLeft(vC[i][j].toString(16),4,"0"));
 		  }
 	  }
 	  System.out.println();
 	  System.out.print("Ciphertext (Vollst.): \t");
 	  for(int i = 0; i < vC.length; i++) {
 		  for(int j = 0; j < vC[i].length;j++) {
-			  System.out.print(vC[i][j].toString(16));
+			  //fillStringLeft füllt die durch toString weggelassenen "0" nach
+			  System.out.print(fillStringLeft(vC[i][j].toString(16),4,"0"));
 		  }
 	  }
 	  System.out.println();
@@ -743,10 +746,12 @@ private short[] stringKeytoShortKey(String originalKey) {
 		  list.add(read);
 	  }
 	  //Erweiter Liste auf Vielfaches von 4
+	  BigInteger biSpace = new BigInteger("" + (int)' ');
+	  String sSpace = fillStringLeft(biSpace.toString(2),8,"0");
 	  if(list.size() % 4 != 0) {
 		  int to = 4 - (list.size() % 4);
 		  for(int i = 0; i < to; i++) {
-			  list.add(BigInteger.ZERO);
+			  list.add(new BigInteger(sSpace+sSpace,2));
 		  }
 	  }
 	  
