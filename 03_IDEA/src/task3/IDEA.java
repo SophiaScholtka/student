@@ -33,7 +33,7 @@ import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
 public final class IDEA extends BlockCipher {
 	final boolean DEBUG = true;
 	final boolean DEBUG_IDEA = false;
-	final boolean TEST = true;
+	final boolean TEST = false;
 	
 	//Konstante Rechenwerte
 	final BigInteger MOD_2 = new BigInteger("2"); //2
@@ -624,8 +624,8 @@ private short[] stringKeytoShortKey(String originalKey) {
 
 		  //Setze Zwischenwerte
 		  vZ[0] = vT[3][0]; // Z1 = T41
-		  vZ[1] = vT[3][2]; // Z2 = T43
-		  vZ[2] = vT[3][1]; // Z3 = T42
+		  vZ[1] = vT[3][1]; // Z2 = T43
+		  vZ[2] = vT[3][2]; // Z3 = T42
 		  vZ[3] = vT[3][3]; // Z4 = T44
 		  
 		  //TEST Idea Runden 1-8
@@ -640,8 +640,8 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  
 	  //Runde 9, Ausgabetransformation
 	  vC[0] = calcMultiplikationZ(vZ[0], vK[8][0]);	//Z1 MultZ K1[9]	> T51
-	  vC[1] = calcAdditionMod216(vZ[1], vK[8][1]);	//Z2 Add216 K2[9]	> T52
-	  vC[2] = calcAdditionMod216(vZ[2], vK[8][2]);	//Z3 Add216 K3[9]	> T53
+	  vC[1] = calcAdditionMod216(vZ[2], vK[8][1]);	//Z2 Add216 K2[9]	> T52
+	  vC[2] = calcAdditionMod216(vZ[1], vK[8][2]);	//Z3 Add216 K3[9]	> T53
 	  vC[3] = calcMultiplikationZ(vZ[3], vK[8][3]);	//Z4 MultZ K4[9]	> T54
 	  //TEST Idea Runde9
 	  if(TEST) {
