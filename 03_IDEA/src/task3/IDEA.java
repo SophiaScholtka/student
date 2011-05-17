@@ -32,7 +32,7 @@ import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
  */
 public final class IDEA extends BlockCipher {
 	final boolean DEBUG = true;
-	final boolean DEBUG_IDEA = false;
+	final boolean DEBUG_IDEA = true;
 	
 	//Konstante Rechenwerte
 	final BigInteger MOD_2 = new BigInteger("2"); //2
