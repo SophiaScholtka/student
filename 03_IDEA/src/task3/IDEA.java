@@ -279,9 +279,8 @@ private short[] hexIVtoShortBlock(String iv){
    * @see #writeKey writeKey
    */
   public void makeKey() {
-	  //User fragen ob eigener oder Zufallskey
-	  //128-bit = 16 char Schlüssel einlesen oder auswürfeln
-	  String originalKey = "abcdefghijklmnop";
+	  //TODO User fragen ob eigener oder Zufallskey
+	  String originalKey = enterKey();
 	  /*if (DEBUG) {
 		  short testkey[]= stringKeytoShortKey(originalKey);
 		  System.out.println(">>>expandingTestkey: ");
@@ -846,5 +845,58 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  if(DEBUG) { msg += " (Länge: "+iv.length()+")"; }
 	  System.out.println(msg);
 	  return iv;
+  }
+  
+  private String enterKey() {
+	  //128-bit = 16 char Schlüssel einlesen oder auswürfeln
+	  String originalKey ="";
+	  
+	  BufferedReader standardInput = launcher.openStandardInput();
+	  boolean accepted = false;
+
+	  String msg = "Bitte geben sie einen Key der Länge 16 ein. \n" +
+	  		"Geben sie Z oder R ein, um einen zufälligen Schlüssel zu erstellen.\n" +
+	  		"Ist die Eingabe leer, so wird ein Standard-Testschlüssel genutzt.\n" +
+	  		"Bitte geben sie jetzt ihre Schlüsselauswahl ein:";
+	  System.out.println(msg);
+	  do {
+		  msg = "Bitte geben sie einen Key der Länge 16 ein.";
+		  try {
+			  String sIn = standardInput.readLine();
+			  if(sIn.length() == 16) {
+				  originalKey = sIn;
+				  accepted = true;
+			  } else if(sIn.toLowerCase().equals("z") || sIn.toLowerCase().equals("r")) {
+				  //Generiere Schlüssel
+				  originalKey = "";
+				  while(originalKey.length() != 16) {
+					  Random random = new Random();
+					  int iRandom = random.nextInt(126); //255 ASCII Zeichen
+					  if(iRandom > 32) { // schließt Steuerzeichen aus
+						  originalKey = originalKey + (char)iRandom;
+					  }
+				  }
+				  accepted=true;
+			  } else if(sIn.length() == 0 || sIn == null) {
+				  //Nutze StandardTestwert
+				  originalKey = "abcdefghijklmnop";
+				  accepted = true;
+			  } else {
+				  System.out.println("Eingabe hat die falsche Länge! " +
+						  "Geben sie bitte 16 Zeichen ein oder " +
+						  "gar kein Zeichen, um den Standardwert zu erhalten.");
+				  accepted = false;
+			  }
+		  } catch (IOException e) {
+			  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+			  e.printStackTrace();
+			  System.exit(1);
+		  }
+	  } while (!accepted);
+	
+	  msg = "Der Schlüssel lautet: " + originalKey;
+	  if(DEBUG) { msg += " (Länge: "+originalKey.length()+")"; }
+	  System.out.println(msg);
+	  return originalKey;
   }
 }
