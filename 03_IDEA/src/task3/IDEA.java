@@ -34,7 +34,7 @@ import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
 public final class IDEA extends BlockCipher {
 	final boolean DEBUG = true;
 	final boolean DEBUG_IDEA = false;
-	final boolean TEST = false;	
+	final boolean TEST = false;
 	//Konstante Rechenwerte
 	final BigInteger MOD_2 = new BigInteger("2"); //2
 	final BigInteger MOD_216_ = new BigInteger("" + MOD_2.pow(16)); //Mod 2^16
@@ -55,12 +55,16 @@ public final class IDEA extends BlockCipher {
   public void decipher(FileInputStream ciphertext, FileOutputStream cleartext) {
 	  BigInteger read = readCipher(ciphertext);
 	  System.out.println(read.toString(2) + "\t" + read + "\t" + read.bitLength());
+	  
 	  //nimm den schlüssel und setze die Tabelle auf Seite 59 um, um daraus den dechiffrier-Schlüssel zu erhalten
 	  BigInteger[][] dekey = reverseKey(expandKey(ideaKey));
+	  
 	  //benutze dann einfach encipher mit dem Dechiffrierschlüssel
 	  
 	  //Lese Ciphertext ein (BigInteger[64bit][16bit])
 	  BigInteger[][] vC = getCiper(ciphertext);
+	  
+	  if(TEST) {testVector();}
 	  
 	  //Bereite Klartext vor
 	  BigInteger[][] vM = new BigInteger[vC.length][4];
@@ -173,57 +177,11 @@ private short[] hexIVtoShortBlock(String iv){
 	  
 	  //Lese Klartext ein (BigInteger[64bit][16bit])
 	  BigInteger[][] vM = getClear(cleartext);
-
-	  //TEST Werte Klartext
-	  if(TEST) {
-		  System.out.print("TTT| Genutzter Klartext: ");
-		  vM = new BigInteger[1][4];
-		  for (int i = 0; i < vM[0].length; i++) {
-			  vM[0][i] = new BigInteger("" + i);
-			  System.out.print("\t" + fillStringLeft(vM[0][i].toString(16),4,"0"));
-		  }
-		  System.out.println();
-	  }
-	  
-	  //TEST Werte
-	  if(TEST) {
-		  System.out.print("TTT| Schlüssel (hex): ");
-		  BigInteger[] tmpIdeaKey = new BigInteger[8];
-		  for (int i = 0; i < tmpIdeaKey.length; i++) {
-			  tmpIdeaKey[i] = new BigInteger("" + (i+1));
-			  System.out.print("\t" + fillStringLeft(tmpIdeaKey[i].toString(16),4,"0"));
-		  }
-		  System.out.println();
-		  ideaKey = tmpIdeaKey;
-	  }
 	  
 	  //Bereite Schüsselteile vor
 	  BigInteger[][] keyExp;
 	  keyExp = expandKey(ideaKey);
-
-	  //TEST Schlüssel
-	  if(TEST) {
-		  System.out.println("TTT| Ausgabe der Teilschlüssel (Hexadezimal)");
-		  for (int i = 0; i < keyExp.length; i++) {
-			  System.out.print("TTT| " + i);
-			  for (int j = 0; j < keyExp[i].length; j++) {
-				  System.out.print("\t" + fillStringLeft(keyExp[i][j].toString(16),4,"0"));
-			  }
-			  System.out.println();
-		  }
-	  }
 	  
-	  //TEST Werte IDEA
-	  if(TEST) {
-		  System.out.println("TTT| IDEA");
-		  BigInteger[] testIdea = doIDEA(vM[0], keyExp);
-		  System.out.print("TTT| IDEA Ergebnis:");
-		  for (int i = 0; i < testIdea.length; i++) {
-			  System.out.print("\t" + fillStringLeft(testIdea[i].toString(16),4,"0"));
-		  }
-		  System.out.println();
-	  }
-
 	  //Bereite Ciphertext vor
 	  BigInteger[][] vC = new BigInteger[vM.length+1][4];
 	  
@@ -648,7 +606,13 @@ private short[] stringKeytoShortKey(String originalKey) {
   }
 
   private BigInteger[][] reverseKey(BigInteger[][] key) {
-	  BigInteger[][] vR = key.clone();
+	  //Erzeuge reversed Key (gefüllt mit 0)
+	  BigInteger[][] vR = new BigInteger[key.length][6];
+	  for (int i = 0; i < vR.length; i++) {
+		  for (int j = 0; j < vR[i].length; j++) {
+			  vR[i][j]=new BigInteger("0");
+		  }
+	  }
 	  
 	  //Schlüssel der Runden 1-9
 	  for(int r = 0; r < 9; r++) {
@@ -894,5 +858,101 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  if(DEBUG) { msg += " (Länge: "+originalKey.length()+")"; }
 	  System.out.println(msg);
 	  return originalKey;
+  }
+  
+  private void testVector() {
+	  //ENCIPHER
+	  System.out.println("TTT| ENCIPER");
+	  System.out.println();
+	  
+	  //TEST Werte Klartext
+	  BigInteger[][] vM = new BigInteger[1][4];
+	  System.out.print("TTT| Genutzter Klartext: ");
+	  vM = new BigInteger[1][4];
+	  for (int i = 0; i < vM[0].length; i++) {
+		  vM[0][i] = new BigInteger("" + i);
+		  System.out.print("\t" + fillStringLeft(vM[0][i].toString(16),4,"0"));
+	  }
+	  System.out.println();
+	  
+	  //TEST Werte Schlüssel
+	  System.out.print("TTT| Schlüssel (hex): ");
+	  BigInteger[] tmpIdeaKey = new BigInteger[8];
+	  for (int i = 0; i < tmpIdeaKey.length; i++) {
+		  tmpIdeaKey[i] = new BigInteger("" + (i+1));
+		  System.out.print("\t" + fillStringLeft(tmpIdeaKey[i].toString(16),4,"0"));
+	  }
+	  System.out.println();
+	  
+	  //TEST Teilschlüssel
+	  System.out.println("TTT| Ausgabe der Teilschlüssel (Hexadezimal)");
+	  BigInteger[][] keyExp = expandKey(tmpIdeaKey);
+	  for (int i = 0; i < keyExp.length; i++) {
+		  System.out.print("TTT| " + i);
+		  for (int j = 0; j < keyExp[i].length; j++) {
+			  System.out.print("\t" + fillStringLeft(keyExp[i][j].toString(16),4,"0"));
+		  }
+		  System.out.println();
+	  }
+	  
+	  //TEST Werte IDEA (Encipher)
+	  System.out.println("TTT| IDEA");
+	  BigInteger[] testIdea = doIDEA(vM[0], keyExp);
+	  System.out.print("TTT| IDEA Ergebnis:");
+	  for (int i = 0; i < testIdea.length; i++) {
+		  System.out.print("\t" + fillStringLeft(testIdea[i].toString(16),4,"0"));
+	  }
+	  System.out.println();
+	  
+	  System.out.println();System.out.println();
+	  //DECIPER
+	  System.out.println("TTT| DECIPER");
+	  System.out.println("");
+	  
+	  //TEST Werte Ciphertext
+	  BigInteger[][] vC = new BigInteger[1][4];
+	  System.out.print("TTT| Genutzter Klartext: ");
+	  vC = new BigInteger[1][4];
+	  vC[0][0] = new BigInteger("11fb",16);
+	  vC[0][1] = new BigInteger("ed2b",16);
+	  vC[0][2] = new BigInteger("0198",16);
+	  vC[0][3] = new BigInteger("6de5",16);
+	  for (int i = 0; i < vC[0].length; i++) {
+		  System.out.print("\t" + fillStringLeft(vC[0][i].toString(16),4,"0"));
+	  }
+	  System.out.println();
+	  
+	  //TEST Werte Schlüssel
+	  System.out.print("TTT| Schlüssel (hex): ");
+	  tmpIdeaKey = new BigInteger[8];
+	  for (int i = 0; i < tmpIdeaKey.length; i++) {
+		  tmpIdeaKey[i] = new BigInteger("" + (i+1));
+		  System.out.print("\t" + fillStringLeft(tmpIdeaKey[i].toString(16),4,"0"));
+	  }
+	  System.out.println();
+	  
+	  //TEST Decipher Key
+	  BigInteger[][] dekey = new BigInteger[9][6];
+	  if(TEST) {
+		  dekey = reverseKey(expandKey(tmpIdeaKey));
+		  System.out.println("TTT| Ausgabe der gedrehten Teilschlüssel (Hexadezimal)");
+		  for (int i = 0; i < dekey.length; i++) {
+			  System.out.print("TTT| " + i);
+			  for (int j = 0; j < dekey[i].length; j++) {
+				  System.out.print("\t" + fillStringLeft(dekey[i][j].toString(16),4,"0"));
+			  }
+			  System.out.println();
+		  }
+	  }
+	  //TEST Werte IDEA (Decipher)
+	  System.out.println("TTT| IDEA");
+	  BigInteger[] testIdeaDe = doIDEA(vC[0], dekey);
+	  System.out.print("TTT| IDEA Ergebnis:");
+	  for (int i = 0; i < testIdeaDe.length; i++) {
+		  System.out.print("\t" + fillStringLeft(testIdeaDe[i].toString(16),4,"0"));
+	  }
+	  System.out.println();
+	  System.out.println("TTT| Test abgeschlossen.");
+	  System.out.println(); System.out.println();
   }
 }
