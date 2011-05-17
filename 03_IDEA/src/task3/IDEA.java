@@ -279,12 +279,8 @@ private short[] hexIVtoShortBlock(String iv){
    * @see #writeKey writeKey
    */
   public void makeKey() {
-	  //TODO User fragen ob eigener oder Zufallskey
 	  String originalKey = enterKey();
-	  /*if (DEBUG) {
-		  short testkey[]= stringKeytoShortKey(originalKey);
-		  System.out.println(">>>expandingTestkey: ");
-		  expandKey(testkey);}*/
+	  
 	  ideaKey = stringKeytoBigIntKey(originalKey);
 	  if (DEBUG) {
 		  System.out.print(">>>Schlüssel:");
