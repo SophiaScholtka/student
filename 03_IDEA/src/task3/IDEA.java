@@ -32,8 +32,8 @@ import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
  */
 public final class IDEA extends BlockCipher {
 	final boolean DEBUG = true;
-	final boolean DEBUG_IDEA = true;
-	
+	final boolean DEBUG_IDEA = false;
+	final boolean TEST = false;	
 	//Konstante Rechenwerte
 	final BigInteger MOD_2 = new BigInteger("2"); //2
 	final BigInteger MOD_216_ = new BigInteger("" + MOD_2.pow(16)); //Mod 2^16
@@ -179,35 +179,59 @@ private short[] hexIVtoShortBlock(String iv){
 	  
 	  //Lese Klartext ein (BigInteger[64bit][16bit])
 	  BigInteger[][] vM = getClear(cleartext);
-	  
-	  //Bereite Ciphertext vor
-	  BigInteger[][] vC = new BigInteger[vM.length+1][4];
 
+	  //TEST Werte Klartext
+	  if(TEST) {
+		  System.out.print("TTT| Genutzter Klartext: ");
+		  vM = new BigInteger[1][4];
+		  for (int i = 0; i < vM[0].length; i++) {
+			  vM[0][i] = new BigInteger("" + i);
+			  System.out.print("\t" + fillStringLeft(vM[0][i].toString(16),4,"0"));
+		  }
+		  System.out.println();
+	  }
+	  
+	  //TEST Werte
+	  if(TEST) {
+		  System.out.print("TTT| Schlüssel (hex): ");
+		  BigInteger[] tmpIdeaKey = new BigInteger[8];
+		  for (int i = 0; i < tmpIdeaKey.length; i++) {
+			  tmpIdeaKey[i] = new BigInteger("" + (i+1));
+			  System.out.print("\t" + fillStringLeft(tmpIdeaKey[i].toString(16),4,"0"));
+		  }
+		  System.out.println();
+		  ideaKey = tmpIdeaKey;
+	  }
+	  
 	  //Bereite Schüsselteile vor
 	  BigInteger[][] keyExp;
 	  keyExp = expandKey(ideaKey);
-//	  if(DEBUG) {
-//		  for (int i = 0; i < keyExp.length; i++) {
-//			  System.out.print(i + "\t");
-//			  for (int j = 0; j < keyExp[i].length; j++) {
-//				  if(i < 8 || (i==8 && j<4))
-//				  System.out.print(fillStringLeft(keyExp[i][j].toString(2),20," ") + "\t");
-//			  }
-//			  System.out.println();
-//		  }
-//	  }
-//	  if(DEBUG) System.out.println();System.out.println();
-	  keyExp = generateKeyParts(ideaKey);
-//	  if(DEBUG) {
-//		  for (int i = 0; i < keyExp.length; i++) {
-//			  System.out.print(i + "\t");
-//			  for (int j = 0; j < keyExp[i].length; j++) {
-//				  if(i < 8 || (i==8 && j<4))
-//				  System.out.print(fillStringLeft(keyExp[i][j].toString(2),20," ") + "\t");
-//			  }
-//			  System.out.println();
-//		  }
-//	  }
+
+	  //TEST Schlüssel
+	  if(TEST) {
+		  System.out.println("TTT| Ausgabe der Teilschlüssel (Hexadezimal)");
+		  for (int i = 0; i < keyExp.length; i++) {
+			  System.out.print("TTT| " + i);
+			  for (int j = 0; j < keyExp[i].length; j++) {
+				  System.out.print("\t" + fillStringLeft(keyExp[i][j].toString(16),4,"0"));
+			  }
+			  System.out.println();
+		  }
+	  }
+	  
+	  //TEST Werte IDEA
+	  if(TEST) {
+		  System.out.println("TTT| IDEA");
+		  BigInteger[] testIdea = doIDEA(vM[0], keyExp);
+		  System.out.print("TTT| IDEA Ergebnis:");
+		  for (int i = 0; i < testIdea.length; i++) {
+			  System.out.print("\t" + fillStringLeft(testIdea[i].toString(16),4,"0"));
+		  }
+		  System.out.println();
+	  }
+
+	  //Bereite Ciphertext vor
+	  BigInteger[][] vC = new BigInteger[vM.length+1][4];
 	  
 	  //CBC
 	  vC[0] = transformIv(iv); //Setze c[0] = iv, iv 64 bit lang
@@ -218,7 +242,7 @@ private short[] hexIVtoShortBlock(String iv){
 		  }
 		  vC[i] = doIDEA(xored, keyExp);
 	  }
-
+	  
 	  //TODO Ausgabe Ciphertext überarbeiten
 	  //Zeige Ciphertext (IV, Ciphertext und Vollständig)
 	  System.out.print("Ciphertext (IV):      \t");
@@ -230,14 +254,16 @@ private short[] hexIVtoShortBlock(String iv){
 	  System.out.print("                ");
 	  for(int i = 1; i < vC.length; i++) {
 		  for(int j = 0; j < vC[i].length;j++) {
-			  System.out.print(vC[i][j].toString(16));
+			  //fillStringLeft füllt die durch toString weggelassenen "0" nach
+			  System.out.print(fillStringLeft(vC[i][j].toString(16),4,"0"));
 		  }
 	  }
 	  System.out.println();
 	  System.out.print("Ciphertext (Vollst.): \t");
 	  for(int i = 0; i < vC.length; i++) {
 		  for(int j = 0; j < vC[i].length;j++) {
-			  System.out.print(vC[i][j].toString(16));
+			  //fillStringLeft füllt die durch toString weggelassenen "0" nach
+			  System.out.print(fillStringLeft(vC[i][j].toString(16),4,"0"));
 		  }
 	  }
 	  System.out.println();
@@ -274,71 +300,6 @@ private short[] hexIVtoShortBlock(String iv){
 	  }
   }
   
-  private BigInteger[][] generateKeyParts(BigInteger[] theideakey) {
-	  //call by reference umgehen indem selbst eine Kopie angelegt wird
-	  BigInteger[] tmpKey = theideakey.clone();
-	  BigInteger[][] keyParts = new BigInteger[9][6];
-	  
-	  //fülle keyParts mit 0
-	  for (int i = 0; i < keyParts.length; i++) {
-		  for (int j = 0; j < keyParts[i].length; j++) {
-			keyParts[i][j] = new BigInteger("0");
-		}
-	  }
-	  
-	  // Teile K in acht 16-Bit-Teilschlüssel auf - liegt als ideaKey vor
-	  // weise diese direkt den ersten 8 Teilschlüsseln K(j)(1),...,K(j+1)(2)...
-	  int indexSub = 0; // K_indexSub^indexTop
-	  int indexTop = 0; // K_indexSub^indexTop
-	  for (int i = 0; i < tmpKey.length; i++) {
-		  keyParts[indexTop][indexSub] = tmpKey[i];
-		  indexSub = indexSub + 1;
-		  if(indexSub %6 == 0) {
-			  indexSub = 0;
-			  indexTop = indexTop + 1;
-		  }
-	  }
-	  
-	  BigInteger key = combineKey(tmpKey);
-	  // WHILE noch nicht alle 52 Teilschlüssel zugewiesen sind DO
-	  while((indexSub < 6 && indexTop < 9)) {
-		  // führe auf K einen zyklischen Linksshift um 25 Positionen durch
-		  key = key.shiftLeft(25); 				 // 25 bit Shift nach links
-		  String sCarry = key.toString(2).substring(0, 25); // Übertragungsbits
-		  key = key.add(new BigInteger(sCarry,2)); // Addiere Übertragungsbits
-		  String sKeep = key.toString(2).substring(25); // Entferne Übertragbits vorne
-		  key = new BigInteger(sKeep,2);
-		  // teile das Ergebnis in acht 16-bit Blöcke ein
-		  BigInteger[] blocks = partKey(key);
-		  // weise das Ergebnis den nächsten 8 Teilschlüsseln zu
-		  for (int i = 0; i < blocks.length; i++) {
-			  keyParts[indexTop][indexSub] = blocks[i];
-			  indexSub = indexSub + 1;
-			  if(indexSub!=0 && indexSub %6 == 0) {
-				  indexSub = 0;
-				  indexTop = indexTop + 1;
-			  }
-			  if(indexTop > 8) {
-				  break;
-			  }
-		  }
-		  
-		  //nächste Runde
-		  key = combineKey(blocks);
-	  } //while end
-	  
-	  if (DEBUG) {
-		  System.out.print(">>>52 Teilschlüssel:      ");
-		  for (int i=0;i<9;i++) {
-			  for(int j=0;j<6;j++) {
-				  System.out.print(" " + keyParts[i][j]);
-			  }
-		  }
-		  System.out.println();
-	  }
-	  
-	  return keyParts;
-  }
   
   private BigInteger combineKey(BigInteger[] key) {
 	  BigInteger[] tmpKey = key.clone();
@@ -380,6 +341,13 @@ private short[] hexIVtoShortBlock(String iv){
 		  tmpKey[i]=theideakey[i];
 	  }
 	  BigInteger[][] expandedKey=new BigInteger[9][6];
+	  //Fülle expandedKey mit Platzhaltern (0)
+	  for (int i = 0; i < expandedKey.length; i++) {
+		  for (int j = 0; j < expandedKey[i].length; j++) {
+			  expandedKey[i][j] = BigInteger.ZERO;
+		  }
+	  }
+	  
 	  int index1,index2;
 	  //Teile Key in acht 16-Bit-Teilschlüssel auf und weise diese direkt den ersten 8 Teilschlüsseln zu
 	  for(int i=0;i<8;i++){
@@ -636,7 +604,6 @@ private short[] stringKeytoShortKey(String originalKey) {
 		  vZ[i] = m[i];
 	  }
 	  
-	  if(DEBUG_IDEA) System.out.println("{doIDEA}");
 	  //Runde r 1 bis 8
 	  for(int r = 0; r < 8; r++) {
 		  vT[0][0] = calcMultiplikationZ(vZ[0], vK[r][0]);	//Z1 MultZ K1[r]  	> T11
@@ -659,18 +626,33 @@ private short[] stringKeytoShortKey(String originalKey) {
 
 		  //Setze Zwischenwerte
 		  vZ[0] = vT[3][0]; // Z1 = T41
-		  vZ[1] = vT[3][2]; // Z2 = T43
-		  vZ[2] = vT[3][1]; // Z3 = T42
+		  vZ[1] = vT[3][1]; // Z2 = T43
+		  vZ[2] = vT[3][2]; // Z3 = T42
 		  vZ[3] = vT[3][3]; // Z4 = T44
+		  
+		  //TEST Idea Runden 1-8
+		  if(TEST) {
+			  System.out.print("TTT| Runde " + (r+1) + " Zwischentexte: ");
+			  for (int i = 0; i < vZ.length; i++) {
+				  System.out.print("\t" + fillStringLeft(vZ[i].toString(16),4,"0"));
+			  }
+			  System.out.println();
+		  }
 	  }
 	  
 	  //Runde 9, Ausgabetransformation
 	  vC[0] = calcMultiplikationZ(vZ[0], vK[8][0]);	//Z1 MultZ K1[9]	> T51
-	  vC[1] = calcAdditionMod216(vZ[1], vK[8][1]);	//Z2 Add216 K2[9]	> T52
-	  vC[2] = calcAdditionMod216(vZ[2], vK[8][2]);	//Z3 Add216 K3[9]	> T53
+	  vC[1] = calcAdditionMod216(vZ[2], vK[8][1]);	//Z2 Add216 K2[9]	> T52
+	  vC[2] = calcAdditionMod216(vZ[1], vK[8][2]);	//Z3 Add216 K3[9]	> T53
 	  vC[3] = calcMultiplikationZ(vZ[3], vK[8][3]);	//Z4 MultZ K4[9]	> T54
-	  
-	  if(DEBUG_IDEA) System.out.println("{/doIDEA}");
+	  //TEST Idea Runde9
+	  if(TEST) {
+		  System.out.print("TTT| Runde " + 9 + " Zwischentexte: ");
+		  for (int i = 0; i < vC.length; i++) {
+			  System.out.print("\t" + fillStringLeft(vC[i].toString(16),4,"0"));
+		  }
+		  System.out.println();
+	  }
 	  
 	  //Rückgabe
 	  return vC;
@@ -763,10 +745,12 @@ private short[] stringKeytoShortKey(String originalKey) {
 		  list.add(read);
 	  }
 	  //Erweiter Liste auf Vielfaches von 4
+	  BigInteger biSpace = new BigInteger("" + (int)' ');
+	  String sSpace = fillStringLeft(biSpace.toString(2),8,"0");
 	  if(list.size() % 4 != 0) {
 		  int to = 4 - (list.size() % 4);
 		  for(int i = 0; i < to; i++) {
-			  list.add(BigInteger.ZERO);
+			  list.add(new BigInteger(sSpace+sSpace,2));
 		  }
 	  }
 	  
