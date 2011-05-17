@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Random;
 
 import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
 
@@ -168,8 +169,7 @@ private short[] hexIVtoShortBlock(String iv){
    * Der FileOutputStream, in den der Chiffretext geschrieben werden soll.
    */
   public void encipher(FileInputStream cleartext, FileOutputStream ciphertext) {
-	  //TODO lese IV ein (momentan Hardcoded)
-	  String iv = "ddc3a8f6c66286d2"; //Hex
+	  String iv = generateIv();
 	  
 	  //Lese Klartext ein (BigInteger[64bit][16bit])
 	  BigInteger[][] vM = getClear(cleartext);
@@ -807,4 +807,44 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  return string;
   }
   
+  private String generateIv() {
+	  String iv = "";
+	  
+	  BufferedReader standardInput = launcher.openStandardInput();
+	  boolean accepted = false;
+
+	  String msg = "Soll ein zufälliger Initialisierungsvektor generiert werden? [Y/N]";
+	  msg = msg + "(Bei allem außer Y wird ein Standard-IV verwendet.)";
+	  System.out.println(msg);
+	  do {
+		  msg = "Soll ein zufälliger Initialisierungsvektor generiert werden? [Y/N]";
+		  try {
+			String sIn = standardInput.readLine();
+			if(sIn.toLowerCase().equals("y")) {
+				//Generiere 16 bit IV (hex)
+				Random random = new Random();
+				iv = "";
+				for (int i = 0; i < 8; i++) {
+					int iRandom = random.nextInt(255);
+					BigInteger value = new BigInteger("" + iRandom);
+					iv = iv + value.toString(16);
+				}
+				
+				accepted=true;
+			} else {
+				iv = "ddc3a8f6c66286d2"; //gibt Standard Test-Vektor zurück
+				accepted = true;
+			}
+		  } catch (IOException e) {
+			  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+			  e.printStackTrace();
+			  System.exit(1);
+		  }
+	  } while (!accepted);
+	
+	  msg = "Der Initialisierungsvektor lautet: " + iv;
+	  if(DEBUG) { msg += " (Länge: "+iv.length()+")"; }
+	  System.out.println(msg);
+	  return iv;
+  }
 }
