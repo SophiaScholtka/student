@@ -758,8 +758,9 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  BufferedReader standardInput = launcher.openStandardInput();
 	  boolean accepted = false;
 
-	  String msg = "Soll ein zufälliger Initialisierungsvektor generiert werden? [Y/N]";
-	  msg = msg + "(Bei allem außer Y wird ein Standard-IV verwendet.)";
+	  String msg = "Soll ein zufälliger Initialisierungsvektor generiert werden? [Y/N]\n";
+	  msg = msg + "1 - ddc3a8f6c66286d2\n";
+	  msg = msg + "2 - 5c7119dd40913232";
 	  System.out.println(msg);
 	  do {
 		  msg = "Soll ein zufälliger Initialisierungsvektor generiert werden? [Y/N]";
@@ -776,6 +777,12 @@ private short[] stringKeytoShortKey(String originalKey) {
 				}
 				
 				accepted=true;
+			} else if(sIn.toLowerCase().equals("1")) {
+				iv = "ddc3a8f6c66286d2";
+				accepted = true;
+			} else if(sIn.toLowerCase().equals("2")) {
+				iv = "5c7119dd40913232";
+				accepted = true;
 			} else {
 				iv = "ddc3a8f6c66286d2"; //gibt Standard Test-Vektor zurück
 				accepted = true;
