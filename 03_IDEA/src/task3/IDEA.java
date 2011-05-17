@@ -77,7 +77,6 @@ public final class IDEA extends BlockCipher {
 		  vM[i] = dkci;
 	  }
 
-	  //TODO Ausgabe Ciphertext überarbeiten
 	  //Zeige Ciphertext (IV, Ciphertext und Vollständig)
 	  System.out.print("IV:          \t");
 	  for(int j = 0; j < vM[0].length;j++) {
@@ -143,7 +142,7 @@ private short[] hexIVtoShortBlock(String iv){
 		  System.exit(0);
 	  }
 	  try {
-		  //TODO 16 Zeichen hex-string in 4 shorts umrechnen
+		  //TODO_UNUSED 16 Zeichen hex-string in 4 shorts umrechnen
 	  } catch (NumberFormatException e){
 		  System.out.println("Fehler beim Parsen des IV! Abbruch.");
 		  System.exit(0);
@@ -183,7 +182,6 @@ private short[] hexIVtoShortBlock(String iv){
 		  vC[i] = doIDEA(xored, keyExp);
 	  }
 	  
-	  //TODO Ausgabe Ciphertext überarbeiten
 	  //Zeige Ciphertext (IV, Ciphertext und Vollständig)
 	  System.out.print("Ciphertext (IV):      \t");
 	  for(int j = 0; j < vC[0].length;j++) {
