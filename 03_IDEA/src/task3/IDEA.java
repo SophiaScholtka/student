@@ -57,28 +57,22 @@ public final class IDEA extends BlockCipher {
 	  //nimm den schlüssel und setze die Tabelle auf Seite 59 um, um daraus den dechiffrier-Schlüssel zu erhalten
 	  BigInteger[][] dekey = reverseKey(expandKey(ideaKey));
 	  //benutze dann einfach encipher mit dem Dechiffrierschlüssel
-	  //TODO lese IV ein (momentan Hardcoded)
-	  String iv = "ddc3a8f6c66286d2"; //Hex
 	  
 	  //Lese Ciphertext ein (BigInteger[64bit][16bit])
 	  BigInteger[][] vC = getCiper(ciphertext);
 	  
 	  //Bereite Klartext vor
-	  BigInteger[][] vM = new BigInteger[vC.length+1][4];
+	  BigInteger[][] vM = new BigInteger[vC.length][4];
 
-	  //Bereite Schüsselteile vor
-	  if(DEBUG) System.out.println(">>>> ideaKey vor expandKey: \t" + Arrays.toString(ideaKey));
-	  BigInteger[][] keyExp = expandKey(ideaKey);
-	  if(DEBUG) System.out.println(">>>> ideaKey nach expandKey: \t" + Arrays.toString(ideaKey));
-
-	  //CBC
-	  vM[0] = transformIv(iv); //Setze c[0] = iv, iv 64 bit lang
+	  //CBC rückwärts
+	  vM[0]=vC[0]; //iv einlesen
 	  for(int i = 1; i < vM.length; i++) {
-		  BigInteger[] xored = new BigInteger[4];
+		  BigInteger[] dkci = new BigInteger[4];
+		  dkci=doIDEA(vC[i],dekey);
 		  for(int j = 0; j < 4; j++) {
-			  xored[j] = calcBitwiseXor(vC[i-1][j], vM[i-1][j]); //M_i XOR C_(i-1)
+			  dkci[j] = calcBitwiseXor(dkci[j], vC[i-1][j]); //D_k(C_i) XOR C_(i-1)
 		  }
-		  vM[i] = doIDEA(xored, keyExp);
+		  vM[i] = dkci;
 	  }
 
 	  //TODO Ausgabe Ciphertext überarbeiten
@@ -123,7 +117,7 @@ public final class IDEA extends BlockCipher {
 	  //Lese Stream aus
 	  ArrayList<BigInteger> list = new ArrayList<BigInteger>();
 	  BigInteger read;
-	  while((read = readCipher(ciphertext)) != null) { //liest je einen bigInt //Entfernt die Anzahl (immer 4)
+	  while((read = readCipher(ciphertext)) != null) { //liest je einen bigInt
 		  list.add(read);
 	  }
 	  //Erweiter Liste auf Vielfaches von 4
