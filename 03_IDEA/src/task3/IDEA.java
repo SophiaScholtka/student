@@ -772,7 +772,7 @@ private short[] stringKeytoShortKey(String originalKey) {
 				for (int i = 0; i < 8; i++) {
 					int iRandom = random.nextInt(255);
 					BigInteger value = new BigInteger("" + iRandom);
-					iv = iv + value.toString(16);
+					iv = iv + fillStringLeft(value.toString(16),2,"0");
 				}
 				
 				accepted=true;
