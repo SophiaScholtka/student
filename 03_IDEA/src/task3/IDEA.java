@@ -53,9 +53,6 @@ public final class IDEA extends BlockCipher {
    * Der FileOutputStream, in den der Klartext geschrieben werden soll.
    */
   public void decipher(FileInputStream ciphertext, FileOutputStream cleartext) {
-	  BigInteger read = readCipher(ciphertext);
-	  System.out.println(read.toString(2) + "\t" + read + "\t" + read.bitLength());
-	  
 	  //nimm den schlüssel und setze die Tabelle auf Seite 59 um, um daraus den dechiffrier-Schlüssel zu erhalten
 	  BigInteger[][] dekey = reverseKey(expandKey(ideaKey));
 	  
@@ -75,14 +72,14 @@ public final class IDEA extends BlockCipher {
 		  BigInteger[] dkci = new BigInteger[4];
 		  dkci=doIDEA(vC[i],dekey);
 		  for(int j = 0; j < 4; j++) {
-			  dkci[j] = calcBitwiseXor(dkci[j], vC[i-1][j]); //D_k(C_i) XOR C_(i-1)
+			  dkci[j] = calcBitwiseXor(vC[i-1][j],dkci[j]); //D_k(C_i) XOR C_(i-1)
 		  }
 		  vM[i] = dkci;
 	  }
 
 	  //TODO Ausgabe Ciphertext überarbeiten
 	  //Zeige Ciphertext (IV, Ciphertext und Vollständig)
-	  System.out.print("Messagetext (IV): \t");
+	  System.out.print("IV:          \t");
 	  for(int j = 0; j < vM[0].length;j++) {
 		  System.out.print(vM[0][j].toString(16));
 	  }
@@ -92,33 +89,24 @@ public final class IDEA extends BlockCipher {
 	  BigInteger mod2to8 = new BigInteger(""+(int) Math.pow(2,8));
 	  for(int i = 1; i < vM.length; i++) {
 		  for(int j = 0; j < vM[i].length;j++) {
-			  text1=vM[i][j].mod(mod2to8).intValue();
-			  text2=vM[i][j].divide(mod2to8).intValue();
+			  text2=vM[i][j].mod(mod2to8).intValue();
+			  text1=vM[i][j].divide(mod2to8).intValue();
 			  System.out.print(""+ (char)text1 +""+ (char)text2);
 		  }
 	  }
 	  System.out.println();
-	  System.out.print("Messagetext (Vollst.): \t");
-	  for(int i = 0; i < vM.length; i++) {
-		  for(int j = 0; j < vM[i].length;j++) {
-			  System.out.print(vM[i][j].toString(16));
-		  }
-	  }
-	  System.out.println();
-	  System.out.println("Should be iv + \t\t\t\t 6162636465666768696a6b6c6d6e6f707172737475767778797a");
 	  
 	  //Speicher Ciphertext
-	  for(int i = 0; i < vM.length; i++) {
+	  for(int i = 1; i < vM.length; i++) { // Index 0 enthält IV!
 		  for(int j = 0; j < vM[i].length;j++) {
-//			  BigInteger write = new BigInteger(vC[i][j].toString(2) + "00000010",2);
-//			  BigInteger write = new BigInteger(vC[i][j].toString());
-			  writeCipher(cleartext, vM[i][j]);
+			  String sSymbols = vM[i][j].toString(2) + "00000010";
+			  vM[i][j] = new BigInteger(sSymbols,2);
+			  writeClear(cleartext, vM[i][j]);
 		  }
 	  }
   }
   
   private BigInteger[][] getCiper(FileInputStream ciphertext) {
-
 	  //Lese Stream aus
 	  ArrayList<BigInteger> list = new ArrayList<BigInteger>();
 	  BigInteger read;
