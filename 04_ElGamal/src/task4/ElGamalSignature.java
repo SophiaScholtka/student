@@ -16,14 +16,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Random;
 
 import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
-import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
 import de.tubs.cs.iti.jcrypt.chiffre.Signature;
 
 /**
@@ -39,7 +36,7 @@ public final class ElGamalSignature extends Signature {
 	
 	private BigInteger[] myKeyPublic_ = new BigInteger[3]; // P, G, Y
 	private BigInteger[] myKeyPrivate_ = new BigInteger[3]; // P, G, X
-	private BigInteger[] foeKey_ = new BigInteger[3];
+	private BigInteger[] foeKey_ = new BigInteger[3]; // P, G, Y
 	
 	private BigInteger myP_;
 	private BigInteger myG_;
@@ -123,7 +120,7 @@ public final class ElGamalSignature extends Signature {
   public void sign(FileInputStream cleartext, FileOutputStream ciphertext) {	  
 	  // Algo 7.8 (1) Signiere Nachricht M
 	  final BigInteger BIGINTTWO = new BigInteger("2"); // 2
-	  final BigInteger BIGINTP1 = myKeyPrivate_[0].subtract(BigInteger.ONE); // P-1
+	  final BigInteger BIGINTP1 = myP_.subtract(BigInteger.ONE); // P-1
 
 	  // Hole eigenen Schlüssel in handliche Variablen
 	  BigInteger myP = myP_;
@@ -179,7 +176,7 @@ public final class ElGamalSignature extends Signature {
 		  BigInteger myM = read.mod(myP); //XXX Wie M in (Z_p)^* festlegen?
 		  
 		  // (1e) Berechne s = (M-xr)k^(-1) mod (p-1)
-		  BigInteger myS = myKeyPrivate_[2].multiply(myR); // x * r
+		  BigInteger myS = myX_.multiply(myR); // x * r
 		  myS = myM.subtract(myS); // M-xr
 		  myS = myS.multiply(myKN); // (M-xr)*k^(-1) 
 		  myS = myS.mod(BIGINTP1); // (M-xr)*k^(-1) mod p-1
@@ -353,11 +350,22 @@ public final class ElGamalSignature extends Signature {
 	  if(DEBUG) { System.out.println("DDD| myY = " + myY.toString()); }
 	  
 	  // Set public key (p,g,y)
+	  myP_ = myP;
+	  myG_ = myG;
+	  myY_ = myY;
+	  
+	  // Public Key als Array
 	  myKeyPublic_ = new BigInteger[3];
 	  myKeyPublic_[0] = myP;
 	  myKeyPublic_[1] = myG;
 	  myKeyPublic_[2] = myY;
+	  
 	  // Set private key (p,g,x)
+	  //myP_ = myP;
+	  //myG_ = myG;
+	  myX_ = myX;
+	  
+	  // Privater Schlüssel als Array
 	  myKeyPrivate_ = new BigInteger[3];
 	  myKeyPrivate_[0] = myP;
 	  myKeyPrivate_[1] = myG;
@@ -682,26 +690,31 @@ public final class ElGamalSignature extends Signature {
 		  // Lese Public Key
 		  File filePublic = new File(myPathOwnPublic_);
 		  br = launcher.openFileForReading(filePublic);
-		  myKeyPublic_[0] = new BigInteger(br.readLine());
-		  myKeyPublic_[1] = new BigInteger(br.readLine());
-		  myKeyPublic_[2] = new BigInteger(br.readLine());
+		  myP_ = new BigInteger(br.readLine());
+		  myG_ = new BigInteger(br.readLine());
+		  myY_ = new BigInteger(br.readLine());
 		  br.close();
+		  
+		  // Public Key als Array
+		  myKeyPublic_[0] = myP_;
+		  myKeyPublic_[1] = myG_;
+		  myKeyPublic_[2] = myY_;
+		  
 		  System.out.println("    * Public Key eingelesen");
 		  
 		  // Lese Private Key
 		  File filePrivate = new File(myPathOwnPrivate_);
 		  br = launcher.openFileForReading(filePrivate);
-		  myKeyPrivate_[0] = new BigInteger(br.readLine());
-		  myKeyPrivate_[1] = new BigInteger(br.readLine());
-		  myKeyPrivate_[2] = new BigInteger(br.readLine());
+		  myP_ = new BigInteger(br.readLine());
+		  myG_ = new BigInteger(br.readLine());
+		  myX_ = new BigInteger(br.readLine());
 		  br.close();
-		  System.out.println("    * Private Key eingelesen");
 		  
-		  // Kurze Variablen
-		  myP_ = myKeyPublic_[0];
-		  myG_ = myKeyPublic_[1];
-		  myY_ = myKeyPublic_[2];
-		  myX_ = myKeyPrivate_[2];
+		  // Privater Schlüssel als Array
+		  myKeyPrivate_[0] = myP_;
+		  myKeyPrivate_[1] = myG_;
+		  myKeyPrivate_[2] = myX_;
+		  System.out.println("    * Private Key eingelesen");
 	  } catch (IOException e) {
 		  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
 		  e.printStackTrace();
@@ -717,16 +730,17 @@ public final class ElGamalSignature extends Signature {
 		  // Lese Public Key
 		  File filePublic = new File(foePathPublic_);
 		  br = launcher.openFileForReading(filePublic);
-		  foeKey_[0] = new BigInteger(br.readLine());
-		  foeKey_[1] = new BigInteger(br.readLine());
-		  foeKey_[2] = new BigInteger(br.readLine());
+		  foeP_ = new BigInteger(br.readLine());
+		  foeG_ = new BigInteger(br.readLine());
+		  foeY_ = new BigInteger(br.readLine());
 		  br.close();
-		  System.out.println("    * Fremden Public Key eingelesen");
 		  
-		  // Kurze Variablen
-		  foeP_ = myKeyPublic_[0];
-		  foeG_ = myKeyPublic_[1];
-		  foeY_ = myKeyPublic_[2];
+		  // Variablen als Array
+		  foeKey_[0] = foeP_;
+		  foeKey_[1] = foeG_;
+		  foeKey_[2] = foeY_;
+		  
+		  System.out.println("    * Fremden Public Key eingelesen");
 	  } catch (IOException e) {
 		  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
 		  e.printStackTrace();
