@@ -65,6 +65,7 @@ public final class ElGamalSignature extends Signature {
 		  
 	  } else { // Neue Schlüssel
 		  System.out.println("    * Generiere neuen Schlüssel");
+		  
 		  myPathOwnPublic_ = "key-testpublic.txt";
 		  myPathOwnPrivate_ = "key-testprivate.txt";
 		  generateKey();
