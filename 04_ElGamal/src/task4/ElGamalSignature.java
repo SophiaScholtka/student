@@ -34,7 +34,7 @@ import de.tubs.cs.iti.jcrypt.chiffre.Signature;
  */
 public final class ElGamalSignature extends Signature {
 	
-	private final boolean DEBUG = true;
+	private final boolean DEBUG = false;
 	private final boolean TEST = false;
 	
 	private BigInteger[] myKeyPublic_ = new BigInteger[3]; // P, G, Y
@@ -176,7 +176,6 @@ public final class ElGamalSignature extends Signature {
 	  while(loopRead) {
 		  if(TEST) { read = new BigInteger("999"); }
 		  // (1d) Nachricht Element M in Z_p^*
-		  System.out.println(">>> Klar= " + read.toString());
 		  BigInteger myM = read.mod(myP); //XXX Platzhalter
 		  
 		  // (1e) Berechne s = (M-xr)k^(-1) mod (p-1)
@@ -191,11 +190,9 @@ public final class ElGamalSignature extends Signature {
 		  myC = myC.add(myR);
 		  if(DEBUG) {System.out.println("DDD| myC=\t" + myC);}
 		  
-		  // (1f) Sende foe Klartext M XXX Wie KLartext M speichern?
-		  
-		  // (1f) Sende foe Signatur (r,s) XXX wie Signatur speichern?
+		  // (1f) Sende foe Klartext
+		  // (1f) Sende foe Signatur (r,s)
 		  writeCipher(ciphertext, myC);
-		  System.out.println(">>> c=" + myC.toString(16));
 		  
 		  // Prüfe nächstes Zeichen und lese es
 		  read = readClear(cleartext, blocksize);
@@ -232,13 +229,10 @@ public final class ElGamalSignature extends Signature {
 	  
 	  // Blocksize für Klartext
 	  int blocksize = calcBlocksize(foeP_);
-	  System.out.println(">>> Blocksize=" + blocksize);
 	  
 	  // Berechne Signaturen und Vergleiche abschnittsweise
 	  BigInteger readCipher = readCipher(ciphertext);
 	  BigInteger readClear = readClear(cleartext,blocksize);
-	  System.out.println(">>> Cipher: " + readCipher.toString(16));;
-	  System.out.println(">>> Clear: " + readClear.toString(16));
 	  boolean isBad = false;
 	  boolean loopReadClear = (readClear != null);
 	  boolean loopReadCipher = (readCipher != null);
@@ -257,13 +251,17 @@ public final class ElGamalSignature extends Signature {
 		  if(DEBUG) {System.out.println("DDD| C=\t" + foeC);}
 		  
 		  // Lese Klartext
-		  BigInteger foeM = readClear;
+		  BigInteger foeM = readClear; 
+		  // (1d) Nachricht Element M in Z_p^*
+		  foeM = foeM.mod(foeP_); //XXX Platzhalter
 		  if(TEST) { foeM = new BigInteger("999"); }
 		  
-		  // Ermittle r = c % p
-		  BigInteger foeR = foeC.mod(foeP_);
 		  // Ermittle s = c mod p
 		  BigInteger foeS = foeC.divideAndRemainder(foeP_)[0];
+		  if(DEBUG) {System.out.println("DDD| s=\t" + foeS);}
+		  // Ermittle r = c % p
+		  BigInteger foeR = foeC.divideAndRemainder(foeP_)[1];
+		  if(DEBUG) {System.out.println("DDD| r=\t" + foeR);}
 		  
 		  // (2b) Prüfe ob 1 <= r <= p-1; false: abbruch
 		  boolean ifLess = (foeR.compareTo(BigInteger.ONE) == -1);
@@ -293,9 +291,6 @@ public final class ElGamalSignature extends Signature {
 		  loopReadCipher = (readCipher != null);
 		  loopReadClear = (readClear != null);
 	  }
-	  System.out.println(loopReadClear);
-	  System.out.println(loopReadCipher);
-	  System.out.println(isBad);
 	  
 	  // (2d) Akzeptiere, wenn v1==v2
 	  if(!isBad) {
@@ -351,7 +346,7 @@ public final class ElGamalSignature extends Signature {
 	  BigInteger upper = myP.subtract(new BigInteger("2"));
 	  BigInteger myX = BigIntegerUtil.randomBetween(lower,upper); // Sets X
 	  System.out.println("    * X erzeugt");
-	  // (2) berechnet y = g^x mod p (Alg. 3.1) (XXX Fast Exp 3.1 nicht verwendet)
+	  // (2) berechnet y = g^x mod p (Alg. 3.1) (Fast Exp 3.1 nicht verwendet)
 	  BigInteger myY = myG.modPow(myX, myP); // Sets Y bwz. G^X
 	  System.out.println("    * Y erzeugt");
 	  if(DEBUG) { System.out.println("DDD| myX = " + myX.toString()); }
@@ -536,7 +531,7 @@ public final class ElGamalSignature extends Signature {
 	  boolean accepted = false;
 	  
 	  String msg = "    ! Bitte geben Sie den Pfad zum Public Key an: \n";
-	  msg = msg +  "      > Leere Eingabe - Standardwert";
+	  msg = msg +  "      > Leere Eingabe - Standardwert (key_testpublic.txt)";
 	  System.out.println(msg);
 	  String path = ""; // Rückgabe
 	  do {
@@ -546,7 +541,7 @@ public final class ElGamalSignature extends Signature {
 			  String sIn = standardInput.readLine();
 			  if (sIn.length() == 0 || sIn == null) {
 //				  sIn = "../ElGamal/schluessel/us.auth.public";
-				  sIn = "key_public.txt";
+				  sIn = "key_testpublic.txt";
 			  }
 			  File file = new File(sIn);
 			  if (file.exists() == true) {
@@ -574,7 +569,7 @@ public final class ElGamalSignature extends Signature {
 	  boolean accepted = false;
 	  
 	  String msg = "    ! Bitte geben Sie den Pfad zum Private Key an: \n";
-	  msg = msg +  "      > Leere Eingabe - Standardwert";
+	  msg = msg +  "      > Leere Eingabe - Standardwert (key_testprivate.txt)";
 	  System.out.println(msg);
 	  String path = ""; // Rückgabe
 	  do {
@@ -583,7 +578,7 @@ public final class ElGamalSignature extends Signature {
 		  try {
 			  String sIn = standardInput.readLine();
 			  if (sIn.length() == 0 || sIn == null) {
-				  sIn = "key_private.txt"; //
+				  sIn = "key_testprivate.txt"; //
 			  }
 			  File file = new File(sIn);
 			  if (file.exists() == true) {
@@ -609,7 +604,7 @@ public final class ElGamalSignature extends Signature {
 	  boolean accepted = false;
 	  
 	  String msg = "    ! Bitte geben Sie den Pfad zum Public Key des anderen an: \n";
-	  msg = msg +  "      > Leere Eingabe - Standardwert";
+	  msg = msg +  "      > Leere Eingabe - Standardwert (key-testpublicfoe.txt)";
 	  System.out.println(msg);
 	  String path = ""; // Rückgabe
 	  do {
