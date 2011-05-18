@@ -16,12 +16,14 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Random;
 
 import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
+import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
 import de.tubs.cs.iti.jcrypt.chiffre.Signature;
 
 /**
@@ -63,6 +65,8 @@ public final class ElGamalSignature extends Signature {
 		  
 	  } else { // Neue Schlüssel
 		  System.out.println("    * Generiere neuen Schlüssel");
+		  myPathOwnPublic_ = "key-testpublic.txt";
+		  myPathOwnPrivate_ = "key-testprivate.txt";
 		  generateKey();
 	  }
 	  
@@ -141,17 +145,47 @@ public final class ElGamalSignature extends Signature {
 	  
 	  // Schreibe Pfade
 	  try {
-		key.write(myPathOwnPublic_);
-		key.newLine();
-		key.write(myPathOwnPrivate_);
-		key.close();
-	} catch (IOException e) {
-		e.printStackTrace();
-	}
-	
-	// Schreibe Public
-	
-	// Schreibe Private
+		  System.out.println(myPathOwnPublic_);
+		  key.write(myPathOwnPublic_);
+		  key.newLine();
+		  key.write(myPathOwnPrivate_);
+		  key.close();
+	  } catch (IOException e) {
+		  e.printStackTrace();
+	  }
+	  
+	  // Schreibe Schlüsseldateien
+	  try{
+		  BufferedWriter keys;
+		  
+		  // Schreibe Public
+		  File filePublic = new File(myPathOwnPublic_);
+		  if(!filePublic.exists()) {
+			  filePublic.createNewFile();
+		  }
+		  keys = launcher.openFileForWriting(filePublic);
+		  for(int i = 0; i < myKeyPublic_.length; i++) {
+			  keys.write("" + myKeyPublic_[i]);
+			  keys.newLine();
+		  }
+		  keys.close();
+		
+		  // Schreibe Private
+		  File filePrivate = new File(myPathOwnPrivate_);
+		  if(!filePrivate.exists()) {
+			  filePrivate.createNewFile();
+		  }
+		  keys = launcher.openFileForWriting(filePrivate);
+		  for(int i = 0; i < myKeyPrivate_.length; i++) {
+			  keys.write("" + myKeyPrivate_[i]);
+			  keys.newLine();
+		  }
+		  keys.close();
+	  } catch (IOException e) {
+		  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+		  e.printStackTrace();
+		  System.exit(1);
+	  }
 	
   }
   
@@ -341,6 +375,43 @@ public final class ElGamalSignature extends Signature {
   }
   
   
+
+  private boolean enterWriteNew() {
+	  
+	  BufferedReader standardInput = launcher.openStandardInput();
+	  boolean accepted = false;
+	  
+	  String msg = "    ! Wollen Sie einen bestehenden Schlüssel überschreiben? [Y/N]";
+	  System.out.println(msg);
+	  boolean back = false; // Rückgabe
+	  do {
+		  msg = "    ! Wollen sie einen bestehenden Schlüssel verwenden? [Y/N]";
+		  System.out.print("      ");
+		  try {
+			  String sIn = standardInput.readLine();
+			  if (sIn.length() == 0 || sIn == null) {
+				  accepted = true;
+				  back = true;
+			  } else if (sIn.toLowerCase().equals("y")) {
+				  accepted = true;
+				  back = true;
+			  } else if (sIn.toLowerCase().equals("n")) {
+				  accepted = true;
+				  back = false;
+			  } else {
+				  accepted = false;
+			  }
+		  } catch (IOException e) {
+			  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+			  e.printStackTrace();
+			  System.exit(1);
+		  }
+	  } while (!accepted);
+	  
+	  return back;
+  }
+  
+  
   private String enterPathOwnPublic() {
 	  
 	  BufferedReader standardInput = launcher.openStandardInput();
@@ -356,7 +427,8 @@ public final class ElGamalSignature extends Signature {
 		  try {
 			  String sIn = standardInput.readLine();
 			  if (sIn.length() == 0 || sIn == null) {
-				  sIn = "key.txt";
+//				  sIn = "../ElGamal/schluessel/us.auth.public";
+				  sIn = "key-testpublic.txt";
 			  }
 			  File file = new File(sIn);
 			  if (file.exists() == true) {
@@ -394,7 +466,7 @@ public final class ElGamalSignature extends Signature {
 		  try {
 			  String sIn = standardInput.readLine();
 			  if (sIn.length() == 0 || sIn == null) {
-				  sIn = "key.txt"; //
+				  sIn = "key-testprivate.txt"; //
 			  }
 			  File file = new File(sIn);
 			  if (file.exists() == true) {
