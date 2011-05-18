@@ -34,15 +34,25 @@ import de.tubs.cs.iti.jcrypt.chiffre.Signature;
  */
 public final class ElGamalSignature extends Signature {
 	
-	private final boolean DEBUG = false;
+	private final boolean DEBUG = true;
 	private final boolean TEST = false;
 	
 	private BigInteger[] myKeyPublic_ = new BigInteger[3]; // P, G, Y
 	private BigInteger[] myKeyPrivate_ = new BigInteger[3]; // P, G, X
 	private BigInteger[] foeKey_ = new BigInteger[3];
 	
+	private BigInteger myP_;
+	private BigInteger myG_;
+	private BigInteger myX_;
+	private BigInteger myY_;
+	
+	private BigInteger foeP_;
+	private BigInteger foeG_;
+	private BigInteger foeY_;
+	
 	private String myPathOwnPublic_;
 	private String myPathOwnPrivate_;
+	private String foePathPublic_;
 	
 	
   /**
@@ -85,29 +95,12 @@ public final class ElGamalSignature extends Signature {
   public void readKey(BufferedReader key) {
 	  
 	  try {
-		  BufferedReader br;
-		  
 		  // Hole Pfade der Key Dateien
 		  myPathOwnPublic_ = key.readLine();
 		  myPathOwnPrivate_ = key.readLine();
 		  
-		  // Lese Public Key
-		  File filePublic = new File(myPathOwnPublic_);
-		  br = launcher.openFileForReading(filePublic);
-		  myKeyPublic_[0] = new BigInteger(br.readLine());
-		  myKeyPublic_[1] = new BigInteger(br.readLine());
-		  myKeyPublic_[2] = new BigInteger(br.readLine());
-		  br.close();
-		  System.out.println("    * Public Key eingelesen");
-		  
-		  // Lese Private Key
-		  File filePrivate = new File(myPathOwnPrivate_);
-		  br = launcher.openFileForReading(filePrivate);
-		  myKeyPrivate_[0] = new BigInteger(br.readLine());
-		  myKeyPrivate_[1] = new BigInteger(br.readLine());
-		  myKeyPrivate_[2] = new BigInteger(br.readLine());
-		  br.close();
-		  System.out.println("    * Private Key eingelesen");
+		  // Lese Public and Private Key
+		  readSecrets();
 	  } catch (IOException e) {
 		  e.printStackTrace();
 	  }
@@ -127,8 +120,93 @@ public final class ElGamalSignature extends Signature {
    * @param ciphertext
    * Der FileOutputStream, in den die Signatur geschrieben werden soll.
    */
-  public void sign(FileInputStream cleartext, FileOutputStream ciphertext) {
+  public void sign(FileInputStream cleartext, FileOutputStream ciphertext) {	  
+	  // Algo 7.8 (1) Signiere Nachricht M
+	  final BigInteger BIGINTTWO = new BigInteger("2"); // 2
+	  final BigInteger BIGINTP1 = myKeyPrivate_[0].subtract(BigInteger.ONE); // P-1
+
+	  // Hole eigenen Schlüssel in handliche Variablen
+	  BigInteger myP = myP_;
+	  BigInteger myG = myG_;
+	  BigInteger myX = myX_;
+	  BigInteger myY = myY_;
 	  
+	  if(TEST) {
+		  myP = new BigInteger("2819");
+		  myG = new BigInteger("2");
+		  myX = new BigInteger("2260");
+		  myY = new BigInteger("101");
+	  }
+	  System.out.println("    * Eigene Schlüsselwerte:");
+	  System.out.println("      P = " + myP);
+	  System.out.println("      G = " + myG);
+	  System.out.println("      X = " + myX);
+	  System.out.println("      Y = " + myY);
+	  
+	  // (1a) Zufälliges k in {1,...,p-2} mit ggt(k,p-1)=1 wählen
+	  BigInteger lower = BigInteger.ONE;
+	  BigInteger upper = myP.subtract(BIGINTTWO);
+	  BigInteger myK;
+	  boolean check = true;
+	  do {
+		  myK = BigIntegerUtil.randomBetween(lower, upper);
+		  check = !(myK.gcd(BIGINTP1).equals(BigInteger.ONE));
+	  } while (check);
+	  if(TEST) { myK = new BigInteger("333"); }
+	  if(DEBUG) System.out.println("DDD| myK=\t" + myK);
+	  System.out.println("    * k zufällig gewählt");
+	  
+	  // (1b) Berechne r = g^k mod p
+	  BigInteger myR;
+	  myR = myG.modPow(myK, myP); // r = g^k mod p
+	  if(DEBUG) {System.out.println("DDD| myR=\t" + myR);}
+	  System.out.println("    * r berechnet");
+	  
+	  // (1c) Berechne k^(-1) mod (p-1)
+	  BigInteger myKN = myK.modInverse(BIGINTP1); // k^(-1) mod (p-1)
+	  if(DEBUG) {System.out.println("DDD| myKN=\t" + myKN);}
+	  
+	  int blocksize = calcBlocksize(myP);
+	  BigInteger read = readClear(cleartext, blocksize);
+	  boolean isBad = false;
+	  boolean loopRead = (read != null);
+	  if(loopRead==false) {
+		  isBad = true;
+	  }
+	  while(loopRead) {
+		  if(TEST) { read = new BigInteger("999"); }
+		  // (1d) Nachricht Element M in Z_p^*
+		  System.out.println(">>> Klar= " + read.toString());
+		  BigInteger myM = read.mod(myP); //XXX Platzhalter
+		  
+		  // (1e) Berechne s = (M-xr)k^(-1) mod (p-1)
+		  BigInteger myS = myKeyPrivate_[2].multiply(myR); // x * r
+		  myS = myM.subtract(myS); // M-xr
+		  myS = myS.multiply(myKN); // (M-xr)*k^(-1) 
+		  myS = myS.mod(BIGINTP1); // (M-xr)*k^(-1) mod p-1
+		  if(DEBUG) {System.out.println("DDD| myS=\t" + myS);}
+		  
+		  // Modifikation: C = (r,s) zu C' = r + s*p geändert
+		  BigInteger myC = myS.multiply(myP);
+		  myC = myC.add(myR);
+		  if(DEBUG) {System.out.println("DDD| myC=\t" + myC);}
+		  
+		  // (1f) Sende foe Klartext M XXX Wie KLartext M speichern?
+		  
+		  // (1f) Sende foe Signatur (r,s) XXX wie Signatur speichern?
+		  writeCipher(ciphertext, myC);
+		  System.out.println(">>> c=" + myC.toString(16));
+		  
+		  // Prüfe nächstes Zeichen und lese es
+		  read = readClear(cleartext, blocksize);
+		  loopRead = (read != null);
+	  }
+	  if(!isBad) {
+		  System.out.println("    * Modifizierte Signatur C' berechnet");
+		  System.out.println("    * Modifizierte Signatur C' gespeichert");
+	  } else {
+		  System.out.println("    * Datei konnte nicht gelesen werden");
+	  }
   }
 
   /**
@@ -146,7 +224,85 @@ public final class ElGamalSignature extends Signature {
    * überprüft werden soll.
    */
   public void verify(FileInputStream ciphertext, FileInputStream cleartext) {
+	  // Algo 7.8 - (2) Prüfe Signatur (r,s) auf M
 	  
+	  // (2a) get authentischen Public Key (p,g,y), y=g^x mod p von foe
+	  foePathPublic_ = enterFoePublic();
+	  readSecretsFoe();
+	  
+	  // Blocksize für Klartext
+	  int blocksize = calcBlocksize(foeP_);
+	  System.out.println(">>> Blocksize=" + blocksize);
+	  
+	  // Berechne Signaturen und Vergleiche abschnittsweise
+	  BigInteger readCipher = readCipher(ciphertext);
+	  BigInteger readClear = readClear(cleartext,blocksize);
+	  System.out.println(">>> Cipher: " + readCipher.toString(16));;
+	  System.out.println(">>> Clear: " + readClear.toString(16));
+	  boolean isBad = false;
+	  boolean loopReadClear = (readClear != null);
+	  boolean loopReadCipher = (readCipher != null);
+	  if(TEST) { readClear = new BigInteger("999"); }
+	  if(TEST) { readCipher = new BigInteger("454"); }
+	  if(TEST) { foeP_ = new BigInteger("2819");}
+	  // Zeige Schlüsselwerte
+	  System.out.println("    * Fremde Schlüsselwerte:");
+	  System.out.println("      P = " + foeP_);
+	  System.out.println("      G = " + foeG_);
+	  System.out.println("      Y = " + foeY_);
+	  while(loopReadClear && loopReadCipher && !isBad) {
+		  // Lese Cipher (modifizierte Signatur), C'=r+s*p
+		  BigInteger foeC = readCipher; // C' = r + s*p
+		  if(TEST) { foeC = new BigInteger("1280041"); }
+		  if(DEBUG) {System.out.println("DDD| C=\t" + foeC);}
+		  
+		  // Lese Klartext
+		  BigInteger foeM = readClear;
+		  if(TEST) { foeM = new BigInteger("999"); }
+		  
+		  // Ermittle r = c % p
+		  BigInteger foeR = foeC.mod(foeP_);
+		  // Ermittle s = c mod p
+		  BigInteger foeS = foeC.divideAndRemainder(foeP_)[0];
+		  
+		  // (2b) Prüfe ob 1 <= r <= p-1; false: abbruch
+		  boolean ifLess = (foeR.compareTo(BigInteger.ONE) == -1);
+		  boolean ifMore = (foeR.compareTo(foeP_.subtract(BigInteger.ONE)) == 1);
+		  if(ifLess || ifMore) {
+			  isBad = true;
+		  }
+		  
+		  // (2c) Berechne v1 = y^r r^s mod p (entfällt bei Modifkation?)
+		  BigInteger foeV1 = foeY_.modPow(foeR,foeP_);
+		  BigInteger h = foeR.modPow(foeS, foeP_);
+		  foeV1 = foeV1.multiply(h);
+		  foeV1 = foeV1.mod(foeP_);
+		  
+		  // (2c) Berechne v2 = g^M mod p
+		  BigInteger foeV2 = foeG_.modPow(foeM, foeP_);
+		  
+		  if(DEBUG) {System.out.println("DDD| V1=\t" + foeV1);}
+		  if(DEBUG) {System.out.println("DDD| V2=\t" + foeV2);}
+		  if(!foeV2.equals(foeV1)) {
+			  isBad = true;
+		  }
+		  
+		  // Lese nächste Zeichen
+		  readCipher = readCipher(ciphertext);
+		  readClear = readClear(cleartext,blocksize);
+		  loopReadCipher = (readCipher != null);
+		  loopReadClear = (readClear != null);
+	  }
+	  System.out.println(loopReadClear);
+	  System.out.println(loopReadCipher);
+	  System.out.println(isBad);
+	  
+	  // (2d) Akzeptiere, wenn v1==v2
+	  if(!isBad) {
+		  System.out.println("    * Signatur akzeptiert");
+	  } else {
+		  System.out.println("    * Signatur abgelehnt");
+	  }
   }
 
   /**
@@ -282,6 +438,18 @@ public final class ElGamalSignature extends Signature {
 	  back[0] = p;
 	  back[1] = g;
 	  return back;
+  }
+  
+  
+  private int calcBlocksize(BigInteger p) {
+	  // bs = floor( (L_p - 1) / 8 )
+	  int blockSize = p.bitLength() - 1;
+	  blockSize = (int) Math.floor(blockSize / 8.0);
+
+	  if(blockSize <= 2) { blockSize = 3; }
+	  if(blockSize > 256) { blockSize = 255; }
+	  
+	  return blockSize;
   }
   
   
@@ -436,6 +604,41 @@ public final class ElGamalSignature extends Signature {
   }
   
   
+  private String enterFoePublic() {
+	  BufferedReader standardInput = launcher.openStandardInput();
+	  boolean accepted = false;
+	  
+	  String msg = "    ! Bitte geben Sie den Pfad zum Public Key des anderen an: \n";
+	  msg = msg +  "      > Leere Eingabe - Standardwert";
+	  System.out.println(msg);
+	  String path = ""; // Rückgabe
+	  do {
+		  msg = "    ! Bitte geben Sie den Pfad zum Public Key des anderen an.";
+		  System.out.print("      ");
+		  try {
+			  String sIn = standardInput.readLine();
+			  if (sIn.length() == 0 || sIn == null) {
+				  sIn = "key-testpublicfoe.txt"; //
+			  }
+			  File file = new File(sIn);
+			  if (file.exists() == true) {
+				  path = sIn;
+				  accepted = true;
+			  } else {
+				  System.out.println(msg);
+				  accepted = false;
+			  }
+		  } catch (IOException e) {
+			  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+			  e.printStackTrace();
+			  System.exit(1);
+		  }
+	  } while (!accepted);
+	  
+	  return path;
+  }
+  
+  
   
   
   private void writeSecrets() {
@@ -469,6 +672,66 @@ public final class ElGamalSignature extends Signature {
 		  }
 		  keys.close();
 		  System.out.println("    * Private Key gespeichert");
+	  } catch (IOException e) {
+		  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+		  e.printStackTrace();
+		  System.exit(1);
+	  }
+  }
+  
+  
+  private void readSecrets() {
+	  try {
+		  BufferedReader br;
+		  
+		  // Lese Public Key
+		  File filePublic = new File(myPathOwnPublic_);
+		  br = launcher.openFileForReading(filePublic);
+		  myKeyPublic_[0] = new BigInteger(br.readLine());
+		  myKeyPublic_[1] = new BigInteger(br.readLine());
+		  myKeyPublic_[2] = new BigInteger(br.readLine());
+		  br.close();
+		  System.out.println("    * Public Key eingelesen");
+		  
+		  // Lese Private Key
+		  File filePrivate = new File(myPathOwnPrivate_);
+		  br = launcher.openFileForReading(filePrivate);
+		  myKeyPrivate_[0] = new BigInteger(br.readLine());
+		  myKeyPrivate_[1] = new BigInteger(br.readLine());
+		  myKeyPrivate_[2] = new BigInteger(br.readLine());
+		  br.close();
+		  System.out.println("    * Private Key eingelesen");
+		  
+		  // Kurze Variablen
+		  myP_ = myKeyPublic_[0];
+		  myG_ = myKeyPublic_[1];
+		  myY_ = myKeyPublic_[2];
+		  myX_ = myKeyPrivate_[2];
+	  } catch (IOException e) {
+		  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+		  e.printStackTrace();
+		  System.exit(1);
+	  }
+  }
+  
+  
+  private void readSecretsFoe() {
+	  try {
+		  BufferedReader br;
+		  
+		  // Lese Public Key
+		  File filePublic = new File(foePathPublic_);
+		  br = launcher.openFileForReading(filePublic);
+		  foeKey_[0] = new BigInteger(br.readLine());
+		  foeKey_[1] = new BigInteger(br.readLine());
+		  foeKey_[2] = new BigInteger(br.readLine());
+		  br.close();
+		  System.out.println("    * Fremden Public Key eingelesen");
+		  
+		  // Kurze Variablen
+		  foeP_ = myKeyPublic_[0];
+		  foeG_ = myKeyPublic_[1];
+		  foeY_ = myKeyPublic_[2];
 	  } catch (IOException e) {
 		  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
 		  e.printStackTrace();
