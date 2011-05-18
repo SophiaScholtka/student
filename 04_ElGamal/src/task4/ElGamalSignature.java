@@ -37,9 +37,9 @@ public final class ElGamalSignature extends Signature {
 	private final boolean DEBUG = false;
 	private final boolean TEST = false;
 	
-	private BigInteger[] myKeyPublic_; // P, G, Y
-	private BigInteger[] myKeyPrivate_; // P, G, X
-	private BigInteger[] foeKey_;
+	private BigInteger[] myKeyPublic_ = new BigInteger[3]; // P, G, Y
+	private BigInteger[] myKeyPrivate_ = new BigInteger[3]; // P, G, X
+	private BigInteger[] foeKey_ = new BigInteger[3];
 	
 	private String myPathOwnPublic_;
 	private String myPathOwnPrivate_;
@@ -69,6 +69,7 @@ public final class ElGamalSignature extends Signature {
 		  myPathOwnPublic_ = "key_public.txt";
 		  myPathOwnPrivate_ = "key_private.txt";
 		  generateKey();
+		  writeSecrets();
 	  }
 	  
   }
@@ -83,20 +84,34 @@ public final class ElGamalSignature extends Signature {
    */
   public void readKey(BufferedReader key) {
 	  
-	  // Hole Pfade der Key Dateien
 	  try {
+		  BufferedReader br;
+		  
+		  // Hole Pfade der Key Dateien
 		  myPathOwnPublic_ = key.readLine();
 		  myPathOwnPrivate_ = key.readLine();
+		  
+		  // Lese Public Key
+		  File filePublic = new File(myPathOwnPublic_);
+		  br = launcher.openFileForReading(filePublic);
+		  myKeyPublic_[0] = new BigInteger(br.readLine());
+		  myKeyPublic_[1] = new BigInteger(br.readLine());
+		  myKeyPublic_[2] = new BigInteger(br.readLine());
+		  br.close();
+		  System.out.println("    * Public Key eingelesen");
+		  
+		  // Lese Private Key
+		  File filePrivate = new File(myPathOwnPrivate_);
+		  br = launcher.openFileForReading(filePrivate);
+		  myKeyPrivate_[0] = new BigInteger(br.readLine());
+		  myKeyPrivate_[1] = new BigInteger(br.readLine());
+		  myKeyPrivate_[2] = new BigInteger(br.readLine());
+		  br.close();
+		  System.out.println("    * Private Key eingelesen");
 	  } catch (IOException e) {
 		  e.printStackTrace();
 	  }
 	  
-	  
-	  // Lese Public Key
-	  // TODO Lese Public Key
-	  
-	  // Lese Private Key
-	  // TODO Lese Private Key
   }
 
   /**
@@ -113,7 +128,7 @@ public final class ElGamalSignature extends Signature {
    * Der FileOutputStream, in den die Signatur geschrieben werden soll.
    */
   public void sign(FileInputStream cleartext, FileOutputStream ciphertext) {
-
+	  
   }
 
   /**
@@ -131,7 +146,7 @@ public final class ElGamalSignature extends Signature {
    * überprüft werden soll.
    */
   public void verify(FileInputStream ciphertext, FileInputStream cleartext) {
-
+	  
   }
 
   /**
@@ -155,42 +170,6 @@ public final class ElGamalSignature extends Signature {
 	  }
 	  System.out.println("    * Schlüsseldatei gespeichert");
 	  
-	  // Schreibe Schlüsseldateien
-	  try{
-		  BufferedWriter keys;
-		  
-		  // Schreibe Public
-		  File filePublic = new File(myPathOwnPublic_);
-		  if(!filePublic.exists()) {
-			  filePublic.createNewFile();
-		  }
-		  keys = launcher.openFileForWriting(filePublic);
-		  for(int i = 0; i < myKeyPublic_.length; i++) {
-			  keys.write("" + myKeyPublic_[i]);
-			  keys.newLine();
-		  }
-		  keys.close();
-		  System.out.println("    * Public Key gespeichert");
-		
-		  // Schreibe Private
-		  File filePrivate = new File(myPathOwnPrivate_);
-		  if(!filePrivate.exists()) {
-			  filePrivate.createNewFile();
-		  }
-		  keys = launcher.openFileForWriting(filePrivate);
-		  for(int i = 0; i < myKeyPrivate_.length; i++) {
-			  keys.write("" + myKeyPrivate_[i]);
-			  keys.newLine();
-		  }
-		  keys.close();
-		  System.out.println("    * Private Key gespeichert");
-	  } catch (IOException e) {
-		  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
-		  e.printStackTrace();
-		  System.exit(1);
-	  }
-	  
-	
   }
   
   
@@ -216,7 +195,7 @@ public final class ElGamalSignature extends Signature {
 	  BigInteger upper = myP.subtract(new BigInteger("2"));
 	  BigInteger myX = BigIntegerUtil.randomBetween(lower,upper); // Sets X
 	  System.out.println("    * X erzeugt");
-	  // (2) berechnet y = g^x mod p (Alg. 3.1) TODO Fast Exp 3.1?
+	  // (2) berechnet y = g^x mod p (Alg. 3.1) (XXX Fast Exp 3.1 nicht verwendet)
 	  BigInteger myY = myG.modPow(myX, myP); // Sets Y bwz. G^X
 	  System.out.println("    * Y erzeugt");
 	  if(DEBUG) { System.out.println("DDD| myX = " + myX.toString()); }
@@ -235,8 +214,30 @@ public final class ElGamalSignature extends Signature {
   }
   
   
+  /**
+   * Definition 3.2
+   * @param modulus
+   * @return
+   */
+  private BigInteger generateReducedRest(BigInteger modulus) {
+	  	  
+	  BigInteger reducedRest = BigInteger.ZERO; // Rückgabe
+	  Random randomGenerator = new Random();
+	  boolean check = false;
+	  while (!check) {
+		  reducedRest = BigIntegerUtil.randomSmallerThan(modulus,randomGenerator);
+		  
+		  check = reducedRest.gcd(modulus).equals(BigInteger.ONE);
+	  }
+	  	  
+	  return reducedRest;
+	  
+  }
   
   
+  
+  
+
   /**
    * Algo 7.3
    * @param bitLength
@@ -264,7 +265,7 @@ public final class ElGamalSignature extends Signature {
 	  BigInteger biNeg1 = new BigInteger("-1");
 	  biNeg1 = biNeg1.mod(p);
 	  do {
-		  g = calcReducedRest(p);
+		  g = generateReducedRest(p);
 		  boolean isNotOne = !g.equals(BigInteger.ONE);
 		  boolean isNotP1 = !g.equals(p.subtract(BigInteger.ONE));
 		  if(isNotOne || isNotP1) {
@@ -281,25 +282,6 @@ public final class ElGamalSignature extends Signature {
 	  back[0] = p;
 	  back[1] = g;
 	  return back;
-  }
-  /**
-   * Definition 3.2
-   * @param modulus
-   * @return
-   */
-  private BigInteger calcReducedRest(BigInteger modulus) {
-	  	  
-	  BigInteger reducedRest = BigInteger.ZERO; // Rückgabe
-	  Random randomGenerator = new Random();
-	  boolean check = false;
-	  while (!check) {
-		  reducedRest = BigIntegerUtil.randomSmallerThan(modulus,randomGenerator);
-		  
-		  check = reducedRest.gcd(modulus).equals(BigInteger.ONE);
-	  }
-	  	  
-	  return reducedRest;
-	  
   }
   
   
@@ -343,49 +325,13 @@ public final class ElGamalSignature extends Signature {
 	  return bitLength;
   }
   
+  
   private boolean enterWhichKey() {
 	  
 	  BufferedReader standardInput = launcher.openStandardInput();
 	  boolean accepted = false;
 	  
 	  String msg = "    ! Wollen Sie einen bestehenden Schlüssel verwenden? [Y/N]";
-	  System.out.println(msg);
-	  boolean back = false; // Rückgabe
-	  do {
-		  msg = "    ! Wollen sie einen bestehenden Schlüssel verwenden? [Y/N]";
-		  System.out.print("      ");
-		  try {
-			  String sIn = standardInput.readLine();
-			  if (sIn.length() == 0 || sIn == null) {
-				  accepted = true;
-				  back = true;
-			  } else if (sIn.toLowerCase().equals("y")) {
-				  accepted = true;
-				  back = true;
-			  } else if (sIn.toLowerCase().equals("n")) {
-				  accepted = true;
-				  back = false;
-			  } else {
-				  accepted = false;
-			  }
-		  } catch (IOException e) {
-			  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
-			  e.printStackTrace();
-			  System.exit(1);
-		  }
-	  } while (!accepted);
-	  
-	  return back;
-  }
-  
-  
-
-  private boolean enterWriteNew() {
-	  
-	  BufferedReader standardInput = launcher.openStandardInput();
-	  boolean accepted = false;
-	  
-	  String msg = "    ! Wollen Sie einen bestehenden Schlüssel überschreiben? [Y/N]";
 	  System.out.println(msg);
 	  boolean back = false; // Rückgabe
 	  do {
@@ -454,7 +400,6 @@ public final class ElGamalSignature extends Signature {
   }
   
   
-
   private String enterPathOwnPrivate() {
 	  
 	  BufferedReader standardInput = launcher.openStandardInput();
@@ -488,5 +433,46 @@ public final class ElGamalSignature extends Signature {
 	  } while (!accepted);
 	  
 	  return path;
+  }
+  
+  
+  
+  
+  private void writeSecrets() {
+
+	  // Schreibe Schlüsseldateien
+	  try{
+		  BufferedWriter keys;
+		  
+		  // Schreibe Public
+		  File filePublic = new File(myPathOwnPublic_);
+		  if(!filePublic.exists()) {
+			  filePublic.createNewFile();
+		  }
+		  keys = launcher.openFileForWriting(filePublic);
+		  for(int i = 0; i < myKeyPublic_.length; i++) {
+			  keys.write("" + myKeyPublic_[i]);
+			  keys.newLine();
+		  }
+		  keys.close();
+		  System.out.println("    * Public Key gespeichert");
+		
+		  // Schreibe Private
+		  File filePrivate = new File(myPathOwnPrivate_);
+		  if(!filePrivate.exists()) {
+			  filePrivate.createNewFile();
+		  }
+		  keys = launcher.openFileForWriting(filePrivate);
+		  for(int i = 0; i < myKeyPrivate_.length; i++) {
+			  keys.write("" + myKeyPrivate_[i]);
+			  keys.newLine();
+		  }
+		  keys.close();
+		  System.out.println("    * Private Key gespeichert");
+	  } catch (IOException e) {
+		  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+		  e.printStackTrace();
+		  System.exit(1);
+	  }
   }
 }
