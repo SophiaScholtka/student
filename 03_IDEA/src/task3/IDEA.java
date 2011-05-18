@@ -134,21 +134,7 @@ public final class IDEA extends BlockCipher {
 	  return back;
 }
 
-private short[] hexIVtoShortBlock(String iv){
-	  short[] block = new short[4];
-	  if (iv.length()<16){
-		  System.out.println("Initialisierungsvektor ist zu kurz! Abbruch.");
-		  System.exit(0);
-	  }
-	  try {
-		  //TODO_UNUSED 16 Zeichen hex-string in 4 shorts umrechnen
-	  } catch (NumberFormatException e){
-		  System.out.println("Fehler beim Parsen des IV! Abbruch.");
-		  System.exit(0);
-	  }
-	  return block;
-  }
-  /**
+/**
    * Verschlüsselt den durch den FileInputStream <code>cleartext</code>
    * gegebenen Klartext und schreibt den Chiffretext in den FileOutputStream
    * <code>ciphertext</code>.
@@ -238,34 +224,6 @@ private short[] hexIVtoShortBlock(String iv){
   }
   
   
-  private BigInteger combineKey(BigInteger[] key) {
-	  BigInteger[] tmpKey = key.clone();
-	  BigInteger combinedKey = new BigInteger("0");
-	  
-	  for (int i = 0; i<tmpKey.length;i++) {
-		  tmpKey[i] = tmpKey[i].shiftLeft(16*(tmpKey.length-1-i));
-		  combinedKey = combinedKey.add(tmpKey[i]);
-	  }
-	  
-	  return combinedKey;
-  }
-  
-  private BigInteger[] partKey(BigInteger key) {
-	  BigInteger[] partedKey = new BigInteger[8];
-	  
-	  String sKey = key.toString(2);
-	  sKey = fillStringLeft(sKey,128,"0");
-	  for(int i = 0; i < 8; i++) {
-		  int indexStart = sKey.length()-i*16-16;
-		  indexStart = indexStart < 0 ? 0 : indexStart;
-		  int indexEnd = sKey.length()-i*16;
-		  String sSub = sKey.substring(indexStart, indexEnd);
-		  partedKey[partedKey.length-1-i] = new BigInteger(sSub,2);
-	  }
-	  
-	  return partedKey;
-  }
-  
   /** 
    * Schlüsselexpansion nach Algorithmus 4.1
    * @param theideakey
@@ -344,24 +302,7 @@ private short[] hexIVtoShortBlock(String iv){
   
 
 
-  //1 short = 2 byte = 16 bit ; 	–2^15 bis 2^15 – 1 (–32768...32767) 
-  private int[] shiftKey(int[] key) {
-	  int[] back=key;
-	  int tmp;
-	  int l=back.length;
-	// zyklisch um 25 = 16+9 bits nach links verschieben und zurück geben
-	  for(int i=0;i<l;i++){
-		  //ganzzahlige div, schreibt die hinteren 7 bits von key[i+1] nach vorne in back[i] (restliche 9 bits sind 0)
-		  back[i]= (key[(i+1)%l]/((int) Math.pow(2, 9)))%((int) Math.pow(2, 16));
-		  //modulus, schreibt die vorderen 9 bits von key[i+2] in tmp
-		  tmp = (key[(i+2)%l]%((int)Math.pow(2, 9)));
-		  //multiplikation, schreibt die 9 bits aus tmp an position 7 bis 15 von back[i] (vordere 7 bits sind 0)
-		  back[i] += (tmp*((int)Math.pow(2, 7)));
-	  }
-	return back;
-}
-
-private BigInteger[] stringKeytoBigIntKey(String originalKey) {
+  private BigInteger[] stringKeytoBigIntKey(String originalKey) {
 	if(originalKey.length() != 16){
 		System.out.println("Fehler: Falsche Schlüssellänge! Abbruch.");
 		System.exit(0);
@@ -373,22 +314,6 @@ private BigInteger[] stringKeytoBigIntKey(String originalKey) {
 		t2 = originalKey.charAt(2*i+1)%((int) Math.pow(2, 8));
 		//schreibe 2 Byte hintereinander in ein Short, indem das erste mit 2^8 multipliziert wird
 		back[i]=BigInteger.valueOf((int) Math.pow(2, 8)*t1 + t2);
-	}
-	return back;
-}
-
-private short[] stringKeytoShortKey(String originalKey) {
-	if(originalKey.length() != 16){
-		System.out.println("Fehler: Falsche Schlüssellänge! Abbruch.");
-		System.exit(0);
-	}
-	short[] back = new short[8];
-	int t1,t2; //Jedes Ascii-Zeichen ist max 1 Byte groß
-	for (int i=0;i<8;i++){
-		t1 = originalKey.charAt(2*i)%((int) Math.pow(2, 8));
-		t2 = originalKey.charAt(2*i+1)%((int) Math.pow(2, 8));
-		//schreibe 2 Byte hintereinander in ein Short, indem das erste mit 2^8 multipliziert wird
-		back[i]=(short) ((int) Math.pow(2, 8)*t1 + t2);
 	}
 	return back;
 }
@@ -496,23 +421,6 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  
 	  //Sonderfall, wenn 2^16 heraus kommt, ersetze durch 0
 	  if (back.equals(MOD_216_)) back=BigInteger.ZERO;
-	  return back;
-  }
-  
-  /**
-   * Bitwise XOR mit Block	2x 64bit eingaben, 1x 64 bit ausgabe
-   * @param message1
-   * @param message2
-   * @return
-   */
-  private BigInteger[] calcBitwiseXORBlock(BigInteger[] message1, BigInteger[] message2) {
-	  if (message1.length != 8 || message2.length !=8){
-		  System.out.println("XOR Blöcke haben die falsche Länge! Abbruch.");
-		  System.exit(1);
-	  }
-	  BigInteger[] back = new BigInteger[message2.length];
-	  for (int i=0;i<back.length;i++)
-		  back[i]=calcBitwiseXor(message1[i],message2[i]);
 	  return back;
   }
   
@@ -653,31 +561,6 @@ private short[] stringKeytoShortKey(String originalKey) {
   }
   
   
-  private short[] makeStringToShort(String string) {
-	  short[] back = new short[string.length()];
-	  
-	  for(int i = 0; i< string.length();i++) {
-		  char c = string.charAt(i);
-		  back[i] = (short)c;
-	  }
-	  
-	  return back;
-  }
-  
-  private ArrayList<Short> readInputStreamToList(FileInputStream fis) {
-	  ArrayList<Short> back = new ArrayList<Short>();
-	  try {
-		  while(fis.available()>0) {
-			  short c = (short) fis.read();
-			  back.add(c);
-		  }
-	  } catch (IOException e) {
-		  e.printStackTrace();
-	  }
-	  
-	  return back;
-  }
-
   private BigInteger[][] getClear(FileInputStream cleartext) {
 	  
 	  //Lese Stream aus
@@ -723,19 +606,6 @@ private short[] stringKeytoShortKey(String originalKey) {
 		  back[i] = new BigInteger(sT, 16);
 	  }
 	  return back;
-  }
-  
-  private BigInteger transformString(String string) {
-	  String s = "";
-	  BigInteger bigInteger;
-	  char character;
-	  for(int i = 0; i < string.length();i++) {
-		  character = string.charAt(i);
-		  bigInteger = new BigInteger(""+ (int)character);
-		  s = s + fillStringLeft(bigInteger.toString(2), 8,"");
-	  }
-	  
-	  return new BigInteger(s,2);
   }
   
   /**
