@@ -763,8 +763,9 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  boolean accepted = false;
 
 	  String msg = "Soll ein zufälliger Initialisierungsvektor generiert werden? [Y/N]\n";
-	  msg = msg + "1 - ddc3a8f6c66286d2\n";
-	  msg = msg + "2 - 5c7119dd40913232";
+	  msg = msg + "1 \t - ddc3a8f6c66286d2\n";
+	  msg = msg + "2 \t - 5c7119dd40913232\n";
+	  msg = msg + "Y \t - Zufällig";
 	  System.out.println(msg);
 	  do {
 		  msg = "Soll ein zufälliger Initialisierungsvektor generiert werden? [Y/N]";
@@ -812,9 +813,11 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  boolean accepted = false;
 
 	  String msg = "Bitte geben sie einen Key der Länge 16 ein. \n" +
-	  		"Geben sie Z oder R ein, um einen zufälligen Schlüssel zu erstellen.\n" +
 	  		"Ist die Eingabe leer, so wird ein Standard-Testschlüssel genutzt.\n" +
 	  		"Bitte geben sie jetzt ihre Schlüsselauswahl ein:";
+	  msg = msg + "\n" + "1 \t - abcdefghijklmnop";
+	  msg = msg + "\n" + "2 \t - !@#$%Krypto^&*()";
+	  msg = msg + "\n" + "Z / R \t - Zufall";
 	  System.out.println(msg);
 	  do {
 		  msg = "Bitte geben sie einen Key der Länge 16 ein.";
@@ -834,14 +837,20 @@ private short[] stringKeytoShortKey(String originalKey) {
 					  }
 				  }
 				  accepted=true;
+			  } else if(sIn.equals("1")) {
+				  originalKey = "abcdefghijklmnop";
+				  accepted = true;
+			  } else if(sIn.equals("2")) {
+				  originalKey = "!@#$%Krypto^&*()";
+				  accepted = true;
 			  } else if(sIn.length() == 0 || sIn == null) {
 				  //Nutze StandardTestwert
 				  originalKey = "abcdefghijklmnop";
 				  accepted = true;
 			  } else {
-				  System.out.println("Eingabe hat die falsche Länge! " +
+				  System.out.println("Die Eingabe ist ungültig! " +
 						  "Geben sie bitte 16 Zeichen ein oder " +
-						  "gar kein Zeichen, um den Standardwert zu erhalten.");
+						  "eine andere gültige Eingabe.");
 				  accepted = false;
 			  }
 		  } catch (IOException e) {
