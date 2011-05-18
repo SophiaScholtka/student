@@ -34,8 +34,8 @@ import de.tubs.cs.iti.jcrypt.chiffre.Signature;
  */
 public final class ElGamalSignature extends Signature {
 	
-	private final boolean DEBUG = true;
-	private final boolean TEST = true;
+	private final boolean DEBUG = false;
+	private final boolean TEST = false;
 	
 	private BigInteger[] myKeyPublic_; // P, G, Y
 	private BigInteger[] myKeyPrivate_; // P, G, X
@@ -146,7 +146,6 @@ public final class ElGamalSignature extends Signature {
 	  
 	  // Schreibe Pfade
 	  try {
-		  System.out.println(myPathOwnPublic_);
 		  key.write(myPathOwnPublic_);
 		  key.newLine();
 		  key.write(myPathOwnPrivate_);
@@ -154,6 +153,7 @@ public final class ElGamalSignature extends Signature {
 	  } catch (IOException e) {
 		  e.printStackTrace();
 	  }
+	  System.out.println("    * Schlüsseldatei gespeichert");
 	  
 	  // Schreibe Schlüsseldateien
 	  try{
@@ -170,6 +170,7 @@ public final class ElGamalSignature extends Signature {
 			  keys.newLine();
 		  }
 		  keys.close();
+		  System.out.println("    * Public Key gespeichert");
 		
 		  // Schreibe Private
 		  File filePrivate = new File(myPathOwnPrivate_);
@@ -182,11 +183,13 @@ public final class ElGamalSignature extends Signature {
 			  keys.newLine();
 		  }
 		  keys.close();
+		  System.out.println("    * Private Key gespeichert");
 	  } catch (IOException e) {
 		  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
 		  e.printStackTrace();
 		  System.exit(1);
 	  }
+	  
 	
   }
   
@@ -429,7 +432,7 @@ public final class ElGamalSignature extends Signature {
 			  String sIn = standardInput.readLine();
 			  if (sIn.length() == 0 || sIn == null) {
 //				  sIn = "../ElGamal/schluessel/us.auth.public";
-				  sIn = "key-testpublic.txt";
+				  sIn = "key_public.txt";
 			  }
 			  File file = new File(sIn);
 			  if (file.exists() == true) {
@@ -467,7 +470,7 @@ public final class ElGamalSignature extends Signature {
 		  try {
 			  String sIn = standardInput.readLine();
 			  if (sIn.length() == 0 || sIn == null) {
-				  sIn = "key-testprivate.txt"; //
+				  sIn = "key_private.txt"; //
 			  }
 			  File file = new File(sIn);
 			  if (file.exists() == true) {
