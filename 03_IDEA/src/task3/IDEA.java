@@ -32,15 +32,14 @@ import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
  * @version 1.1 - Sat Apr 03 21:57:35 CEST 2010
  */
 public final class IDEA extends BlockCipher {
-	final boolean DEBUG = true;
-	final boolean DEBUG_IDEA = false;
-	final boolean TEST = false;
+	private final boolean DEBUG = false;
+	private final boolean TEST = false;
 	//Konstante Rechenwerte
-	final BigInteger MOD_2 = new BigInteger("2"); //2
-	final BigInteger MOD_216_ = new BigInteger("" + MOD_2.pow(16)); //Mod 2^16
-	final BigInteger MOD_MULT_Z216_= new BigInteger("" + MOD_216_.add(BigInteger.ONE)); //Mod 2^16+1
+	private final BigInteger MOD_2_ = new BigInteger("2"); //2
+	private final BigInteger MOD_216_ = new BigInteger("" + MOD_2_.pow(16)); //Mod 2^16
+	private final BigInteger MOD_MULT_Z216_= new BigInteger("" + MOD_216_.add(BigInteger.ONE)); //Mod 2^16+1
 	
-	BigInteger[] ideaKey = new BigInteger[8];
+	private BigInteger[] ideaKey = new BigInteger[8];
 	
   /**
    * Entschlüsselt den durch den FileInputStream <code>ciphertext</code>
@@ -183,34 +182,39 @@ private short[] hexIVtoShortBlock(String iv){
 	  }
 	  
 	  //Zeige Ciphertext (IV, Ciphertext und Vollständig)
-	  System.out.print("Ciphertext (IV):      \t");
+	  System.out.print("Ciphertext (IV):                   \t");
 	  for(int j = 0; j < vC[0].length;j++) {
 		  System.out.print(vC[0][j].toString(16));
 	  }
 	  System.out.println();
-	  System.out.print("Ciphertext:            \t");
-	  System.out.print("                ");
+	  System.out.print("Ciphertext (Beginn):               ");
+	  System.out.print("                \t");
+	  int lengthShown = 0;
 	  for(int i = 1; i < vC.length; i++) {
 		  for(int j = 0; j < vC[i].length;j++) {
 			  //fillStringLeft füllt die durch toString weggelassenen "0" nach
 			  System.out.print(fillStringLeft(vC[i][j].toString(16),4,"0"));
 		  }
+		  lengthShown++;
+		  if(lengthShown>30) { break; }
 	  }
 	  System.out.println();
-	  System.out.print("Ciphertext (Vollst.): \t");
+	  System.out.print("Ciphertext (Komplett, Ausschnitt): \t");
+	  lengthShown = 0;
 	  for(int i = 0; i < vC.length; i++) {
 		  for(int j = 0; j < vC[i].length;j++) {
 			  //fillStringLeft füllt die durch toString weggelassenen "0" nach
 			  System.out.print(fillStringLeft(vC[i][j].toString(16),4,"0"));
 		  }
+		  lengthShown++;
+		  if(lengthShown>30) { break; }
 	  }
 	  System.out.println();
 	  
 	  //Speicher Ciphertext
+	  System.out.println("Schreibe Cipherdatei");
 	  for(int i = 0; i < vC.length; i++) {
 		  for(int j = 0; j < vC[i].length;j++) {
-//			  BigInteger write = new BigInteger(vC[i][j].toString(2) + "00000010",2);
-//			  BigInteger write = new BigInteger(vC[i][j].toString());
 			  writeCipher(ciphertext, vC[i][j]);
 		  }
 	  }
@@ -926,16 +930,14 @@ private short[] stringKeytoShortKey(String originalKey) {
 	  
 	  //TEST Decipher Key
 	  BigInteger[][] dekey = new BigInteger[9][6];
-	  if(TEST) {
-		  dekey = reverseKey(expandKey(tmpIdeaKey));
-		  System.out.println("TTT| Ausgabe der gedrehten Teilschlüssel (Hexadezimal)");
-		  for (int i = 0; i < dekey.length; i++) {
-			  System.out.print("TTT| " + i);
-			  for (int j = 0; j < dekey[i].length; j++) {
-				  System.out.print("\t" + fillStringLeft(dekey[i][j].toString(16),4,"0"));
-			  }
-			  System.out.println();
+	  dekey = reverseKey(expandKey(tmpIdeaKey));
+	  System.out.println("TTT| Ausgabe der gedrehten Teilschlüssel (Hexadezimal)");
+	  for (int i = 0; i < dekey.length; i++) {
+		  System.out.print("TTT| " + i);
+		  for (int j = 0; j < dekey[i].length; j++) {
+			  System.out.print("\t" + fillStringLeft(dekey[i][j].toString(16),4,"0"));
 		  }
+		  System.out.println();
 	  }
 	  //TEST Werte IDEA (Decipher)
 	  System.out.println("TTT| IDEA");
