@@ -53,9 +53,13 @@ public final class ElGamalSignature extends Signature {
 	
 	
   /**
-   * Erzeugt einen neuen Schlüssel.
+   * Erzeugt/Setzt einen neuen Schlüssel (Algo 7.4)
    * 
    * Nutzt Algorithmus 7.4
+   * Wenn bestehende Schlüssel genutzt werden sollen, werden jediglich die Pfade
+   * zu den Public und Private Dateien abgespeichert.
+   * Wenn ein neuer Schlüssel erzeugt wird, wird er im Ordner des Programms 
+   * abgespeichert und sollte manuell an seinen richtigen Ort verschoben werden.
    * @see #readKey readKey
    * @see #writeKey writeKey
    */
@@ -84,6 +88,9 @@ public final class ElGamalSignature extends Signature {
   /**
    * Liest den Schlüssel mit dem Reader <code>key</code>.
    * 
+   * Liest die Pfadnamen der Schlüsseldateien aus und
+   * danach werden die eigentlichen Schlüsseldateien ausgelesen und in
+   * interne Variablen abgelegt.
    * @param key
    * Der Reader, der aus der Schlüsseldatei liest.
    * @see #makeKey makeKey
@@ -299,6 +306,8 @@ public final class ElGamalSignature extends Signature {
 
   /**
    * Schreibt den Schlüssel mit dem Writer <code>key</code>.
+   * 
+   * Es werden jediglich die Schlüsselpfade in die Datei geschrieben.
    * 
    * @param key
    * Der Writer, der in die Schlüsseldatei schreibt.
