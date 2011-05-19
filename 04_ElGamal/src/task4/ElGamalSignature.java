@@ -172,8 +172,8 @@ public final class ElGamalSignature extends Signature {
 	  }
 	  while(loopRead) {
 		  if(TEST) { read = new BigInteger("999"); }
-		  // (1d) Nachricht Element M in Z_p^*
-		  BigInteger myM = read.mod(myP); //XXX Wie M in (Z_p)^* festlegen?
+		  // (1d) Nachricht Element M in Z_p^*: M mod p, ggt(M,p)=1
+		  BigInteger myM = read.mod(myP);
 		  
 		  // (1e) Berechne s = (M-xr)k^(-1) mod (p-1)
 		  BigInteger myS = myX_.multiply(myR); // x * r
@@ -249,8 +249,8 @@ public final class ElGamalSignature extends Signature {
 		  
 		  // Lese Klartext
 		  BigInteger foeM = readClear; 
-		  // (1d) Nachricht Element M in Z_p^*
-		  foeM = foeM.mod(foeP_); //XXX Wie M in (Z_p)^* festlegen?
+		  // (1d) Nachricht Element M in Z_p^*: M mod p, ggt(M,p)=1
+		  foeM = foeM.mod(foeP_); // M mod P
 		  if(TEST) { foeM = new BigInteger("999"); }
 		  
 		  // Ermittle s = c mod p
