@@ -15,6 +15,8 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.math.BigInteger;
+import java.util.Random;
 
 import de.tubs.cs.iti.jcrypt.chiffre.BlockCipher;
 
@@ -40,7 +42,11 @@ public final class ElGamalCipher extends BlockCipher {
    * Der FileOutputStream, in den der Klartext geschrieben werden soll.
    */
   public void decipher(FileInputStream ciphertext, FileOutputStream cleartext) {
-
+	  BigInteger read;
+	  while((read=readCipher(ciphertext)) != null){
+		  System.out.println(">>>In while, read is "+read.toString());
+		  writeClear(cleartext,read);
+	  }
   }
 
   /**
@@ -57,7 +63,30 @@ public final class ElGamalCipher extends BlockCipher {
    * Der FileOutputStream, in den der Chiffretext geschrieben werden soll.
    */
   public void encipher(FileInputStream cleartext, FileOutputStream ciphertext) {
-
+	//TODO key einlesen, momentan hardcoded
+	  BigInteger pkey[] = new BigInteger[4];
+	  pkey[0]=new BigInteger("2819",10);
+	  pkey[1]=new BigInteger("2",10);
+	  pkey[2]=new BigInteger("2260",10);
+	  pkey[3]=new BigInteger("101",10);
+	  int L = (pkey[0].bitLength()-1)/8;
+	  BigInteger read;
+	  BigInteger writea, writeb;
+	  int k;
+	  Random krand= new Random();
+	  //solange es noch Klartext gibt
+	 // while((read=readClear(cleartext,L)) != null){
+		  k=999;
+		  //>>>zum Testen!
+		  read=new BigInteger("123");
+		  
+		  writea = pkey[1].pow(k).mod(pkey[0]);
+		  writeb = read.multiply(pkey[2].pow(k)).mod(pkey[0]);
+		  System.out.println(">>>writea "+writea.toString());
+		  System.out.println(">>>writeb "+writeb.toString());
+		  writeCipher(ciphertext,writea);
+		  writeCipher(ciphertext,writeb);
+	  //}
   }
 
   /**
