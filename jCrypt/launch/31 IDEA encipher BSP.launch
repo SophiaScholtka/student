@@ -6,9 +6,6 @@
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
 </listAttribute>
-<listAttribute key="org.eclipse.debug.ui.favoriteGroups">
-<listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
-</listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="de.tubs.cs.iti.jcrypt.chiffre.Launcher"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-execute task3.IDEA&#13;&#10;-action encipher&#13;&#10;-cleartext test-bsp.txt&#13;&#10;-ciphertext ../03_IDEA/text_enc.txt&#13;&#10;-key ../03_IDEA/key.txt"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="03_IDEA"/>
