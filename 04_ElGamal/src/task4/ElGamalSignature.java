@@ -126,7 +126,6 @@ public final class ElGamalSignature extends Signature {
    */
   public void sign(FileInputStream cleartext, FileOutputStream ciphertext) {	  
 	  // Algo 7.8 (1) Signiere Nachricht M
-	  final BigInteger BIGINTTWO = new BigInteger("2"); // 2
 	  final BigInteger BIGINTP1 = myP_.subtract(BigInteger.ONE); // P-1
 
 	  // Hole eigenen Schlüssel in handliche Variablen
@@ -149,7 +148,7 @@ public final class ElGamalSignature extends Signature {
 	  
 	  // (1a) Zufälliges k in {1,...,p-2} mit ggt(k,p-1)=1 wählen
 	  BigInteger lower = BigInteger.ONE;
-	  BigInteger upper = myP.subtract(BIGINTTWO);
+	  BigInteger upper = myP.subtract(BigIntegerUtil.TWO);
 	  BigInteger myK;
 	  boolean check = true;
 	  do {
@@ -165,11 +164,13 @@ public final class ElGamalSignature extends Signature {
 	  myR = myG.modPow(myK, myP); // r = g^k mod p
 	  if(DEBUG) {System.out.println("DDD| myR=\t" + myR);}
 	  System.out.println("    * r berechnet");
+	  System.out.println("      R = " + myR);
 	  
 	  // (1c) Berechne k^(-1) mod (p-1)
 	  BigInteger myKN = myK.modInverse(BIGINTP1); // k^(-1) mod (p-1)
 	  if(DEBUG) {System.out.println("DDD| myKN=\t" + myKN);}
 	  
+	  System.out.println("    * Signierung begonnen");
 	  int blocksize = calcBlocksize(myP);
 	  BigInteger read = readClear(cleartext, blocksize);
 	  boolean isBad = false;
@@ -179,8 +180,10 @@ public final class ElGamalSignature extends Signature {
 	  }
 	  while(loopRead) {
 		  if(TEST) { read = new BigInteger("999"); }
+		  if(DEBUG) {System.out.println("DDD| Klartext: " + read);}
 		  // (1d) Nachricht Element M in Z_p^*: M mod p, ggt(M,p)=1
 		  BigInteger myM = read.mod(myP);
+		  if(DEBUG) {System.out.println("DDD| Klartext M: " + myM);}
 		  
 		  // (1e) Berechne s = (M-xr)k^(-1) mod (p-1)
 		  BigInteger myS = myX_.multiply(myR); // x * r
@@ -201,6 +204,23 @@ public final class ElGamalSignature extends Signature {
 		  // Prüfe nächstes Zeichen und lese es
 		  read = readClear(cleartext, blocksize);
 		  loopRead = (read != null);
+		  
+		  if(DEBUG) {
+			  System.out.println("DDD| Berechne V1");
+			  // (2c) v1 = y^r r^s mod p
+			  BigInteger foeV1 = myY.modPow(myR,myP);
+			  BigInteger h = myR.modPow(myS, myP);
+			  foeV1 = foeV1.multiply(h);
+			  foeV1 = foeV1.mod(myP);
+			  if(DEBUG) {System.out.println("DDD| V1=\t" + foeV1);}
+			  			  
+			  // (2c) Berechne v2 = g^M mod p
+			  System.out.println("DDD| Berechne V2");
+			  BigInteger foeV2 = myG.modPow(myM, myP);
+			  System.out.println(">>> g^m mod p " + foeV2);
+			  if(DEBUG) {System.out.println("DDD| V2=\t" + foeV2);}
+			  if(DEBUG) {System.out.println("DDD| V1 == V2 ist " + foeV1.equals(foeV2));}
+		  }
 	  }
 	  if(!isBad) {
 		  System.out.println("    * Modifizierte Signatur C' berechnet");
@@ -266,15 +286,19 @@ public final class ElGamalSignature extends Signature {
 		  // Ermittle r = c % p
 		  BigInteger foeR = foeC.divideAndRemainder(foeP_)[1];
 		  if(DEBUG) {System.out.println("DDD| r=\t" + foeR);}
+		  System.out.println("    * r ermittelt");
+		  System.out.println("      R = " + foeR);
 		  
 		  // (2b) Prüfe ob 1 <= r <= p-1; false: abbruch
 		  boolean ifLess = (foeR.compareTo(BigInteger.ONE) == -1);
 		  boolean ifMore = (foeR.compareTo(foeP_.subtract(BigInteger.ONE)) == 1);
 		  if(ifLess || ifMore) {
 			  isBad = true;
+			  if(DEBUG) { System.out.println("DDD| BAD Weil ifLess or ifMore true sind!");}
+			  break;
 		  }
 		  
-		  // (2c) Berechne v1 = y^r r^s mod p (entfällt bei Modifkation?)
+		  // (2c) Berechne v1 = y^r r^s mod p
 		  BigInteger foeV1 = foeY_.modPow(foeR,foeP_);
 		  BigInteger h = foeR.modPow(foeS, foeP_);
 		  foeV1 = foeV1.multiply(h);
@@ -287,6 +311,8 @@ public final class ElGamalSignature extends Signature {
 		  if(DEBUG) {System.out.println("DDD| V2=\t" + foeV2);}
 		  if(!foeV2.equals(foeV1)) {
 			  isBad = true;
+			  if(DEBUG) {System.out.println("DDD| BAD weil V1 != V2");}
+			  break;
 		  }
 		  
 		  // Lese nächste Zeichen
@@ -294,6 +320,15 @@ public final class ElGamalSignature extends Signature {
 		  readClear = readClear(cleartext,blocksize);
 		  loopReadCipher = (readCipher != null);
 		  loopReadClear = (readClear != null);
+		  if(DEBUG) {System.out.println("DDD| Klartext lesbar=" + loopReadClear + " ; Cipher lesbar=" + loopReadCipher);}
+		  if (loopReadCipher && !loopReadClear) {
+			  if(DEBUG) {System.out.println("DDD| Cipher ok, Klartext leer");}
+			  break;
+		  } 
+		  else if (!loopReadCipher && loopReadClear) {
+			  if(DEBUG) {System.out.println("DDD| Cipher leer, Klartext ok");}
+			  break;
+		  }
 	  }
 	  
 	  // (2d) Akzeptiere, wenn v1==v2
@@ -349,7 +384,7 @@ public final class ElGamalSignature extends Signature {
 	  
 	  // (2) Alice wählt Zufallszahl x in {1,...,p-2}
 	  BigInteger lower = BigInteger.ONE;
-	  BigInteger upper = myP.subtract(new BigInteger("2"));
+	  BigInteger upper = myP.subtract(BigIntegerUtil.TWO);
 	  BigInteger myX = BigIntegerUtil.randomBetween(lower,upper); // Sets X
 	  System.out.println("    * X erzeugt");
 	  // (2) berechnet y = g^x mod p (Alg. 3.1) (Fast Exp 3.1 nicht verwendet)
@@ -416,20 +451,20 @@ public final class ElGamalSignature extends Signature {
 	  // Generiere sichere Primzahl p
 	  Random random = new Random();
 	  boolean isPrime = false;
-	  BigInteger p = new BigInteger("2");
-	  BigInteger q = new BigInteger("2");
+	  BigInteger p = BigIntegerUtil.TWO;
+	  BigInteger q = BigIntegerUtil.TWO;
 	  do {
 		  q = BigInteger.probablePrime(bitLength-1, random);
-		  p = q.multiply(new BigInteger("2"));
+		  p = q.multiply(BigIntegerUtil.TWO);
 		  p = p.add(BigInteger.ONE);
 		  
-		  isPrime = p.isProbablePrime(99); // Prime zu %
-	  } while (isPrime);
+		  isPrime = p.isProbablePrime(50); // Prime zu %
+	  } while (!isPrime);
 	  
 	  
 	  // Generiere primitive Wurzel g in Z_p^*
 	  boolean checkRoot = false;
-	  BigInteger g = new BigInteger("2");
+	  BigInteger g = BigIntegerUtil.TWO;
 	  BigInteger biNeg1 = new BigInteger("-1");
 	  biNeg1 = biNeg1.mod(p);
 	  do {
@@ -463,8 +498,6 @@ public final class ElGamalSignature extends Signature {
 	  
 	  return blockSize;
   }
-  
-  
   
   
   private int enterBitLength() {
