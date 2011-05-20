@@ -13,16 +13,12 @@ package task1;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.Console;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.Reader;
-import java.io.File;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,7 +28,6 @@ import java.util.List;
 import de.tubs.cs.iti.jcrypt.chiffre.CharacterMapping;
 import de.tubs.cs.iti.jcrypt.chiffre.Cipher;
 import de.tubs.cs.iti.jcrypt.chiffre.FrequencyTables;
-import de.tubs.cs.iti.jcrypt.chiffre.NGram;
 
 //import java.util.StringTokenizer;
 
@@ -64,7 +59,6 @@ public class Vigenere extends Cipher {
   public void breakCipher(BufferedReader ciphertext, BufferedWriter cleartext) {
 	  if(DEBUG) System.out.println(">>>breakCipher called");
 	  
-	  //if(DEBUG) callTest();
 	  
 	  //safe buffered ciphertext to file
 	  //writeToFile("read-cipher.txt", bufferedReaderToString(ciphertext));
@@ -75,7 +69,6 @@ public class Vigenere extends Cipher {
 	  ArrayList<Character> cipher;
 	  String alph = "generatedAlphabet.alph";
 	  String textfile = launcher.getCiphertextFile().toString(); 
-	  String textfile2 = launcher.getCleartextFile().toString();
 	  //"programmierer_enc.txt";
 	  
 	  //TEST
@@ -891,100 +884,6 @@ private char[] mostFreqChar(ArrayList<Character> text){
 	  return null;
   }
   
-  private double calcIC(BufferedReader ciphertext) {
-	  double back = -1.0;
-	  String text = bufferedReaderToString(ciphertext);
-	  back = calcIC(text);
-	return back;
-  }
-  
-  private String[][] getAbsoluteFrequency(String text) {
-	//if(DEBUG) { System.out.println(">>>getAbsoluteFrequency called"); }
-	String[][] back;  
-	ArrayList<String> foundSymbols = new ArrayList<String>();
-	String sTmp = "";
-	
-	//Symbole suchen
-	for(int i = 0;i<text.length();i++) {
-		if(!foundSymbols.contains(String.valueOf(text.charAt(i)))) {
-			sTmp = "" + String.valueOf(text.charAt(i));
-			foundSymbols.add(sTmp);
-		}
-	}
-	//if(DEBUG) System.out.println(">>>> " + foundSymbols.toString());
-	
-	//Symbole zählen
-	ArrayList<Integer> countSymbols = new ArrayList<Integer>();
-	for(int i = 0;i<foundSymbols.size();i++) {
-		countSymbols.add(0); //erzeuge Zaehlerliste fuer Symbole
-	}
-	for(int i = 0;i<text.length();i++) {
-		int index = foundSymbols.indexOf(String.valueOf(text.charAt(i)));
-		int count = 0;
-		count = countSymbols.get(index);
-		countSymbols.set(index, count + 1);
-	}
-	//if(DEBUG) System.out.println(">>>> " + countSymbols.toString());
-	
-	//Erzeuge return statement
-	back = new String[foundSymbols.size()][2];
-	for(int i = 0;i<foundSymbols.size();i++) {
-		back[i][0] = foundSymbols.get(i);
-		back[i][1] = "" + countSymbols.get(i);
-		//if(DEBUG) System.out.print(">>>> " + Arrays.toString(back[i]) + " ; ");
-	}	
-	
-	return back;	  
-  }
-  /**
-   * Achtung, macht dummes Zeug - Periode ist immer 1.0, weil sich alles wegkürzt.
-   * @param ic
-   * @param text
-   * @return
-   * 
-   * @deprecated
-   */
-  private double calcPeriod(double ic,String text) {
-	  double back = -1.0; // approximierte Periodenlaenge
-	  
-	  String[][] sAbsoluteFreqency = getAbsoluteFrequency(text);
-	  double dN = text.length();
-	  double dn = sAbsoluteFreqency.length;
-	  
-	  back = (ic - 1.0 / dn) * dN;
-	  back = back / (((dN - 1.0) * ic) - (1.0/dn * dN) + ic);
-	  
-	  return back;
-  }
-  
-  private double calcIC(String text) {
-	  //if(DEBUG) System.out.println(">>>calcIC called");
-	  double ic = -1.0;
-	  
-	  //Hole absolute Häufigkeiten der Buchstaben.
-	  String[][] sAbsoluteFreqency = getAbsoluteFrequency(text);
-
-	  //Anzahl der einzelnen Buchstaben
-	  double iSum = 0;
-	  double[] iF = new double[sAbsoluteFreqency.length];
-	  for(int i = 0;i<sAbsoluteFreqency.length;i++) {
-		  iF[i] = Integer.parseInt(sAbsoluteFreqency[i][1]);
-	  }
-	  
-	  for(int i = 0;i<iF.length;i++) {
-		  iSum = iSum + iF[i] * (iF[i] - 1);
-	  }
-	  double iN = text.length();	//Laenge des Textes
-
-	  //if(DEBUG) System.out.println(">>>> iSum = " + iSum);
-	  //if(DEBUG) System.out.println(">>>> iN = " + iN);
-	  
-	  ic = iSum / (iN * (iN - 1.0));
-	  //if(DEBUG) System.out.println("IC = " + ic);
-	  
-	  return ic;
-  }
-  
   private double calcCoincidenceIndex(ArrayList<Character> text) {
 	  double d = -1.0;
 	  double N = (double) text.size();
@@ -1158,33 +1057,6 @@ private char[] mostFreqChar(ArrayList<Character> text){
 	  return GCD;
   }
   
-  /**
-   * Out of order
-   * @param text
-   * @param ngram
-   * @return
-   * @deprecated
-   */
-  private int[] calcPossiblePeriod(String text, String ngram) {
-//	  //splitts text by the chosen ngram
-//	  String[] subStrings = text.split(ngram);
-//	  //gets periods between repeated ngram (first and last one are ignored)
-//	  int[] subLengths = new int[subStrings.length];
-//	  for(int i = 1; i<subStrings.length;i++) {
-//		  subLengths[i] = subStrings[i].length() + ngram.length();
-//		  //System.out.println(subLengths[i]);
-//	  }
-//	  //gets ggt() of all periods
-//	  int GCD[] = new int[subLengths.length-1];
-//	  GCD[0]=subLengths[subLengths.length-1];
-//	  for(int i = 1;i<subLengths.length-1;i++) {
-//		  GCD[i] = getGCD(subLengths[i],subLengths[(i+1)%(subLengths.length-1)]);
-//	  }
-//	  GCD[0]=getGCD(GCD[subLengths.length-2],GCD[0]);
-//	  return GCD;
-	  return null;
-  }
-  
   private BufferedReader readFromFile(String file) {
 	  BufferedReader textInput = null;
 	  try {
@@ -1218,62 +1090,6 @@ private char[] mostFreqChar(ArrayList<Character> text){
 	  } catch (IOException e){
 		  e.printStackTrace();
 	  }
-  }
-  
-  private void callTest() {
-
-	  //Test ArraySubListkram
-	  if(DEBUG) {
-		ArrayList<Character> l = new ArrayList<Character>();
-		l.add('a');l.add('b');l.add('c');l.add('d');l.add('e');l.add('f');
-		System.out.println(l);
-		List<Character> l2 = l.subList(0, l.size() - 3);
-		System.out.println(l2);
-		System.out.println("Vigenere.callTest()");
-		System.exit(0);
-	  }	  
-	  
-//	  //Test IC
-//	  if(DEBUG) {
-//		String sTmp = "abadeffhaj";
-//		System.out.print(">>>> String: " + sTmp);
-//		System.out.print("\t Länge: " + sTmp.length());
-//		System.out.print("\t oldIC: " + calcCoincidenceIndex(sTmp));
-//		System.out.print("\t IC: " + calcIC(sTmp));
-//		System.out.print("\t approx p: " + calcPeriod(calcIC(sTmp), sTmp));
-//		System.out.println();
-//		System.exit(0);
-//	  }
-	  
-//	  //Test writeToFile
-//	  if(DEBUG) {
-//		  writeToFile("test.txt", "blah2");
-//		  writeToFile("test.txt", "blah3");
-//		  System.exit(0);
-//	  }
-	  
-	  //Test getSubtext
-//	  if(DEBUG) {
-//		  String sTmp = bufferedReaderToString(readFromFile("test.txt"));
-//		  double dTmp = getSubtextCoincidenceIndex(sTmp, 10);
-//		  String sTmp2 = getSubtext(sTmp,10,0);
-//		  System.out.print("#### " + dTmp);
-//		  System.out.print("\t" + sTmp2);
-//		  System.out.println();
-//		  for (int i = 0; i < 11; i++) {
-//			sTmp2 = getSubtext(sTmp,10,i);
-//			System.out.println(i + " \t" + sTmp2);			
-//		  }
-//		  System.out.println();
-//		  System.exit(0);
-//	  }
-
-//	  if(DEBUG){
-//		  String s = "\n";
-//		  System.out.println((int)'\n' + "" +  '\n' + "blah \t" + s);
-//		  System.out.println("blah");
-//		  System.exit(0);
-//	  }
   }
 
 }
