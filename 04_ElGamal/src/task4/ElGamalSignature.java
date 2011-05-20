@@ -558,7 +558,7 @@ public final class ElGamalSignature extends Signature {
 			  String sIn = standardInput.readLine();
 			  if (sIn.length() == 0 || sIn == null) {
 //				  sIn = "../ElGamal/schluessel/us.auth.public";
-				  sIn = "key_testpublic.txt";
+				  sIn = "key-testpublic.txt";
 			  }
 			  File file = new File(sIn);
 			  if (file.exists() == true) {
@@ -595,7 +595,7 @@ public final class ElGamalSignature extends Signature {
 		  try {
 			  String sIn = standardInput.readLine();
 			  if (sIn.length() == 0 || sIn == null) {
-				  sIn = "key_testprivate.txt"; //
+				  sIn = "key-testprivate.txt"; //
 			  }
 			  File file = new File(sIn);
 			  if (file.exists() == true) {
