@@ -54,10 +54,12 @@ public final class ElGamalCipher extends BlockCipher {
    * Der FileOutputStream, in den der Klartext geschrieben werden soll.
    */
   public void decipher(FileInputStream ciphertext, FileOutputStream cleartext) {
-	  BigInteger read1, read2;
+	  BigInteger read, read1, read2;
 	  BigInteger z;
 	  BigInteger write;
-	  while(((read1=readCipher(ciphertext)) != null) && ((read2=readCipher(ciphertext)) != null)){
+	  while(((read=readCipher(ciphertext)) != null)){
+		  read1=read.mod(pubkey[0]);
+		  read2=read.divide(pubkey[0]);
 		  if (DEBUG) System.out.println(">>>In while, read1 is "+read1.toString()+ " read2 is "+ read2.toString());
 		  z = (read1.modPow(prikey,pubkey[0])).modInverse(pubkey[0]);
 		  write = z.multiply(read2).mod(pubkey[0]);
@@ -86,7 +88,8 @@ public final class ElGamalCipher extends BlockCipher {
 	  foePathPublic_ = enterFoePublic();
 	  readSecretsFoe();
 	  int L = (foekey[0].bitLength()-1)/8;
-	  L = Math.min(Math.max(3, L),256);
+	  L = Math.min(Math.max(3, L),2048);
+	  if (DEBUG) System.out.println(">>>L is "+L);
 	  BigInteger read;
 	  BigInteger writea, writeb;
 	  BigInteger k;
@@ -101,8 +104,7 @@ public final class ElGamalCipher extends BlockCipher {
 		  if(DEBUG) System.out.println(">>>writea "+writea.toString());
 		  writeb = (read.multiply(foekey[2].modPow(k,foekey[0]))).mod(foekey[0]);
 		  if(DEBUG) System.out.println(">>>writeb "+writeb.toString());
-		  writeCipher(ciphertext,writea);
-		  writeCipher(ciphertext,writeb);
+		  writeCipher(ciphertext,writea.add(writeb.multiply(foekey[0])));
 		  read = readClear(cleartext,L);
 	  }
   }
@@ -112,7 +114,7 @@ public final class ElGamalCipher extends BlockCipher {
 	  boolean accepted = false;
 	  
 	  String msg = "    ! Bitte geben Sie den Pfad zum Public Key des anderen an: \n";
-	  msg = msg +  "      > Leere Eingabe - Standardwert (key_public.txt)";
+	  msg = msg +  "      > Leere Eingabe - Standardwert (key-testpublicfoe.txt)";
 	  System.out.println(msg);
 	  String path = ""; // Rückgabe
 	  do {
@@ -121,7 +123,7 @@ public final class ElGamalCipher extends BlockCipher {
 		  try {
 			  String sIn = standardInput.readLine();
 			  if (sIn.length() == 0 || sIn == null) {
-				  sIn = "key_public.txt"; //
+				  sIn = "key-testpublicfoe.txt"; //
 			  }
 			  File file = new File(sIn);
 			  if (file.exists() == true) {
@@ -234,7 +236,7 @@ public final class ElGamalCipher extends BlockCipher {
 	  boolean accepted = false;
 	  
 	  String msg = "    ! Bitte geben Sie den Pfad zum Public Key an: \n";
-	  msg = msg +  "      > Leere Eingabe - Standardwert (key_testpublic.txt)";
+	  msg = msg +  "      > Leere Eingabe - Standardwert (key-testpublic.txt)";
 	  System.out.println(msg);
 	  String path = ""; // Rückgabe
 	  do {
@@ -244,7 +246,7 @@ public final class ElGamalCipher extends BlockCipher {
 			  String sIn = standardInput.readLine();
 			  if (sIn.length() == 0 || sIn == null) {
 //				  sIn = "../ElGamal/schluessel/us.auth.public";
-				  sIn = "key_testpublic.txt";
+				  sIn = "key-testpublic.txt";
 			  }
 			  File file = new File(sIn);
 			  if (file.exists() == true) {
@@ -272,7 +274,7 @@ public final class ElGamalCipher extends BlockCipher {
 	  boolean accepted = false;
 	  
 	  String msg = "    ! Bitte geben Sie den Pfad zum Private Key an: \n";
-	  msg = msg +  "      > Leere Eingabe - Standardwert (key_testprivate.txt)";
+	  msg = msg +  "      > Leere Eingabe - Standardwert (key-testprivate.txt)";
 	  System.out.println(msg);
 	  String path = ""; // Rückgabe
 	  do {
@@ -281,7 +283,7 @@ public final class ElGamalCipher extends BlockCipher {
 		  try {
 			  String sIn = standardInput.readLine();
 			  if (sIn.length() == 0 || sIn == null) {
-				  sIn = "key_testprivate.txt"; //
+				  sIn = "key-testprivate.txt"; //
 			  }
 			  File file = new File(sIn);
 			  if (file.exists() == true) {
@@ -500,6 +502,10 @@ public final class ElGamalCipher extends BlockCipher {
 			  filePrivate.createNewFile();
 		  }
 		  keys = launcher.openFileForWriting(filePrivate);
+		  keys.write("" + pubkey[0]);
+		  keys.newLine();
+		  keys.write("" + pubkey[1]);
+		  keys.newLine();
 		  keys.write("" + prikey);
 		  keys.newLine();
 		  keys.close();
@@ -528,6 +534,9 @@ public final class ElGamalCipher extends BlockCipher {
 		  // Lese Private Key
 		  File filePrivate = new File(myPathOwnPrivate_);
 		  br = launcher.openFileForReading(filePrivate);
+		  //zwei nicht gebrauchte Zeilen "weglesen"
+		  br.readLine();
+		  br.readLine();
 		  prikey = new BigInteger(br.readLine());
 		  br.close();
 		  System.out.println("    * Private Key eingelesen");
