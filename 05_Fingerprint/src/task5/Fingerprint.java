@@ -16,7 +16,11 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.Random;
 
+import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
 import de.tubs.cs.iti.jcrypt.chiffre.HashFunction;
 
 /**
@@ -26,7 +30,13 @@ import de.tubs.cs.iti.jcrypt.chiffre.HashFunction;
  * @version 1.1 - Sat Apr 03 22:20:18 CEST 2010
  */
 public final class Fingerprint extends HashFunction {
-
+	
+	private final boolean DEBUG = true;
+	
+	private BigInteger myP_;
+	private BigInteger myG1_;
+	private BigInteger myG2_;
+	
   /**
    * Berechnet den Hash-Wert des durch den FileInputStream
    * <code>cleartext</code> gegebenen Klartextes und schreibt das Ergebnis in
@@ -48,8 +58,36 @@ public final class Fingerprint extends HashFunction {
    * @see #writeParam writeParam
    */
   public void makeParam() {
-
-    System.out.println("Dummy für die Parametererzeugung.");
+	  // Erzeuge Parameter p,g1,g2
+	  int bitLength = enterBitLength();
+	  
+	  // erzeuge sichere Primzahl p, min 512 bits
+	  Random random = new Random();
+	  boolean isPrime = false;
+	  BigInteger p = BigIntegerUtil.TWO;
+	  BigInteger q = BigIntegerUtil.TWO;
+	  do {
+		  q = BigInteger.probablePrime(bitLength-1, random);
+		  p = q.multiply(BigIntegerUtil.TWO);
+		  p = p.add(BigInteger.ONE);
+		  
+		  isPrime = p.isProbablePrime(99);
+	  } while (!isPrime);
+	  
+	  // erzeuge g1,g2 primitive Wurzeln mod p
+	  BigInteger g1, g2;
+	  boolean checkEqRoot = true;
+	  do {
+		  g1 = calcPrimeRoot(p, q);
+		  g2 = calcPrimeRoot(p, q);
+		  
+		  checkEqRoot = g1.equals(g2);
+	  } while (checkEqRoot);
+	  
+	  // Setze globale Variablen
+	  myP_ = p;
+	  myG1_ = g1;
+	  myG2_ = g2;
   }
 
   /**
@@ -61,7 +99,17 @@ public final class Fingerprint extends HashFunction {
    * @see #writeParam writeParam
    */
   public void readParam(BufferedReader param) {
-
+	  
+	  try {
+		  // Hole Pfade der Paramdatei
+		  myP_ = new BigInteger(param.readLine());
+		  myG1_ = new BigInteger(param.readLine());
+		  myG2_ = new BigInteger(param.readLine());
+		  
+	  } catch (IOException e) {
+		  e.printStackTrace();
+	  }
+	  
   }
 
   /**
@@ -79,7 +127,10 @@ public final class Fingerprint extends HashFunction {
   public void verify(FileInputStream ciphertext, FileInputStream cleartext) {
 
   }
-
+  
+  
+  
+  
   /**
    * Schreibt die Parameter mit dem Writer <code>param</code>.
    * 
@@ -89,6 +140,113 @@ public final class Fingerprint extends HashFunction {
    * @see #readParam readParam
    */
   public void writeParam(BufferedWriter param) {
+	  
+	  // Schreibe Pfade
+	  try {
+		  param.write("" + myP_);
+		  param.newLine();
+		  param.write("" + myG1_);
+		  param.newLine();
+		  param.write("" + myG2_);
+		  param.close();
+	  } catch (IOException e) {
+		  e.printStackTrace();
+	  }
+	  System.out.println("    * Schlüsseldatei gespeichert");
+	  
+  }
+  
+  
+  
+  
 
+  /**
+   * Algo 7.3
+   * @param bitLength
+   * @return
+   */
+  private BigInteger calcPrimeRoot(BigInteger p, BigInteger q) {
+	  
+	  // Generiere primitive Wurzel g in Z_p^*
+	  boolean checkRoot = false;
+	  BigInteger g = BigIntegerUtil.TWO;
+	  BigInteger biNeg1 = new BigInteger("-1");
+	  biNeg1 = biNeg1.mod(p);
+	  do {
+		  g = generateReducedRest(p);
+		  boolean isNotOne = !g.equals(BigInteger.ONE);
+		  boolean isNotP1 = !g.equals(p.subtract(BigInteger.ONE));
+		  if(isNotOne || isNotP1) {
+			  BigInteger h;
+			  h = g.modPow(q, p);
+			  checkRoot = (h.equals(biNeg1));
+		  } else {
+			  checkRoot = false;
+		  }
+	  } while (checkRoot);
+	  
+	  // Setze Rückgabevariabel
+	  return g;
+  }
+  
+
+  /**
+   * Definition 3.2
+   * @param modulus
+   * @return
+   */
+  private BigInteger generateReducedRest(BigInteger modulus) {
+	  	  
+	  BigInteger reducedRest = BigInteger.ZERO; // Rückgabe
+	  Random randomGenerator = new Random();
+	  boolean check = false;
+	  while (!check) {
+		  reducedRest = BigIntegerUtil.randomSmallerThan(modulus,randomGenerator);
+		  
+		  check = reducedRest.gcd(modulus).equals(BigInteger.ONE);
+	  }
+	  
+	  return reducedRest;
+	  
+  }
+  
+
+  private int enterBitLength() {
+	  
+	  BufferedReader standardInput = launcher.openStandardInput();
+	  boolean accepted = false;
+
+	  String msg = "    ! Bitte geben sie die gewünschte Bitlänge für die Primzahl P an (minimum 512):";
+	  System.out.println(msg);
+	  int bitLength = 0; // Rückgabe
+	  do {
+		  msg = "    ! Bitte geben sie die Bitlänge an.";
+		  System.out.print("      ");
+		  try {
+			  String sIn = standardInput.readLine();
+			  if(sIn.length() == 0 || sIn == null) {
+				  // Standardwert bei "keiner" Eingabe
+				  bitLength = 512;
+				  accepted = true;
+			  } else {
+				  bitLength = Integer.parseInt(sIn);
+				  if(bitLength >= 512) {
+					  accepted = true;
+				  } else {
+					  accepted = false;
+					  System.out.println(msg);
+				  }
+			  }
+		  } catch (IOException e) {
+			  System.err.println("Abbruch: Fehler beim Lesen von der Standardeingabe.");
+			  e.printStackTrace();
+			  System.exit(1);
+		  } catch (NumberFormatException e) {
+			  System.err.println("      Keine gültige Zahl.");
+			  System.out.println(msg);
+		  }
+	  } while (!accepted);
+	  
+	  return bitLength;
   }
 }
