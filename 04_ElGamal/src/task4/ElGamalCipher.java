@@ -98,7 +98,7 @@ public final class ElGamalCipher extends BlockCipher {
 	  read = readClear(cleartext,L);
 	  while(read !=null){
 		  k = new BigInteger(foekey[0].bitLength()-1,krand);
-		  k = new BigInteger("999",10);
+		  //k = new BigInteger("999",10);
 		  if(DEBUG) System.out.println(">>>read is "+read.toString());
 		  writea = foekey[1].modPow(k, foekey[0]);
 		  if(DEBUG) System.out.println(">>>writea "+writea.toString());
