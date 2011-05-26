@@ -209,17 +209,29 @@ private BigInteger hashIt(ArrayList<Byte> clear) {
 	  BigInteger textvalue = hashIt(text);
 	  byte hashed[]= new byte[textvalue.bitLength()/8];
 	  try {
-		  ciphertext.read(hashed);
+		  String readCipher = "";
+		  int read;
+		  do {
+			  read = ciphertext.read();
+			  if(read != -1) {
+				  readCipher = readCipher + (char)read;
+				  //if(DEBUG) {System.out.println(read + "\t" + readCipher);}
+			  }
+		  } while (read != -1);
+		  //if(DEBUG) {System.out.println(">>> gelesener Cipher: " + readCipher);}
+		  
+		  
+//		  BigInteger hashtext = new BigInteger(hashed);
+		  BigInteger hashtext = new BigInteger(readCipher,16);
+		  if (DEBUG) System.out.println(">>>hashtext \t"+hashtext.toString(16));
+		  if (DEBUG) System.out.println(">>>textvalue \t"+textvalue.toString(16));
+		  if (hashtext.equals(textvalue)) {
+			  System.out.println("hash verifiziert");
+		  } else {
+			  System.out.println("hash abgelehnt");
+		  }
 	  } catch (IOException e) {
 		  System.err.println(e);
-	  }
-	  BigInteger hashtext = new BigInteger(hashed);
-	  if (DEBUG) System.out.println(">>>hashtext \t"+hashtext.toString(16));
-	  if (DEBUG) System.out.println(">>>textvalue \t"+textvalue.toString(16));
-	  if (hashtext.equals(textvalue)) {
-		  System.out.println("hash verifiziert");
-	  } else {
-		  System.out.println("hash abgelehnt");
 	  }
   }
   
