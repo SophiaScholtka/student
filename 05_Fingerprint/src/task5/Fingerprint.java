@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Random;
 
 import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
@@ -48,41 +49,85 @@ private final boolean DEBUG = true;
    * Der FileOutputStream, in den der Hash-Wert geschrieben werden soll.
    */
   public void hash(FileInputStream cleartext, FileOutputStream ciphertext) {
-	  try {
-		  
-		  //TODO Param einlesen
-		  //BigInteger myP_ = new BigInteger("2999",10);
-		  //BigInteger myG1_ = new BigInteger("17",10);
-		  //BigInteger myG2_ = new BigInteger("1235",10);
-		  int Lp=myP_.bitLength();
-		  BigInteger read,write,temp1,temp2;
-		  byte m1[] = new byte[(Lp-2)/8]; //soviele byte kann man mit der Primzahl p verarbeiten.
-		  byte m2[] = new byte[(Lp-2)/8];
-		  int m1laenge, m2laenge;
-		  m1laenge = cleartext.read(m1);
-		  m2laenge = cleartext.read(m2);
-		  if (DEBUG) System.out.println(">>>m1l und m2l "+m1laenge +" "+m2laenge);
-		  while(m1 != null){
-			  temp1=new BigInteger(m1);
-			  if (m2 == null) {
-				  temp2= new BigInteger("0");
-			  } else {
-				  temp2=new BigInteger(m2);
-			  }
-			  if (DEBUG) System.out.println(">>>temp1 is "+temp1);
-			  if (DEBUG) System.out.println(">>>temp2 is "+temp2);
-			  temp1=myG1_.modPow(temp1, myP_);
-			  temp2=myG2_.modPow(temp2, myP_);
-			  write=(temp1.multiply(temp2)).mod(myP_);
-			  if (DEBUG) System.out.println(">>>write is "+write);
-			  cleartext.read(m1);
-			  cleartext.read(m2);
-			  break;
-		  }
+	  //testwerte
+	  /*myP_=new BigInteger("2999",10);
+	  myG1_=new BigInteger("17",10);
+	  myG2_=new BigInteger("1235",10);*/
+	  
+	  ArrayList<Byte> clear = getClear(cleartext);
+	  BigInteger hashvalue = hashIt(clear);
+	  System.out.println(">>>hashvalue "+hashvalue.toString(16));
+	  byte output[] = hashvalue.toByteArray();
+	  try{
+		  //TODO hier was besseres ausdenken
+		  ciphertext.write(output);
 	  } catch (IOException e){
 		  System.err.println(e);
 	  }
   }
+
+private ArrayList<Byte> getClear(FileInputStream cleartext) {
+	ArrayList<Byte> back = new ArrayList<Byte>();
+	byte b[]=new byte[1];
+	try{
+		while(cleartext.read(b) != -1){
+			back.add(b[0]);
+		}
+	} catch (IOException e){
+		System.err.println(e);
+	}
+	return back;
+}
+
+private BigInteger hashIt(ArrayList<Byte> clear) {
+	//Länge von P herausfinden, damit passende Stückchen eingelesen werden können
+	int Lp=myP_.bitLength();
+	int clearlen = clear.size();
+	int m = 2*(Lp-2);
+	int xlen = m - Lp -1;
+	if (DEBUG) System.out.println(">>>xlen is "+xlen);
+	int numrounds = (clearlen*8)/xlen;
+	BigInteger gi, giplus1;
+	giplus1=null;
+	//schreibe die bits aus den bytes in die BigInts undzwar jeweils ceil(m/2) und floor(m/2)
+	BigInteger x[]= new BigInteger[numrounds+1];
+	BigInteger zwei = new BigInteger("2",10);
+	int position = 0;
+	for(int i=0; i<numrounds;i++){
+		//x[i] auf Länge m mit 1en füllen
+		x[i]= (zwei.pow(xlen)).subtract(BigInteger.ONE);
+		//if (DEBUG) System.out.println(">>>initial x["+i+"] " +x[i]);
+		for(int j=xlen; j>0;j--){
+			//falls das passende bit aber 0 ist, wieder abziehen
+			int seewhatitis = (clear.get(position/8)/((int)Math.pow(2,position%8)))%2;
+			//if (DEBUG) System.out.println(">>>seewhatitis " +seewhatitis);
+			if(seewhatitis==0){
+				x[i]=x[i].subtract(zwei.pow(j-1));
+			}
+			//if (DEBUG) System.out.println(">>>x["+i+"] " +x[i]);
+			position++;
+		}
+	}
+	//rest von x_k mit 0en füllen, x_k+1 mit d=#0en
+	int d=(numrounds+1)*xlen-clearlen*8;
+	for(int j=d;j>0;j--){
+		x[numrounds-1]=x[numrounds-1].subtract(zwei.pow(j-1));
+	}
+	if (d==0) {
+		x[numrounds]=new BigInteger("0",10);
+	} else {
+		x[numrounds]=BigInteger.valueOf(d);
+	}
+	
+	gi=myG2_.modPow(x[0], myP_);
+	BigInteger appendone;
+	for(int i=1;i<numrounds;i++){
+		appendone=gi.multiply(zwei).add(BigInteger.ONE);
+		giplus1=myG1_.modPow(appendone, myP_);
+		gi=giplus1.multiply(myG2_.modPow(x[i], myP_));
+	}
+	return gi;
+}
 
   /**
    * Erzeugt neue Parameter.
@@ -158,7 +203,22 @@ private final boolean DEBUG = true;
    * werden soll.
    */
   public void verify(FileInputStream ciphertext, FileInputStream cleartext) {
-
+	  ArrayList<Byte> text = getClear(cleartext);
+	  BigInteger textvalue = hashIt(text);
+	  byte hashed[]= new byte[textvalue.bitLength()/8];
+	  try {
+		  ciphertext.read(hashed);
+	  } catch (IOException e) {
+		  System.err.println(e);
+	  }
+	  BigInteger hashtext = new BigInteger(hashed);
+	  if (DEBUG) System.out.println(">>>hashtext \t"+hashtext.toString(16));
+	  if (DEBUG) System.out.println(">>>textvalue \t"+textvalue.toString(16));
+	  if (hashtext.equals(textvalue)) {
+		  System.out.println("hash verifiziert");
+	  } else {
+		  System.out.println("hash abgelehnt");
+	  }
   }
   
   
