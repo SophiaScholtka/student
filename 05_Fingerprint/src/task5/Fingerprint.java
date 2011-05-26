@@ -57,10 +57,12 @@ private final boolean DEBUG = true;
 	  ArrayList<Byte> clear = getClear(cleartext);
 	  BigInteger hashvalue = hashIt(clear);
 	  System.out.println(">>>hashvalue "+hashvalue.toString(16));
-	  byte output[] = hashvalue.toByteArray();
+	  char[] outputChar = hashvalue.toString(16).toCharArray();
 	  try{
-		  //TODO hier was besseres ausdenken
-		  ciphertext.write(output);
+		  for (char c : outputChar) {
+			  //hier was besseres ausdenken - erledigt!
+			  ciphertext.write(c);
+		  }
 	  } catch (IOException e){
 		  System.err.println(e);
 	  }
