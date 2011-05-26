@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 
 import de.tubs.cs.iti.jcrypt.chiffre.HashFunction;
@@ -41,21 +42,39 @@ public final class Fingerprint extends HashFunction {
    * Der FileOutputStream, in den der Hash-Wert geschrieben werden soll.
    */
   public void hash(FileInputStream cleartext, FileOutputStream ciphertext) {
-	  //TODO Param einlesen
-	  BigInteger myP_ = new BigInteger("2999",10);
-	  BigInteger myG1_ = new BigInteger("17",10);
-	  BigInteger myG2_ = new BigInteger("1235",10);
-	  int Lp=myP_.bitLength();
-	  BigInteger read, write,temp1,temp2;
-	  read = new BigInteger("302924",10);
-	  while(read != null){
-		  temp1=read.mod(myP_);
-		  temp2=read.divide(myP_);
-		  temp1=myG1_.modPow(temp1, myP_);
-		  temp2=myG2_.modPow(temp2, myP_);
-		  write=(temp1.multiply(temp2)).mod(myP_);
-		  if (DEBUG) System.out.println(">>>write is "+write);
-		  //read = readClear(cleartext,(Lp-2)*2);
+	  try {
+		  
+		  //TODO Param einlesen
+		  //BigInteger myP_ = new BigInteger("2999",10);
+		  //BigInteger myG1_ = new BigInteger("17",10);
+		  //BigInteger myG2_ = new BigInteger("1235",10);
+		  int Lp=myP_.bitLength();
+		  BigInteger read,write,temp1,temp2;
+		  byte m1[] = new byte[(Lp-2)/8]; //soviele byte kann man mit der Primzahl p verarbeiten.
+		  byte m2[] = new byte[(Lp-2)/8];
+		  int m1laenge, m2laenge;
+		  m1laenge = cleartext.read(m1);
+		  m2laenge = cleartext.read(m2);
+		  if (DEBUG) System.out.println(">>>m1l und m2l "+m1laenge +" "+m2laenge);
+		  while(m1 != null){
+			  temp1=new BigInteger(m1);
+			  if (m2 == null) {
+				  temp2= new BigInteger("0");
+			  } else {
+				  temp2=new BigInteger(m2);
+			  }
+			  if (DEBUG) System.out.println(">>>temp1 is "+temp1);
+			  if (DEBUG) System.out.println(">>>temp2 is "+temp2);
+			  temp1=myG1_.modPow(temp1, myP_);
+			  temp2=myG2_.modPow(temp2, myP_);
+			  write=(temp1.multiply(temp2)).mod(myP_);
+			  if (DEBUG) System.out.println(">>>write is "+write);
+			  cleartext.read(m1);
+			  cleartext.read(m2);
+			  break;
+		  }
+	  } catch (IOException e){
+		  System.err.println(e);
 	  }
   }
 
