@@ -4,5 +4,5 @@ if [ -z $KRYPTOUMGEBUNG ]; then
   echo Starte trotzdem.
   java de.tubs.cs.iti.krypto.protokoll.Server $*
 else
-  java -classpath "$KRYPTOUMGEBUNG/chiffre/classes.jar:$KRYPTOUMGEBUNG/protokoll/classes.jar:." de.tubs.cs.iti.krypto.protokoll.Server $*
+  java -classpath "$KRYPTOUMGEBUNG/jCrypt/classes.jar:$KRYPTOUMGEBUNG/protokoll/classes.jar:." de.tubs.cs.iti.krypto.protokoll.Server $*
 fi
