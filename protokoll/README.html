@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Kryptographische Protokolle</title>
+</head>
+<body bgcolor="white">
+<h1>Programmierumgebung f&uuml;r kryptographische Protokolle</h1>
+<p>
+
+<table border="1" cellpadding="5" cellspacing="3" width="100%">
+<tr>
+  <th align=left><a href="docs/packages.html">docs/</a></th>
+  <td>Dokumentationen der f&uuml;r den Aufgaben-Teil II zur
+	Verf&uuml;gung gestellten Klassen.
+  </td>
+<tr>
+  <th align=left>classes.jar</th>
+  <td>Archiv der f&uuml;r den Aufgaben-Teil II zur Verf&uuml;gung gestellten
+	Klassen.<br>
+      Damit die darin enthaltenen Klassen sowohl beim Kompilieren als auch
+      beim Starten eigener Klassen gefunden werden, mu&szlig; es in der
+      Umgebungsvariablen CLASSPATH enthalten sein.
+  </td>
+<tr>
+  <th align=left>local/</th>
+  <td>Diese Dateien sollen von jeder Gruppe in Ihr Arbeitsverzeichnis
+      kopiert werden; beispielsweise durch den Aufrug des
+      Shellscriptes <br>
+      <strong>$KRYPTOUMGEBUNG/protokoll/make_local.sh</strong><br>
+      aufruft. Das Verzeichnis enthält die folgenden Dateien:
+
+      <OL>
+      <LI>
+      <strong>server.sh</strong><br>
+      Bevor ein Protokoll ausgef&uuml;hrt werden kann, mu&szlig; ein Server gestartet werden, der
+      die Kommunikation zwischen den teilnehmenden Parteien (Clients) gew&auml;hrleistet. Da
+      dieser Server mehrere Protokolle gleichzeitig verwalten kann, braucht nur ein Server pro
+      Host gestartet zu werden.  <strong>server.sh</strong> ist ein einfaches
+      Shellscript, welches den Server mit dem erforderlichen vollst&auml;ndigen Klassennamen
+      startet.
+      <P>
+
+      <LI>
+      <strong>client.sh</strong><br>
+      Eine .class-Datei, die den Ablauf eines Protokolls beschreibt, wird ausgef&uuml;hrt, indem
+      jede teilnehmende Partei einen Client startet und in einem der sich dann &ouml;ffnenden
+      Eingabefenstern den Namen dieser .class-Datei ausw&auml;hlt.
+      <strong>client.sh</strong> ist ein einfaches Shellscript, welches den Client mit dem
+      erforderlichen vollst&auml;ndigen Klassennamen startet.
+      <P>
+
+      <LI>
+      <strong>Skeleton.java</strong><br>
+      Hierin sind die leeren Methoden <A 
+        HREF="docs/de/tubs/cs/iti/krypto/protokoll/Protocol.html#sendFirst()">sendFirst</A>
+      und 
+      <A HREF="docs/de/tubs/cs/iti/krypto/protokoll/Protocol.html#receiveFirst()">receiveFirst</A>
+      mit den f&uuml;r das jeweilige 
+      Protokoll spezifischen Algorithmen auszuf&uuml;llen. Die Klasse <A
+	HREF="docs/de/tubs/cs/iti/krypto/protokoll/Communicator.html">Communicator</A> stellt hierf&uuml;r
+       Methoden zur Kommunikation mit den anderen Parteien zur
+      Verf&uuml;gung.
+     <P>
+     <LI>
+     <strong>example.java</strong><br>
+     Ein Beispielprotokoll, das als <i>nicht w&ouml;rtlich</i> zu nehmendes Beispiel dienen mag,
+     wie eigene Protokolle anzugehen sind.
+     </OL>
+  </td>
+</table>
+
+</body>
+</html>
