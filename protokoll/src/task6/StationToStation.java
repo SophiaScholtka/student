@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.math.BigInteger;
 
+import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
 import de.tubs.cs.iti.krypto.protokoll.*;
 import task3.IDEA;
 import task5.Fingerprint;
@@ -23,8 +24,7 @@ public final class StationToStation implements Protocol
 	private static final boolean DEBUG = true;
 
 	private static final int RADIX_SEND = 16;
-
-
+	
 	static private int MinPlayer        = 2; // Minimal number of players
 	static private int MaxPlayer        = 2; // Maximal number of players
 	static private String NameOfTheGame = "Station-to-Station";
@@ -65,18 +65,15 @@ public final class StationToStation implements Protocol
 			// (0)d Alice empfängt Bobs Public RSA (eB, nB)
 			
 			// (1)a Alice wählt xA zufällig in {1,...,p-2}
+			final BigInteger P_SUB2 = myP.subtract(BigIntegerUtil.TWO);
+			BigInteger myXA = BigIntegerUtil.randomBetween(BigInteger.ONE, P_SUB2);
 			// (1)b Alice berechnet yA = g^xA mod p
+			BigInteger myYA = myG1.modPow(myXA, myP);
 			// (1)c Alice sendet yA an Bob
+			Com.sendTo(1, myYA.toString(RADIX_SEND)); // g1
+			if(DEBUG) { System.out.println("DDD| Alice sendet yA an Bob: " + myYA); }
 			
-			// (2) Bob wählt zufällige xB in {1,...,p-2}
-			// (2) Bob berechnet yB = g^xB mod p
-			// (2) Bob bestimmt Schlüssel k = yA^ xB mod p
-			// (2) Bob bestimmt Signatur SB(yB,yA)=(h(yB,yA))^dB mod nB
-			// (3) 
-			// (4) 
-			// (5) 
-			// (6) 
-			// (7) 
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -102,6 +99,11 @@ public final class StationToStation implements Protocol
 		// (0) Bob empfängt eA und nA von Alice
 		
 		// (0) Bob sendet Alice seine eB, nB
+		
+		// Bob empfängt yA
+		sReceive = Com.receive();
+		BigInteger foeYA = new BigInteger(sReceive,RADIX_SEND);
+		if(DEBUG) { System.out.println("DDD| Bob received yA of Alice: " + foeYA);}
 	}
 	
 	public String nameOfTheGame ()
