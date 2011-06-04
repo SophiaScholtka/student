@@ -3,5 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/jCrypt/jCrypt.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/03_IDEA"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/05_Fingerprint"/>
 	<classpathentry kind="output" path="src"/>
 </classpath>
