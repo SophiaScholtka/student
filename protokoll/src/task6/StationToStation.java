@@ -1,9 +1,11 @@
 package task6;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.math.BigInteger;
 
@@ -19,6 +21,9 @@ import task6.StationToStation;
 public final class StationToStation implements Protocol
 {
 	private static final boolean DEBUG = true;
+
+	private static final int RADIX_SEND = 16;
+
 
 	static private int MinPlayer        = 2; // Minimal number of players
 	static private int MaxPlayer        = 2; // Maximal number of players
@@ -40,21 +45,24 @@ public final class StationToStation implements Protocol
 		try {
 			// Player 0 = Alice; Player 1 = Bob
 			// (0)a Alice Nutzerangabe, wo Hashparameter
-			String fileHash = "../Station-to-Station/hashparam"; // TODO hardcoded hashparam
-			Fingerprint fp = new Fingerprint();
-			FileReader in = new FileReader(fileHash);
-			BufferedReader br = new BufferedReader(in);
-			fp.readParam(br);
-			BigInteger[] keyHash = new BigInteger[3];
-			keyHash[0] = new BigInteger("1234");
-			keyHash[1] = new BigInteger("5678");
-			keyHash[2] = new BigInteger("9000");
+			String fileHash = "../Station-to-Station/alice-hash"; // TODO hardcoded hashparam
+			
+			// (0)a2 Auslesen der Hashparameter
+			BigInteger[] keyHash = readIntegers(fileHash,3);
+			
+			// Speichere eigene Hashkeys
+			BigInteger myP = keyHash[0];
+			BigInteger myG1 = keyHash[1];
+			BigInteger myG2 = keyHash[2];
 			
 			// (0)b Alice Parameter p, g an Bob senden
-			Com.sendTo(1, keyHash[0].toString()); // p
-//			Com.sendTo(1, keyHash[1].toString()); // g1
+			Com.sendTo(1, myP.toString(RADIX_SEND)); // p
+			if(DEBUG) { System.out.println("DDD| Alice sendet P an Bob: " + myP); }
+			Com.sendTo(1, myG1.toString(RADIX_SEND)); // g1
+			if(DEBUG) { System.out.println("DDD| Alice sendet G1 an Bob: " + myG1); }
+			
 			// (0)c Alice Public RSA (eA, nA) an Bob senden
-			// (0)d Bob sendet seinen Public RSA (eB, nB) an Alice
+			// (0)d Alice empfängt Bobs Public RSA (eB, nB)
 			
 			// (1)a Alice wählt xA zufällig in {1,...,p-2}
 			// (1)b Alice berechnet yA = g^xA mod p
@@ -69,7 +77,7 @@ public final class StationToStation implements Protocol
 			// (5) 
 			// (6) 
 			// (7) 
-		} catch (FileNotFoundException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -82,15 +90,18 @@ public final class StationToStation implements Protocol
 	{
 		if(DEBUG) { System.out.println("DDD| receiveFirst() by Bob"); }
 		
-		// (0) Bob empfängt p und g
+		// (0) Bob empfängt p und g von Alice
 		String sReceive = "";
-		BigInteger[] keyFoe = new BigInteger[3];
 		sReceive = Com.receive();
-		System.out.println("Received: " + sReceive);
-		keyFoe[0] = new BigInteger(sReceive);
-//		sReceive = Com.receive();
-//		System.out.println(sReceive);
-//		keyFoe[1] = new BigInteger(sReceive);
+		BigInteger foeP = new BigInteger(sReceive,RADIX_SEND);
+		if(DEBUG) { System.out.println("DDD| Bob received p of Alice: " + foeP);}
+		sReceive = Com.receive();
+		BigInteger foeG1 = new BigInteger(sReceive,RADIX_SEND);
+		if(DEBUG) { System.out.println("DDD| Bob received G1 of Alice: " + foeG1);}
+		
+		// (0) Bob empfängt eA und nA von Alice
+		
+		// (0) Bob sendet Alice seine eB, nB
 	}
 	
 	public String nameOfTheGame ()
@@ -124,5 +135,28 @@ public final class StationToStation implements Protocol
 		BigInteger hash = new BigInteger("0"); //TODO hashen irgendwie.
 		
 		return hash;
+	}
+
+	private BigInteger[] readIntegers(String fileHash, int lines) throws IOException {
+		
+		String[] sKeyHash = readFile(fileHash,lines);
+		BigInteger[] keyHash = new BigInteger[lines];
+		for (int i = 0; i < sKeyHash.length; i++) {
+			keyHash[i] = new BigInteger(sKeyHash[i]);
+			
+		}
+		
+		return keyHash;
+	}
+
+	private String[] readFile(String fileHash, int lines) throws IOException {
+		FileReader in = new FileReader(fileHash);
+		BufferedReader br = new BufferedReader(in);
+		String[] sLines = new String[lines]; // Return
+		for(int i = 0; i < lines; i++) {
+			sLines[i] = br.readLine(); // Zeile i+1
+		}
+		
+		return sLines;
 	}
 }
