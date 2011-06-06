@@ -82,7 +82,6 @@ public final class ElGamalCipher extends BlockCipher {
    * Der FileOutputStream, in den der Chiffretext geschrieben werden soll.
    */
   
-  //TODO encipher und decipher noch mal checken
   public void encipher(FileInputStream cleartext, FileOutputStream ciphertext) {
 	  //frage nach pubkey des Kommunikationspartners
 	  foePathPublic_ = enterFoePublic();

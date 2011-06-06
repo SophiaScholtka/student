@@ -8,12 +8,12 @@ package de.tubs.cs.iti.krypto.protokoll;
 /**
  * Diese Klasse stellt mit einem Kommandozeilenclient eine Alternative
  * zu der Framevariante Client bereit. Sie wurde geschaffen, um das 
- * Entwickeln von Protokollen für das Kryptologie-Praktikum zu unterstützen.
+ * Entwickeln von Protokollen fï¿½r das Kryptologie-Praktikum zu unterstï¿½tzen.
  * <p>
- * Diese Einschränkung sorgt somit dafür, dass hier nur Protokolle mit einer
- * Teilnehmerzahl von 2 ausgeführt werden können.
+ * Diese Einschrï¿½nkung sorgt somit dafï¿½r, dass hier nur Protokolle mit einer
+ * Teilnehmerzahl von 2 ausgefï¿½hrt werden kï¿½nnen.
  * <p>
- * Bitte folgendes durchführen, um entsprechendes Protokoll zu testen
+ * Bitte folgendes durchfï¿½hren, um entsprechendes Protokoll zu testen
  * <ol>
  * <li>Server starten mit
 <pre>
@@ -24,7 +24,7 @@ java de.tubs.cs.iti.krypto.protokoll.Server
 java de.tubs.cs.iti.krypto.protokoll.CmdLineClient PROTOCOL HOST PORT
 </pre>
  * </ol>
- * @author <a href="l.girndt @tu-bs.de">Lars Girndt</a>
+ * @author <a href="l.girndtï¿½@tu-bs.de">Lars Girndt</a>
  *
  */
 public class CmdLineClient implements IClient {
@@ -50,7 +50,6 @@ public class CmdLineClient implements IClient {
 	 * @see de.tubs.cs.iti.krypto.protokoll.IClient#end(java.lang.String)
 	 */
 	public void end(String message) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -58,7 +57,6 @@ public class CmdLineClient implements IClient {
 	 * @see de.tubs.cs.iti.krypto.protokoll.IClient#playerNumberChanged(int)
 	 */
 	public void playerNumberChanged(int newPlayerNumber) {
-		// TODO Auto-generated method stub
 		playerNumber = newPlayerNumber;
 		
 		// if player number 2 let's start
@@ -101,7 +99,6 @@ public class CmdLineClient implements IClient {
 				com.sendTo(-2, String.valueOf(com.myNumber()));
 			}
 		} catch (Exception e) {
-			// TODO: handle exception
 			System.err.println("An Exception occured: " + e.getMessage());
 			e.printStackTrace();
 		}
@@ -118,7 +115,6 @@ public class CmdLineClient implements IClient {
 				Integer.parseInt(args[2]));
 			client.connect();
 		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
