@@ -140,7 +140,8 @@ public final class StationToStation implements Protocol {
 			// Hole IDEA Schlüssel (lowest 128 bit of k)
 			BigInteger keyIdea = getIdeaKey(k, 128);
 			if (DEBUG) {
-				System.out.println("DDD| Idea Schlüssel: " + keyIdea);
+				System.out.println("DDD| Idea Schlüssel: " + keyIdea + " ("
+						+ keyIdea.bitLength() + ")");
 			}
 
 			// (4)b TODO Prüfe Zertifikat von Bob
@@ -236,7 +237,7 @@ public final class StationToStation implements Protocol {
 			// (3)a B berechnet A IDEA Key ( 128 lowest bits of k)
 			BigInteger keyIdea = getIdeaKey(k, 128);
 			if (DEBUG) {
-				System.out.println("DDD| IDEA key = " + keyIdea + "("
+				System.out.println("DDD| IDEA key = " + keyIdea + " ("
 						+ keyIdea.bitLength() + ")");
 			}
 
