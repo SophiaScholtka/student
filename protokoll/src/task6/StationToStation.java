@@ -86,16 +86,15 @@ public final class StationToStation implements Protocol {
 			}
 
 			// (0)d A empfängt B Public RSA (eB, nB)
+			System.out.println("Warte auf Public RSA von Bob.");
 			String sReceive;
 			sReceive = Com.receive();
 			BigInteger foeRsaE = new BigInteger(sReceive, RADIX_SEND_); // eB
-			if (DEBUG) {
-			}
 			sReceive = Com.receive();
-			BigInteger foeRsaN = new BigInteger(sReceive, RADIX_SEND_); // eB
+			BigInteger foeRsaN = new BigInteger(sReceive, RADIX_SEND_); // nB
 			if (DEBUG) {
-				System.out.println("DDD| A empfängt RSA nB von B: " + foeRsaN);
 				System.out.println("DDD| A empfängt RSA eB von B: " + foeRsaE);
+				System.out.println("DDD| A empfängt RSA nB von B: " + foeRsaN);
 			}
 
 			// (1)a A wählt x zufällig in {1,...,p-2}
@@ -108,7 +107,30 @@ public final class StationToStation implements Protocol {
 			if (DEBUG) {
 				System.out.println("DDD| A sendet yA an B: " + myY);
 			}
+			
+			
+			// (3) Empfange Z(Bob),yB, Ek(SB(yB,yA)))
+			sReceive = Com.receive();
+			BigInteger foeZ = new BigInteger(sReceive,RADIX_SEND_);
+			sReceive = Com.receive();
+			BigInteger foeY = new BigInteger(sReceive,RADIX_SEND_);
+			sReceive = Com.receive();
+			BigInteger foeCiph = new BigInteger(sReceive,RADIX_SEND_);
+			if(DEBUG) {
+				System.out.println("DDD| Empfangen von Bob:");
+				System.out.println("DDD| \t Z(Bob) = " + foeZ);
+				System.out.println("DDD| \t yB = " + foeY);
+				System.out.println("DDD| \t E_k(S_B(yB,yA)) = " + foeCiph);
+			}
+			
+			
+			// (4)a Berechne k = yB ^ xA mod p
+			BigInteger k = foeY.modPow(myX, myP);
+			
+			// Hole IDEA Schlüssel (lowest 128 bit of k)
+			BigInteger keyIdea = getIdeaKey(k, 128);
 
+			// (4)b TODO Prüfe Zertifikat von Bob
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -129,13 +151,12 @@ public final class StationToStation implements Protocol {
 			BigInteger myRsaE = keyRSA[1];
 			BigInteger myRsaD = keyRSA[2];
 
-			// TODO Erhalte IDEA-Keys
-
 			// (0)a A Nutzerangabe, wo Hashparameter
 			String fileHash = "../Station-to-Station/hashparameters";
 			// (0)a2 Auslesen der Hashparameter
 			BufferedReader hashParam = createReader(fileHash);
 			Fingerprint hf = new Fingerprint();
+			hf.setDebug(true);
 			hf.readParam(hashParam); // d.h. Hashparameter sind jetzt im Objekt
 										// gespeichert
 
@@ -182,15 +203,7 @@ public final class StationToStation implements Protocol {
 			// (2)c B bestimmt Schlüssel k
 			BigInteger k = foeY.modPow(myX, foeGamalP);
 			if (DEBUG) {
-				System.out.println("DDD| k " + k + "("
-						+ k.bitLength() + ")");
-			}
-			
-			//TODO wird erst nach dem Hash gemacht eigenltich
-			BigInteger keyIdeaT = getIdeaKey(k, 128);
-			if (DEBUG) {
-				System.out.println("DDD| IDEA key = " + keyIdeaT + "("
-						+ keyIdeaT.bitLength() + ")");
+				System.out.println("DDD| k " + k + "(" + k.bitLength() + ")");
 			}
 
 			// (2)d B bestimmt Signatur SB(yB,yA)=(h(yB,yA))^dB mod nB
@@ -204,11 +217,23 @@ public final class StationToStation implements Protocol {
 						+ keyIdea.bitLength() + ")");
 			}
 
+			// TODO Berechne Zertifikat Z(Bob)
+			BigInteger myZ = new BigInteger("zertifikat",26);
+			
+			// TODO Bestimmte Ciffre E_K(S_B(yB,YA))
+			BigInteger myCiph = new BigInteger("ciphersignature",26);
 			// (3)b B schickt (Z(Bob), yB, Ek(sB(yB,yA))) an A
 			// TODO Sende Bobs Zertifikat und Kram.
-
-			// FileInputStream fis = new FileInputStream("bla");
-
+			Com.sendTo(0, myZ.toString(RADIX_SEND_));
+			Com.sendTo(0, myY.toString(RADIX_SEND_));
+			Com.sendTo(0, myCiph.toString(RADIX_SEND_));
+			if(DEBUG) {
+				System.out.println("DDD| (3) Bob sendet an Alice:");
+				System.out.println("DDD| \t Z(Bob) = " + myZ);
+				System.out.println("DDD| \t yB = " + myY);
+				System.out.println("DDD| \t E_k(S_B(yB,yA)) = " + myCiph);
+			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -230,7 +255,7 @@ public final class StationToStation implements Protocol {
 		String tmp = k.toString(2);
 		tmp = tmp.substring(tmp.length() - bitCount);
 		BigInteger keyIdea = new BigInteger(tmp, 2);
-		
+
 		return keyIdea;
 	}
 
