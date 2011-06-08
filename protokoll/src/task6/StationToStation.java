@@ -8,7 +8,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.math.BigInteger;
+import java.util.Random;
 
+import chiffre.Grundlagen;
 import chiffre.RSA;
 
 import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
@@ -63,12 +65,16 @@ public final class StationToStation implements Protocol {
 			BigInteger myHashG1 = keyHash[1];
 			BigInteger myHashG2 = keyHash[2];
 
-			// (0)b A Parameter p, g an B senden
-			Com.sendTo(1, myHashP.toString(RADIX_SEND)); // p
-			Com.sendTo(1, myHashG1.toString(RADIX_SEND)); // g1
+			// (0)b A Parameter p, g generieren und an B senden
+			int bitLength = 512;
+			BigInteger[] prime = Grundlagen.generatePrimePQ(bitLength);
+			BigInteger myP = prime[0];
+			BigInteger myG = Grundlagen.calcPrimeRoot(myP, prime[1]);
+			Com.sendTo(1, myP.toString(RADIX_SEND)); // p
+			Com.sendTo(1, myG.toString(RADIX_SEND)); // g
 			if (DEBUG) {
-				System.out.println("DDD| A sendet P an B: " + myHashP);
-				System.out.println("DDD| A sendet G1 an B: " + myHashG1);
+				System.out.println("DDD| A sendet P an B: " + myP);
+				System.out.println("DDD| A sendet G an B: " + myG);
 			}
 
 			// (0)c A Public RSA (eA, nA) an B senden
@@ -191,6 +197,7 @@ public final class StationToStation implements Protocol {
 			// (3) B schickt (Z(Bob), yB, Ek(sB(yB,yA))) an A
 			//TODO Sende Bobs Zertifikat und Kram.
 			
+			FileInputStream fis = new FileInputStream("bla");
 			
 			
 			
