@@ -32,7 +32,7 @@ import de.tubs.cs.iti.jcrypt.chiffre.HashFunction;
  */
 public final class Fingerprint extends HashFunction {
 
-private final boolean DEBUG = true;
+private boolean DEBUG = false;
 	
 	private BigInteger myP_;
 	private BigInteger myG1_;
@@ -263,7 +263,13 @@ public BigInteger hashIt(ArrayList<Byte> clear) {
 	  
   }
   
+  public void setDebug(boolean b) {
+	  DEBUG = b;
+  }
   
+  public boolean getDebug() {
+	  return DEBUG;
+  }
   
   
 
