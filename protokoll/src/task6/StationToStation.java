@@ -146,12 +146,12 @@ public final class StationToStation implements Protocol {
 			// (0) B empfängt p und g von A
 			String sReceive = "";
 			sReceive = Com.receive();
-			BigInteger foeHashP = new BigInteger(sReceive, RADIX_SEND);
+			BigInteger foeP = new BigInteger(sReceive, RADIX_SEND);
 			sReceive = Com.receive();
-			BigInteger foeHashG1 = new BigInteger(sReceive, RADIX_SEND);
+			BigInteger foeG = new BigInteger(sReceive, RADIX_SEND);
 			if (DEBUG) {
-				System.out.println("DDD| B received p of A: " + foeHashP);
-				System.out.println("DDD| B received G1 of A: " + foeHashG1);
+				System.out.println("DDD| B received p of A: " + foeP);
+				System.out.println("DDD| B received G1 of A: " + foeG);
 			}
 
 			// (0) B empfängt eA und nA von A
@@ -188,10 +188,10 @@ public final class StationToStation implements Protocol {
 			// (2)b B berechnet y = g^x mod p
 			BigInteger myY = myHashG1.modPow(myX, myHashP);
 			// (2)c B bestimmt Schlüssel k
-			BigInteger k = foeY.modPow(myX, foeHashP);
+			BigInteger k = foeY.modPow(myX, foeP);
 			
 			// (2)d B bestimmt Signatur SB(yB,yA)=(h(yB,yA))^dB mod nB
-			BigInteger hashedY = computeHash(foeHashP, myY, foeY);
+			BigInteger hashedY = computeHash(foeP, myY, foeY);
 			BigInteger sig = hashedY.modPow(myRsaD, myRsaN);
 			
 			// (3) B schickt (Z(Bob), yB, Ek(sB(yB,yA))) an A
