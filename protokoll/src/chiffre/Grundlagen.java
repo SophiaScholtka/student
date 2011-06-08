@@ -27,7 +27,6 @@ public class Grundlagen {
 		  back[1] = q;
 		  return back;
 	}
-	
 
 	public static BigInteger generatePrime(int bitLength) {
 
@@ -46,6 +45,7 @@ public class Grundlagen {
 		  
 		  return p;
 	}
+
 	/**
 	 * Algo 7.3
 	 * 

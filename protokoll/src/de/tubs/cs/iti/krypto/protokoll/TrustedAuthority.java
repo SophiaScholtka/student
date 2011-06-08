@@ -4,11 +4,9 @@
 
 package de.tubs.cs.iti.krypto.protokoll;
 
-import java.io.*;
-import java.math.*;
-import java.security.*;
-import java.util.*;
-import de.tubs.cs.iti.jcrypt.chiffre.*;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.util.Random;
 
 // import de.tubs.cs.iti.krypto.chiffre.*;
 
