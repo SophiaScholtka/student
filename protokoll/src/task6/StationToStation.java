@@ -50,10 +50,12 @@ public final class StationToStation implements Protocol {
 		// Player 0 = A; Player 1 = B
 		try {
 			// Erhalte RSA-Keys
+			System.out.print("Generiere RSA Key für mich... Augenblick...");
 			BigInteger[] keyRSA = RSA.generateKey(512);
 			BigInteger myRsaN = keyRSA[0];
 			BigInteger myRsaE = keyRSA[1];
 			BigInteger myRsaD = keyRSA[2];
+			System.out.println("\t [OK]");
 
 			// (0)a A Nutzerangabe, wo Hashparameter
 			String fileHash = "../Station-to-Station/hashparameters";
@@ -66,6 +68,8 @@ public final class StationToStation implements Protocol {
 			BigInteger myHashG2 = keyHash[2];
 
 			// (0)b A Parameter p, g generieren und an B senden
+			System.out
+					.print("Generiere El-Gamal Key für mich... Augenblick...");
 			int bitLength = 512;
 			BigInteger[] prime = Grundlagen.generatePrimePQ(bitLength);
 			BigInteger myP = prime[0];
@@ -73,16 +77,19 @@ public final class StationToStation implements Protocol {
 			Com.sendTo(1, myP.toString(RADIX_SEND_)); // p
 			Com.sendTo(1, myG.toString(RADIX_SEND_)); // g
 			if (DEBUG) {
-				System.out.println("DDD| (0) A sendet P an B: " + myP);
-				System.out.println("DDD| (0) A sendet G an B: " + myG);
+				System.out.println("DDD| (0) A sendet an B:");
+				System.out.println("DDD| \t p =  " + myP);
+				System.out.println("DDD| \t g =" + myG);
 			}
+			System.out.println("\t [OK]");
 
 			// (0)c A Public RSA (eA, nA) an B senden
 			Com.sendTo(1, myRsaE.toString(RADIX_SEND_)); // eA
 			Com.sendTo(1, myRsaN.toString(RADIX_SEND_)); // nA
 			if (DEBUG) {
-				System.out.println("DDD| (0) A sendet RSA eA an B: " + myRsaE);
-				System.out.println("DDD| (0) A sendet RSA nA an B: " + myRsaN);
+				System.out.println("DDD| (0) A sendet RSA an B:");
+				System.out.println("DDD| \t eA = " + myRsaE);
+				System.out.println("DDD| \t nA = " + myRsaN);
 			}
 
 			// (0)d A empfängt B Public RSA (eB, nB)
@@ -92,10 +99,9 @@ public final class StationToStation implements Protocol {
 			sReceive = Com.receive();
 			BigInteger foeRsaN = new BigInteger(sReceive, RADIX_SEND_); // nB
 			if (DEBUG) {
-				System.out.println("DDD| (0) A empfängt RSA eB von B: "
-						+ foeRsaE);
-				System.out.println("DDD| (0) A empfängt RSA nB von B: "
-						+ foeRsaN);
+				System.out.println("DDD| (0) A empfängt RSA von B:");
+				System.out.println("DDD| \t eB = " + foeRsaE);
+				System.out.println("DDD| \t nB = " + foeRsaN);
 			}
 
 			// (1)a A wählt x zufällig in {1,...,p-2}
@@ -131,7 +137,7 @@ public final class StationToStation implements Protocol {
 
 			// Hole IDEA Schlüssel (lowest 128 bit of k)
 			BigInteger keyIdea = getIdeaKey(k, 128);
-			if(DEBUG) {
+			if (DEBUG) {
 				System.out.println("DDD| Idea Schlüssel: " + keyIdea);
 			}
 
@@ -151,10 +157,12 @@ public final class StationToStation implements Protocol {
 		}
 		try {
 			// Erhalte RSA-Keys
+			System.out.print("Generiere RSA Key für mich... Augenblick...");
 			BigInteger[] keyRSA = RSA.generateKey(512);
 			BigInteger myRsaN = keyRSA[0];
 			BigInteger myRsaE = keyRSA[1];
 			BigInteger myRsaD = keyRSA[2];
+			System.out.println("\t [OK]");
 
 			// (0)a A Nutzerangabe, wo Hashparameter
 			String fileHash = "../Station-to-Station/hashparameters";
@@ -172,8 +180,9 @@ public final class StationToStation implements Protocol {
 			sReceive = Com.receive();
 			BigInteger foeGamalG = new BigInteger(sReceive, RADIX_SEND_);
 			if (DEBUG) {
-				System.out.println("DDD| (0) B received P of A: " + foeGamalP);
-				System.out.println("DDD| (0) B received G of A: " + foeGamalG);
+				System.out.println("DDD| (0) B empfängt von A:");
+				System.out.println("DDD| \t p = " + foeGamalP);
+				System.out.println("DDD| \t g = " + foeGamalG);
 			}
 
 			// (0) B empfängt eA und nA von A
@@ -182,16 +191,18 @@ public final class StationToStation implements Protocol {
 			sReceive = Com.receive();
 			BigInteger foeRsaN = new BigInteger(sReceive, RADIX_SEND_);
 			if (DEBUG) {
-				System.out.println("DDD| (0) B received RSA e of A: " + foeRsaE);
-				System.out.println("DDD| (0) B received RSA n of A: " + foeRsaN);
+				System.out.println("DDD| (0) B empfängt RSA von A:");
+				System.out.println("DDD| \t e = " + foeRsaE);
+				System.out.println("DDD| \t n = " + foeRsaN);
 			}
 
 			// (0) B sendet A seine eB, nB
 			Com.sendTo(0, myRsaE.toString(RADIX_SEND_)); // eA
 			Com.sendTo(0, myRsaN.toString(RADIX_SEND_)); // nA
 			if (DEBUG) {
-				System.out.println("DDD| (0) B sendet RSA e an A: " + myRsaE);
-				System.out.println("DDD| (0) B sendet RSA n an A: " + myRsaN);
+				System.out.println("DDD| (0) B sendet RSA an A:");
+				System.out.println("DDD| \t e = " + myRsaE);
+				System.out.println("DDD| \t n = " + myRsaN);
 			}
 
 			// B empfängt yA
@@ -212,7 +223,8 @@ public final class StationToStation implements Protocol {
 				System.out.println("DDD| (2) Bob berechnet:");
 				System.out.println("DDD| \t x = " + myX);
 				System.out.println("DDD| \t y = " + myY);
-				System.out.println("DDD| \t k = " + k + "(" + k.bitLength() + ")");
+				System.out.println("DDD| \t k = " + k + "(" + k.bitLength()
+						+ ")");
 			}
 
 			// (2)d B bestimmt Signatur SB(yB,yA)=(h(yB,yA))^dB mod nB
@@ -227,9 +239,9 @@ public final class StationToStation implements Protocol {
 			}
 
 			// TODO Berechne Zertifikat Z(Bob)
-			BigInteger myZ = new BigInteger("zertifikat", 26);
+			BigInteger myZ = new BigInteger("aaaa", 16);
 			// TODO Bestimmte Ciffre E_K(S_B(yB,YA))
-			BigInteger myCiph = new BigInteger("ciphersignature", 26);
+			BigInteger myCiph = new BigInteger("cccc", 16);
 			// (3)b B schickt (Z(Bob), yB, Ek(sB(yB,yA))) an A
 			// TODO Sende Bobs Zertifikat und Kram.
 			Com.sendTo(0, myZ.toString(RADIX_SEND_));
@@ -283,13 +295,14 @@ public final class StationToStation implements Protocol {
 		m = m.add(v);
 		byte[] mbyte = m.toByteArray();
 		ArrayList<Byte> mlist = new ArrayList<Byte>();
-		for(int i=0;i<mbyte.length;i++){
+		for (int i = 0; i < mbyte.length; i++) {
 			mlist.add(mbyte[i]);
 		}
- 		BigInteger hash = hf.hashIt(mlist);
+		BigInteger hash = hf.hashIt(mlist);
 		// FIXME mlist ArrayIndexOutOfBoundsException: -1
-		//ArrayList<Byte> mlist = new ArrayList(java.util.Arrays.asList(mbyte));
-		//BigInteger hash = hf.hashIt(mlist);
+		// ArrayList<Byte> mlist = new
+		// ArrayList(java.util.Arrays.asList(mbyte));
+		// BigInteger hash = hf.hashIt(mlist);
 
 		return hash;
 	}
