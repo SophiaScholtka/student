@@ -67,7 +67,7 @@ public final class StationToStation implements Protocol {
 
 			// (0)b A Parameter p, g generieren und an B senden
 			int bitLength = 512;
-			BigInteger[] prime = Grundlagen.generateSecurePrimePQ(bitLength);
+			BigInteger[] prime = Grundlagen.generatePrimePQ(bitLength);
 			BigInteger myP = prime[0];
 			BigInteger myG = Grundlagen.calcPrimeRoot(myP, prime[1]);
 			Com.sendTo(1, myP.toString(RADIX_SEND_)); // p
@@ -181,13 +181,8 @@ public final class StationToStation implements Protocol {
 				System.out.println("DDD| B received RSA n of A: " + foeRsaN);
 			}
 			// (0) B sendet A seine eB, nB
-<<<<<<< HEAD
-			Com.sendTo(1, myRsaE.toString(RADIX_SEND)); // eB
-			Com.sendTo(1, myRsaN.toString(RADIX_SEND)); // nB
-=======
-			Com.sendTo(1, myRsaE.toString(RADIX_SEND_)); // eA
-			Com.sendTo(1, myRsaN.toString(RADIX_SEND_)); // nA
->>>>>>> branch 'master' of https://github.com/SophiaScholtka/student.git
+			Com.sendTo(1, myRsaE.toString(RADIX_SEND_)); // eB
+			Com.sendTo(1, myRsaN.toString(RADIX_SEND_)); // nB
 			if (DEBUG) {
 				System.out.println("DDD| B sendet RSA e an A: " + myRsaE);
 				System.out.println("DDD| B sendet RSA n an A: " + myRsaN);
@@ -224,19 +219,6 @@ public final class StationToStation implements Protocol {
 
 			// TODO Berechne Zertifikat Z(Bob)
 			BigInteger myZ = new BigInteger("zertifikat",26);
-			
-<<<<<<< HEAD
-			// (3) B schickt (Z(Bob), yB, Ek(sB(yB,yA))) an A
-			//TODO Sende Bobs Zertifikat und Kram.
-			
-			
-			
-//			Com.sendTo(1, irgendwas.toString(RADIX_SEND));
-			
-			FileInputStream fis = new FileInputStream("bla");
-			
-			
-=======
 			// TODO Bestimmte Ciffre E_K(S_B(yB,YA))
 			BigInteger myCiph = new BigInteger("ciphersignature",26);
 			// (3)b B schickt (Z(Bob), yB, Ek(sB(yB,yA))) an A
@@ -250,7 +232,6 @@ public final class StationToStation implements Protocol {
 				System.out.println("DDD| \t yB = " + myY);
 				System.out.println("DDD| \t E_k(S_B(yB,yA)) = " + myCiph);
 			}
->>>>>>> branch 'master' of https://github.com/SophiaScholtka/student.git
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -292,17 +273,14 @@ public final class StationToStation implements Protocol {
 		m = u.multiply(p);
 		m = m.add(v);
 		byte[] mbyte = m.toByteArray();
-<<<<<<< HEAD
 		ArrayList<Byte> mlist = new ArrayList<Byte>();
 		for(int i=0;i<mbyte.length;i++){
 			mlist.add(mbyte[i]);
 		}
  		BigInteger hash = hf.hashIt(mlist);
-=======
 		// FIXME mlist ArrayIndexOutOfBoundsException: -1
-		ArrayList<Byte> mlist = new ArrayList(java.util.Arrays.asList(mbyte));
-		BigInteger hash = hf.hashIt(mlist);
->>>>>>> branch 'master' of https://github.com/SophiaScholtka/student.git
+		//ArrayList<Byte> mlist = new ArrayList(java.util.Arrays.asList(mbyte));
+		//BigInteger hash = hf.hashIt(mlist);
 
 		return hash;
 	}
