@@ -6,43 +6,44 @@ import java.util.Random;
 import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
 
 public class Grundlagen {
+	
+	public static BigInteger[] generatePrimePQ(int bitLength) {
 
-	/**
-	 * Algo 7.3 für sichere Primzahl
-	 * @param bitLength
-	 * @return
-	 */
-	public static BigInteger[] generateSecurePrimePQ(int bitLength) {
-
-		// erzeuge sichere Primzahl p, min 512 bits
-		Random random = new Random();
-		boolean isPrime = false;
-		BigInteger p = BigIntegerUtil.TWO;
-		BigInteger q = BigIntegerUtil.TWO;
-		do {
-			q = BigInteger.probablePrime(bitLength - 1, random);
-			p = q.multiply(BigIntegerUtil.TWO);
-			p = p.add(BigInteger.ONE);
-
-			isPrime = p.isProbablePrime(99);
-		} while (!isPrime);
-
-		BigInteger[] back = new BigInteger[2];
-		back[0] = p;
-		back[1] = q;
-		return back;
+		  // erzeuge sichere Primzahl p, min 512 bits
+		  Random random = new Random();
+		  boolean isPrime = false;
+		  BigInteger p = BigIntegerUtil.TWO;
+		  BigInteger q = BigIntegerUtil.TWO;
+		  do {
+			  q = BigInteger.probablePrime(bitLength-1, random);
+			  p = q.multiply(BigIntegerUtil.TWO);
+			  p = p.add(BigInteger.ONE);
+			  
+			  isPrime = p.isProbablePrime(99);
+		  } while (!isPrime);
+		  
+		  BigInteger[] back = new BigInteger[2];
+		  back[0] = p;
+		  back[1] = q;
+		  return back;
 	}
 
-	/**
-	 * Algo 7.3 für sichere Primzahl
-	 * @param bitLength
-	 * @return
-	 */
-	public static BigInteger generateSecurePrime(int bitLength) {
+	public static BigInteger generatePrime(int bitLength) {
 
-		BigInteger[] back = generateSecurePrimePQ(bitLength);
-
-		return back[0];
+		  // erzeuge sichere Primzahl p, min 512 bits
+		  Random random = new Random();
+		  boolean isPrime = false;
+		  BigInteger p = BigIntegerUtil.TWO;
+		  BigInteger q = BigIntegerUtil.TWO;
+		  do {
+			  q = BigInteger.probablePrime(bitLength-1, random);
+			  p = q.multiply(BigIntegerUtil.TWO);
+			  p = p.add(BigInteger.ONE);
+			  
+			  isPrime = p.isProbablePrime(99);
+		  } while (!isPrime);
+		  
+		  return p;
 	}
 
 	/**
