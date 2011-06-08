@@ -130,22 +130,20 @@ public final class StationToStation implements Protocol {
 
 			// (0)a A Nutzerangabe, wo Hashparameter
 			String fileHash = "../Station-to-Station/bob-hash";
-			
 			// (0)a2 Auslesen der Hashparameter
-			BigInteger[] keyHash = readIntegers(fileHash, 3);
-			BigInteger myHashP = keyHash[0];
-			BigInteger myHashG1 = keyHash[1];
-			BigInteger myHashG2 = keyHash[2];
+			BufferedReader hashParam = createReader(fileHash);
+			Fingerprint hashfunct = new Fingerprint();
+			hashfunct.readParam(hashParam); //d.h. Hashparameter sind jetzt im Objekt gespeichert
 
 			// (0) B empfängt p und g von A
 			String sReceive = "";
 			sReceive = Com.receive();
-			BigInteger foeHashP = new BigInteger(sReceive, RADIX_SEND);
+			BigInteger foeGamalP = new BigInteger(sReceive, RADIX_SEND);
 			sReceive = Com.receive();
-			BigInteger foeHashG1 = new BigInteger(sReceive, RADIX_SEND);
+			BigInteger foeGamalG = new BigInteger(sReceive, RADIX_SEND);
 			if (DEBUG) {
-				System.out.println("DDD| B received p of A: " + foeHashP);
-				System.out.println("DDD| B received G1 of A: " + foeHashG1);
+				System.out.println("DDD| B received p of A: " + foeGamalP);
+				System.out.println("DDD| B received G1 of A: " + foeGamalG);
 			}
 
 			// (0) B empfängt eA und nA von A
@@ -176,16 +174,16 @@ public final class StationToStation implements Protocol {
 			
 
 			// (2)a B wählt x zufällig in {1,...,p-2}
-			BigInteger help = myHashP.subtract(BigIntegerUtil.TWO);
+			BigInteger help = foeGamalP.subtract(BigIntegerUtil.TWO);
 			BigInteger myX = BigIntegerUtil.randomBetween(BigInteger.ONE,
 					help);
 			// (2)b B berechnet y = g^x mod p
-			BigInteger myY = myHashG1.modPow(myX, myHashP);
+			BigInteger myY = foeGamalG.modPow(myX, foeGamalP);
 			// (2)c B bestimmt Schlüssel k
-			BigInteger k = foeY.modPow(myX, foeHashP);
+			BigInteger k = foeY.modPow(myX, foeGamalP);
 			
 			// (2)d B bestimmt Signatur SB(yB,yA)=(h(yB,yA))^dB mod nB
-			BigInteger hashedY = computeHash(foeHashP, myY, foeY);
+			BigInteger hashedY = computeHash(foeGamalP, myY, foeY);
 			BigInteger sig = hashedY.modPow(myRsaD, myRsaN);
 			
 			// (3) B schickt (Z(Bob), yB, Ek(sB(yB,yA))) an A
