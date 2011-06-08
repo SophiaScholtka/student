@@ -16,6 +16,7 @@ import chiffre.RSA;
 
 import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
 import de.tubs.cs.iti.krypto.protokoll.*;
+import sun.security.x509.KeyIdentifier;
 import task3.IDEA;
 import task5.Fingerprint;
 import task6.StationToStation;
@@ -75,7 +76,7 @@ public final class StationToStation implements Protocol {
 			BigInteger myP = prime[0];
 			BigInteger myG = Grundlagen.calcPrimeRoot(myP, prime[1]);
 			System.out.println("\t [OK]");
-			
+
 			// (0)b2 Parameter p, g an B senden
 			Com.sendTo(1, myP.toString(RADIX_SEND_)); // p
 			Com.sendTo(1, myG.toString(RADIX_SEND_)); // g
