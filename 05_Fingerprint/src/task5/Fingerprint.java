@@ -81,7 +81,7 @@ private ArrayList<Byte> getClear(FileInputStream cleartext) {
 	return back;
 }
 
-private BigInteger hashIt(ArrayList<Byte> clear) {
+public BigInteger hashIt(ArrayList<Byte> clear) {
 	//Länge von P herausfinden, damit passende Stückchen eingelesen werden können
 	int Lp=myP_.bitLength();
 	int clearlen = clear.size();

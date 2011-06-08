@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Random;
 
 import chiffre.Grundlagen;
@@ -138,8 +139,8 @@ public final class StationToStation implements Protocol {
 			String fileHash = "../Station-to-Station/bob-hash";
 			// (0)a2 Auslesen der Hashparameter
 			BufferedReader hashParam = createReader(fileHash);
-			Fingerprint hashfunct = new Fingerprint();
-			hashfunct.readParam(hashParam); //d.h. Hashparameter sind jetzt im Objekt gespeichert
+			Fingerprint hf = new Fingerprint();
+			hf.readParam(hashParam); //d.h. Hashparameter sind jetzt im Objekt gespeichert
 
 			// (0) B empfängt p und g von A
 			String sReceive = "";
@@ -189,7 +190,7 @@ public final class StationToStation implements Protocol {
 			BigInteger k = foeY.modPow(myX, foeGamalP);
 			
 			// (2)d B bestimmt Signatur SB(yB,yA)=(h(yB,yA))^dB mod nB
-			BigInteger hashedY = computeHash(foeGamalP, myY, foeY);
+			BigInteger hashedY = computeHash(hf, foeGamalP, myY, foeY);
 			BigInteger sig = hashedY.modPow(myRsaD, myRsaN);
 			
 			// (3) B schickt (Z(Bob), yB, Ek(sB(yB,yA))) an A
@@ -224,17 +225,15 @@ public final class StationToStation implements Protocol {
 	 * @param v
 	 * @return
 	 */
-	private BigInteger computeHash(BigInteger p, BigInteger u, BigInteger v) {
+	private BigInteger computeHash(Fingerprint hf, BigInteger p, BigInteger u, BigInteger v) {
 		
 		// m = u*p+v
 		BigInteger m;
 		m = u.multiply(p);
 		m = m.add(v);
-
-		Fingerprint h = new Fingerprint();
-//		h.readParam(param);
-//		h.hash(cleartext, ciphertext);
-		BigInteger hash = new BigInteger("0"); // TODO Hashen mit Fingerprint
+		byte[] mbyte = m.toByteArray();
+		ArrayList<Byte> mlist = new ArrayList(java.util.Arrays.asList(mbyte));
+ 		BigInteger hash = hf.hashIt(mlist);
 
 		return hash;
 	}
