@@ -7,7 +7,12 @@ import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
 
 public class Grundlagen {
 
-	public static BigInteger[] generatePrimePQ(int bitLength) {
+	/**
+	 * Algo 7.3 für sichere Primzahl
+	 * @param bitLength
+	 * @return
+	 */
+	public static BigInteger[] generateSecurePrimePQ(int bitLength) {
 
 		// erzeuge sichere Primzahl p, min 512 bits
 		Random random = new Random();
@@ -28,9 +33,14 @@ public class Grundlagen {
 		return back;
 	}
 
-	public static BigInteger generatePrime(int bitLength) {
+	/**
+	 * Algo 7.3 für sichere Primzahl
+	 * @param bitLength
+	 * @return
+	 */
+	public static BigInteger generateSecurePrime(int bitLength) {
 
-		BigInteger[] back = generatePrimePQ(bitLength);
+		BigInteger[] back = generateSecurePrimePQ(bitLength);
 
 		return back[0];
 	}
