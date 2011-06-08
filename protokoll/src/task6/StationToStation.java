@@ -67,21 +67,23 @@ public final class StationToStation implements Protocol {
 			BigInteger myHashG1 = keyHash[1];
 			BigInteger myHashG2 = keyHash[2];
 
-			// (0)b A Parameter p, g generieren und an B senden
-			System.out
-					.print("Generiere El-Gamal Key für mich... Augenblick...");
+			// (0)b1 A Parameter p, g generieren
+			System.out.print("Generiere El-Gamal Key für mich... "
+					+ "Augenblick...");
 			int bitLength = 512;
 			BigInteger[] prime = Grundlagen.generatePrimePQ(bitLength);
 			BigInteger myP = prime[0];
 			BigInteger myG = Grundlagen.calcPrimeRoot(myP, prime[1]);
+			System.out.println("\t [OK]");
+			
+			// (0)b2 Parameter p, g an B senden
 			Com.sendTo(1, myP.toString(RADIX_SEND_)); // p
 			Com.sendTo(1, myG.toString(RADIX_SEND_)); // g
 			if (DEBUG) {
 				System.out.println("DDD| (0) A sendet an B:");
-				System.out.println("DDD| \t p =  " + myP);
-				System.out.println("DDD| \t g =" + myG);
+				System.out.println("DDD| \t p = " + myP);
+				System.out.println("DDD| \t g = " + myG);
 			}
-			System.out.println("\t [OK]");
 
 			// (0)c A Public RSA (eA, nA) an B senden
 			Com.sendTo(1, myRsaE.toString(RADIX_SEND_)); // eA
@@ -124,8 +126,8 @@ public final class StationToStation implements Protocol {
 			BigInteger foeCiph = new BigInteger(sReceive, RADIX_SEND_);
 			if (DEBUG) {
 				System.out.println("DDD| (3) Empfangen von Bob:");
-				System.out.println("DDD| \t Z(Bob) = " + foeZ);
-				System.out.println("DDD| \t yB = " + foeY);
+				System.out.println("DDD| \t Z(Bob)          = " + foeZ);
+				System.out.println("DDD| \t yB              = " + foeY);
 				System.out.println("DDD| \t E_k(S_B(yB,yA)) = " + foeCiph);
 			}
 
@@ -249,8 +251,8 @@ public final class StationToStation implements Protocol {
 			Com.sendTo(0, myCiph.toString(RADIX_SEND_));
 			if (DEBUG) {
 				System.out.println("DDD| (3) Bob sendet an Alice:");
-				System.out.println("DDD| \t Z(Bob) = " + myZ);
-				System.out.println("DDD| \t yB = " + myY);
+				System.out.println("DDD| \t Z(Bob)          = " + myZ);
+				System.out.println("DDD| \t yB              = " + myY);
 				System.out.println("DDD| \t E_k(S_B(yB,yA)) = " + myCiph);
 			}
 
