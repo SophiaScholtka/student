@@ -73,28 +73,29 @@ public final class StationToStation implements Protocol {
 			Com.sendTo(1, myP.toString(RADIX_SEND_)); // p
 			Com.sendTo(1, myG.toString(RADIX_SEND_)); // g
 			if (DEBUG) {
-				System.out.println("DDD| A sendet P an B: " + myP);
-				System.out.println("DDD| A sendet G an B: " + myG);
+				System.out.println("DDD| (0) A sendet P an B: " + myP);
+				System.out.println("DDD| (0) A sendet G an B: " + myG);
 			}
 
 			// (0)c A Public RSA (eA, nA) an B senden
 			Com.sendTo(1, myRsaE.toString(RADIX_SEND_)); // eA
 			Com.sendTo(1, myRsaN.toString(RADIX_SEND_)); // nA
 			if (DEBUG) {
-				System.out.println("DDD| A sendet RSA eA an B: " + myRsaE);
-				System.out.println("DDD| A sendet RSA nA an B: " + myRsaN);
+				System.out.println("DDD| (0) A sendet RSA eA an B: " + myRsaE);
+				System.out.println("DDD| (0) A sendet RSA nA an B: " + myRsaN);
 			}
 
 			// (0)d A empfängt B Public RSA (eB, nB)
-			System.out.println("Warte auf Public RSA von Bob.");
 			String sReceive;
 			sReceive = Com.receive();
 			BigInteger foeRsaE = new BigInteger(sReceive, RADIX_SEND_); // eB
 			sReceive = Com.receive();
 			BigInteger foeRsaN = new BigInteger(sReceive, RADIX_SEND_); // nB
 			if (DEBUG) {
-				System.out.println("DDD| A empfängt RSA eB von B: " + foeRsaE);
-				System.out.println("DDD| A empfängt RSA nB von B: " + foeRsaN);
+				System.out.println("DDD| (0) A empfängt RSA eB von B: "
+						+ foeRsaE);
+				System.out.println("DDD| (0) A empfängt RSA nB von B: "
+						+ foeRsaN);
 			}
 
 			// (1)a A wählt x zufällig in {1,...,p-2}
@@ -105,30 +106,34 @@ public final class StationToStation implements Protocol {
 			// (1)c A sendet y an B
 			Com.sendTo(1, myY.toString(RADIX_SEND_)); // g1
 			if (DEBUG) {
-				System.out.println("DDD| A sendet yA an B: " + myY);
+				System.out.println("DDD| (1) A sendet yA an B: " + myY);
 			}
-			
-			
+
 			// (3) Empfange Z(Bob),yB, Ek(SB(yB,yA)))
 			sReceive = Com.receive();
-			BigInteger foeZ = new BigInteger(sReceive,RADIX_SEND_);
+			BigInteger foeZ = new BigInteger(sReceive, RADIX_SEND_);
 			sReceive = Com.receive();
-			BigInteger foeY = new BigInteger(sReceive,RADIX_SEND_);
+			BigInteger foeY = new BigInteger(sReceive, RADIX_SEND_);
 			sReceive = Com.receive();
-			BigInteger foeCiph = new BigInteger(sReceive,RADIX_SEND_);
-			if(DEBUG) {
-				System.out.println("DDD| Empfangen von Bob:");
+			BigInteger foeCiph = new BigInteger(sReceive, RADIX_SEND_);
+			if (DEBUG) {
+				System.out.println("DDD| (3) Empfangen von Bob:");
 				System.out.println("DDD| \t Z(Bob) = " + foeZ);
 				System.out.println("DDD| \t yB = " + foeY);
 				System.out.println("DDD| \t E_k(S_B(yB,yA)) = " + foeCiph);
 			}
-			
-			
+
 			// (4)a Berechne k = yB ^ xA mod p
 			BigInteger k = foeY.modPow(myX, myP);
-			
+			if (DEBUG) {
+				System.out.println("DDD| (4) k = " + k);
+			}
+
 			// Hole IDEA Schlüssel (lowest 128 bit of k)
 			BigInteger keyIdea = getIdeaKey(k, 128);
+			if(DEBUG) {
+				System.out.println("DDD| Idea Schlüssel: " + keyIdea);
+			}
 
 			// (4)b TODO Prüfe Zertifikat von Bob
 		} catch (Exception e) {
@@ -167,8 +172,8 @@ public final class StationToStation implements Protocol {
 			sReceive = Com.receive();
 			BigInteger foeGamalG = new BigInteger(sReceive, RADIX_SEND_);
 			if (DEBUG) {
-				System.out.println("DDD| B received P of A: " + foeGamalP);
-				System.out.println("DDD| B received G of A: " + foeGamalG);
+				System.out.println("DDD| (0) B received P of A: " + foeGamalP);
+				System.out.println("DDD| (0) B received G of A: " + foeGamalG);
 			}
 
 			// (0) B empfängt eA und nA von A
@@ -177,22 +182,23 @@ public final class StationToStation implements Protocol {
 			sReceive = Com.receive();
 			BigInteger foeRsaN = new BigInteger(sReceive, RADIX_SEND_);
 			if (DEBUG) {
-				System.out.println("DDD| B received RSA e of A: " + foeRsaE);
-				System.out.println("DDD| B received RSA n of A: " + foeRsaN);
+				System.out.println("DDD| (0) B received RSA e of A: " + foeRsaE);
+				System.out.println("DDD| (0) B received RSA n of A: " + foeRsaN);
 			}
+
 			// (0) B sendet A seine eB, nB
-			Com.sendTo(1, myRsaE.toString(RADIX_SEND_)); // eA
-			Com.sendTo(1, myRsaN.toString(RADIX_SEND_)); // nA
+			Com.sendTo(0, myRsaE.toString(RADIX_SEND_)); // eA
+			Com.sendTo(0, myRsaN.toString(RADIX_SEND_)); // nA
 			if (DEBUG) {
-				System.out.println("DDD| B sendet RSA e an A: " + myRsaE);
-				System.out.println("DDD| B sendet RSA n an A: " + myRsaN);
+				System.out.println("DDD| (0) B sendet RSA e an A: " + myRsaE);
+				System.out.println("DDD| (0) B sendet RSA n an A: " + myRsaN);
 			}
 
 			// B empfängt yA
 			sReceive = Com.receive();
 			BigInteger foeY = new BigInteger(sReceive, RADIX_SEND_);
 			if (DEBUG) {
-				System.out.println("DDD| B received yA of A: " + foeY);
+				System.out.println("DDD| (1) B received yA of A: " + foeY);
 			}
 
 			// (2)a B wählt x zufällig in {1,...,p-2}
@@ -203,7 +209,10 @@ public final class StationToStation implements Protocol {
 			// (2)c B bestimmt Schlüssel k
 			BigInteger k = foeY.modPow(myX, foeGamalP);
 			if (DEBUG) {
-				System.out.println("DDD| k " + k + "(" + k.bitLength() + ")");
+				System.out.println("DDD| (2) Bob berechnet:");
+				System.out.println("DDD| \t x = " + myX);
+				System.out.println("DDD| \t y = " + myY);
+				System.out.println("DDD| \t k = " + k + "(" + k.bitLength() + ")");
 			}
 
 			// (2)d B bestimmt Signatur SB(yB,yA)=(h(yB,yA))^dB mod nB
@@ -218,22 +227,22 @@ public final class StationToStation implements Protocol {
 			}
 
 			// TODO Berechne Zertifikat Z(Bob)
-			BigInteger myZ = new BigInteger("zertifikat",26);
-			
+			BigInteger myZ = new BigInteger("zertifikat", 26);
+
 			// TODO Bestimmte Ciffre E_K(S_B(yB,YA))
-			BigInteger myCiph = new BigInteger("ciphersignature",26);
+			BigInteger myCiph = new BigInteger("ciphersignature", 26);
 			// (3)b B schickt (Z(Bob), yB, Ek(sB(yB,yA))) an A
 			// TODO Sende Bobs Zertifikat und Kram.
 			Com.sendTo(0, myZ.toString(RADIX_SEND_));
 			Com.sendTo(0, myY.toString(RADIX_SEND_));
 			Com.sendTo(0, myCiph.toString(RADIX_SEND_));
-			if(DEBUG) {
+			if (DEBUG) {
 				System.out.println("DDD| (3) Bob sendet an Alice:");
 				System.out.println("DDD| \t Z(Bob) = " + myZ);
 				System.out.println("DDD| \t yB = " + myY);
 				System.out.println("DDD| \t E_k(S_B(yB,yA)) = " + myCiph);
 			}
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
