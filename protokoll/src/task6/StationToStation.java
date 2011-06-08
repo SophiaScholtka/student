@@ -163,8 +163,8 @@ public final class StationToStation implements Protocol {
 				System.out.println("DDD| B received n of A: " + foeRsaN);
 			}
 			// (0) B sendet A seine eB, nB
-			Com.sendTo(1, myRsaE.toString(RADIX_SEND)); // eA
-			Com.sendTo(1, myRsaN.toString(RADIX_SEND)); // nA
+			Com.sendTo(1, myRsaE.toString(RADIX_SEND)); // eB
+			Com.sendTo(1, myRsaN.toString(RADIX_SEND)); // nB
 			if (DEBUG) {
 				System.out.println("DDD| B sendet e an A: " + myRsaE);
 				System.out.println("DDD| B sendet n an A: " + myRsaN);
@@ -195,6 +195,10 @@ public final class StationToStation implements Protocol {
 			
 			// (3) B schickt (Z(Bob), yB, Ek(sB(yB,yA))) an A
 			//TODO Sende Bobs Zertifikat und Kram.
+			
+			
+			
+//			Com.sendTo(1, irgendwas.toString(RADIX_SEND));
 			
 			FileInputStream fis = new FileInputStream("bla");
 			
