@@ -55,6 +55,7 @@ public final class StationToStation implements Protocol {
 
 			// (0)a A Nutzerangabe, wo Hashparameter
 			String fileHash = "../Station-to-Station/alice-hash";
+			BufferedReader hashParam = createReader(fileHash);
 
 			// (0)a2 Auslesen der Hashparameter
 			BigInteger[] keyHash = readIntegers(fileHash, 3);
@@ -255,5 +256,12 @@ public final class StationToStation implements Protocol {
 		}
 
 		return sLines;
+	}
+	
+	private BufferedReader createReader(String fileHash) throws FileNotFoundException {
+		FileReader in = new FileReader(fileHash);
+		BufferedReader br = new BufferedReader(in);
+		
+		return br;
 	}
 }
