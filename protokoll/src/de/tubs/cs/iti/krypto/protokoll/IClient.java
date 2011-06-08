@@ -7,9 +7,10 @@ package de.tubs.cs.iti.krypto.protokoll;
 
 /**
  * @author <a href="l.girndt@tu-bs.de">Lars Girndt</a>
- *
+ * 
  */
 public interface IClient {
-	public void end( String message );
-	public void playerNumberChanged( int newPlayerNumber );
+	public void end(String message);
+
+	public void playerNumberChanged(int newPlayerNumber);
 }

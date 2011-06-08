@@ -2,28 +2,33 @@ package de.tubs.cs.iti.krypto.protokoll;
 
 import java.awt.*;
 import java.awt.event.*;
+
 /**
- * PopWindow zur Ausgabe von Fehlermeldungen.
- * Diese Klasse erzeugt ein Fenster mit entweder einem "Ja" und einem "Nein" Button,
- * oder nur einem "OK" Button.
+ * PopWindow zur Ausgabe von Fehlermeldungen. Diese Klasse erzeugt ein Fenster
+ * mit entweder einem "Ja" und einem "Nein" Button, oder nur einem "OK" Button.
  * Das Fenster schliesst sich nach dem einer der Button gedrueckt wurde.
+ * 
  * @author Marcus Lagemann
  * @version 0.1
  */
 
 public class popUpWindow extends Dialog {
-    boolean result;
+	boolean result;
 
-    /**
-     * Der Konstruktor erzeugt ein Fenster mit dem String text als Text, einem
-     * und einem "Ok" Button.
-     * @param owner "Besitzer" des PopUpFensters
-     * @param text Text der im popUpFensters erscheinen soll
-     * @param ok unterscheidet den Konstruktor vom "Ja"-"Nein"-"popUpWindow"
-     */
-    public popUpWindow( Frame owner, String text, boolean ok ) {
-        super( owner, "Dialog", true );
-        setLayout( new BorderLayout() );
+	/**
+	 * Der Konstruktor erzeugt ein Fenster mit dem String text als Text, einem
+	 * und einem "Ok" Button.
+	 * 
+	 * @param owner
+	 *            "Besitzer" des PopUpFensters
+	 * @param text
+	 *            Text der im popUpFensters erscheinen soll
+	 * @param ok
+	 *            unterscheidet den Konstruktor vom "Ja"-"Nein"-"popUpWindow"
+	 */
+	public popUpWindow(Frame owner, String text, boolean ok) {
+		super(owner, "Dialog", true);
+		setLayout(new BorderLayout() );
         setBackground( new Color( 0, 118, 184 ) );
         setForeground( new Color( 0, 0, 0 ) );
         setFont( new Font( "SansSerif", 1, 14 ) );
