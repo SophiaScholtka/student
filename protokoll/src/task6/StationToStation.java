@@ -54,7 +54,7 @@ public final class StationToStation implements Protocol {
 			// TODO Erhalte IDEA-Keys
 
 			// (0)a A Nutzerangabe, wo Hashparameter
-			String fileHash = "../Station-to-Station/A-hash";
+			String fileHash = "../Station-to-Station/alice-hash";
 
 			// (0)a2 Auslesen der Hashparameter
 			BigInteger[] keyHash = readIntegers(fileHash, 3);
@@ -128,7 +128,7 @@ public final class StationToStation implements Protocol {
 			// TODO Erhalte IDEA-Keys
 
 			// (0)a A Nutzerangabe, wo Hashparameter
-			String fileHash = "../Station-to-Station/B-hash";
+			String fileHash = "../Station-to-Station/bob-hash";
 			
 			// (0)a2 Auslesen der Hashparameter
 			BigInteger[] keyHash = readIntegers(fileHash, 3);
