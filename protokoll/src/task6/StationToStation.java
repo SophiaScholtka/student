@@ -232,7 +232,10 @@ public final class StationToStation implements Protocol {
 		m = u.multiply(p);
 		m = m.add(v);
 		byte[] mbyte = m.toByteArray();
-		ArrayList<Byte> mlist = new ArrayList(java.util.Arrays.asList(mbyte));
+		ArrayList<Byte> mlist = new ArrayList<Byte>();
+		for(int i=0;i<mbyte.length;i++){
+			mlist.add(mbyte[i]);
+		}
  		BigInteger hash = hf.hashIt(mlist);
 
 		return hash;
