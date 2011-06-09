@@ -238,13 +238,23 @@ public final class StationToStation implements Protocol {
 						+ keyIdea.bitLength() + ")");
 			}
 
-			// TODO Berechne Zertifikat Z(Bob)
+			//Berechne Zertifikat Z(Bob)
 			BigInteger myZ = new BigInteger("aaaa", 16);
+			byte[] dataE = myRsaE.toByteArray();
+			byte[] dataN = myRsaN.toByteArray();
+			byte[] data = new byte[dataE.length+dataN.length];
+			for(int i=0;i<dataE.length;i++){
+				data[i]=dataE[i];
+			}
+			for(int i=0;i<dataN.length;i++){
+				data[dataE.length+i]=dataN[i];
+			}
+			Certificate myCert = TrustedAuthority.newCertificate(data);
 			// TODO Bestimmte Ciffre E_K(S_B(yB,YA))
 			BigInteger myCiph = new BigInteger("cccc", 16);
 			// (3)b B schickt (Z(Bob), yB, Ek(sB(yB,yA))) an A
-			// TODO Sende Bobs Zertifikat und Kram.
-			Com.sendTo(0, myZ.toString(RADIX_SEND_));
+			//Sende Bobs Zertifikat und Kram.
+			Com.sendTo(0, myCert.toString());
 			Com.sendTo(0, myY.toString(RADIX_SEND_));
 			Com.sendTo(0, myCiph.toString(RADIX_SEND_));
 			if (DEBUG) {
