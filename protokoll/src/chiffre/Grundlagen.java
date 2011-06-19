@@ -19,7 +19,7 @@ public class Grundlagen {
 			  p = q.multiply(BigIntegerUtil.TWO);
 			  p = p.add(BigInteger.ONE);
 			  
-			  isPrime = p.isProbablePrime(99);
+			  isPrime = p.isProbablePrime(50);
 		  } while (!isPrime);
 		  
 		  BigInteger[] back = new BigInteger[2];
@@ -40,7 +40,7 @@ public class Grundlagen {
 			  p = q.multiply(BigIntegerUtil.TWO);
 			  p = p.add(BigInteger.ONE);
 			  
-			  isPrime = p.isProbablePrime(99);
+			  isPrime = p.isProbablePrime(50);
 		  } while (!isPrime);
 		  
 		  return p;

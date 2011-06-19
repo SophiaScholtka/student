@@ -62,19 +62,7 @@ public final class IDEA extends BlockCipher {
 	  
 	  if(TEST) {testVector();}
 	  
-	  //Bereite Klartext vor
-	  BigInteger[][] vM = new BigInteger[vC.length][4];
-
-	  //CBC rückwärts
-	  vM[0]=vC[0]; //iv einlesen
-	  for(int i = 1; i < vM.length; i++) {
-		  BigInteger[] dkci = new BigInteger[4];
-		  dkci=doIDEA(vC[i],dekey);
-		  for(int j = 0; j < 4; j++) {
-			  dkci[j] = calcBitwiseXor(vC[i-1][j],dkci[j]); //D_k(C_i) XOR C_(i-1)
-		  }
-		  vM[i] = dkci;
-	  }
+	  BigInteger[][] vM = doDecipher(dekey, vC);
 
 	  //Zeige Ciphertext (IV, Ciphertext und Vollständig)
 	  System.out.print("IV:          \t");
@@ -103,6 +91,23 @@ public final class IDEA extends BlockCipher {
 		  }
 	  }
   }
+
+public BigInteger[][] doDecipher(BigInteger[][] vC,BigInteger[][] dekey) {
+	//Bereite Klartext vor
+	  BigInteger[][] vM = new BigInteger[vC.length][4];
+
+	  //CBC rückwärts
+	  vM[0]=vC[0]; //iv einlesen
+	  for(int i = 1; i < vM.length; i++) {
+		  BigInteger[] dkci = new BigInteger[4];
+		  dkci=doIDEA(vC[i],dekey);
+		  for(int j = 0; j < 4; j++) {
+			  dkci[j] = calcBitwiseXor(vC[i-1][j],dkci[j]); //D_k(C_i) XOR C_(i-1)
+		  }
+		  vM[i] = dkci;
+	  }
+	return vM;
+}
   
   private BigInteger[][] getCiper(FileInputStream ciphertext) {
 	  //Lese Stream aus
@@ -111,7 +116,7 @@ public final class IDEA extends BlockCipher {
 	  while((read = readCipher(ciphertext)) != null) { //liest je einen bigInt
 		  list.add(read);
 	  }
-	  //Erweiter Liste auf Vielfaches von 4
+	  //Erweitere Liste auf Vielfaches von 4
 	  if(list.size() % 4 != 0) {
 		  int to = 4 - (list.size() % 4);
 		  for(int i = 0; i < to; i++) {
@@ -145,7 +150,6 @@ public final class IDEA extends BlockCipher {
    * Der FileOutputStream, in den der Chiffretext geschrieben werden soll.
    */
   public void encipher(FileInputStream cleartext, FileOutputStream ciphertext) {
-	  String iv = generateIv();
 	  
 	  //Lese Klartext ein (BigInteger[64bit][16bit])
 	  BigInteger[][] vM = getClear(cleartext);
@@ -154,18 +158,7 @@ public final class IDEA extends BlockCipher {
 	  BigInteger[][] keyExp;
 	  keyExp = expandKey(ideaKey);
 	  
-	  //Bereite Ciphertext vor
-	  BigInteger[][] vC = new BigInteger[vM.length+1][4];
-	  
-	  //CBC
-	  vC[0] = transformIv(iv); //Setze c[0] = iv, iv 64 bit lang
-	  for(int i = 1; i < vC.length; i++) {
-		  BigInteger[] xored = new BigInteger[4];
-		  for(int j = 0; j < 4; j++) {
-			  xored[j] = calcBitwiseXor(vM[i-1][j], vC[i-1][j]); //M_i XOR C_(i-1)
-		  }
-		  vC[i] = doIDEA(xored, keyExp);
-	  }
+	  BigInteger[][] vC = doEncipher(vM, keyExp);
 	  
 	  //Zeige Ciphertext (IV, Ciphertext und Vollständig)
 	  System.out.print("Ciphertext (IV):                   \t");
@@ -206,6 +199,24 @@ public final class IDEA extends BlockCipher {
 	  }
   }
 
+public BigInteger[][] doEncipher(BigInteger[][] vM, BigInteger[][] keyExp) {
+	//String iv = generateIv();
+	  String iv = "0000000000000000";
+	  //Bereite Ciphertext vor
+	  BigInteger[][] vC = new BigInteger[vM.length+1][4];
+	  
+	  //CBC
+	  vC[0] = transformIv(iv); //Setze c[0] = iv, iv 64 bit lang
+	  for(int i = 1; i < vC.length; i++) {
+		  BigInteger[] xored = new BigInteger[4];
+		  for(int j = 0; j < 4; j++) {
+			  xored[j] = calcBitwiseXor(vM[i-1][j], vC[i-1][j]); //M_i XOR C_(i-1)
+		  }
+		  vC[i] = doIDEA(xored, keyExp);
+	  }
+	return vC;
+}
+
   /**
    * Erzeugt einen neuen Schlüssel.
    * 
@@ -229,7 +240,7 @@ public final class IDEA extends BlockCipher {
    * @param theideakey
    * @return
    */
-  private BigInteger[][] expandKey(BigInteger[] theideakey) {
+  public BigInteger[][] expandKey(BigInteger[] theideakey) {
 	  //call by reference umgehen indem selbst eine Kopie angelegt wird
 	  BigInteger[] tmpKey = new BigInteger[theideakey.length];
 	  for(int i=0; i<theideakey.length; i++){
@@ -427,7 +438,7 @@ public final class IDEA extends BlockCipher {
   /**
    * Umsetzung des IDEA
    */
-  private BigInteger[] doIDEA(BigInteger[] m,BigInteger[][] k) {
+  public BigInteger[] doIDEA(BigInteger[] m,BigInteger[][] k) {
 	  BigInteger[][] vK = new BigInteger[9][6]; //Temporär, Parameterübergabe
 	  BigInteger[][] vT = new BigInteger[5][4]; //Zwischenwerte des Algorithmus'
 	  BigInteger[] vZ = new BigInteger[4]; //Zwischenwerte der Nachrichten
@@ -435,6 +446,7 @@ public final class IDEA extends BlockCipher {
 	  
 	  //Prüfe Eingaben
 	  if(m.length != 4 || k.length != 9) {
+		  System.err.println(">>>m.length is "+m.length+" should be 4");
 		  return null;
 	  }
 	  for (int i = 0; i < k.length; i++) {
@@ -503,7 +515,7 @@ public final class IDEA extends BlockCipher {
 	  return vC;
   }
 
-  private BigInteger[][] reverseKey(BigInteger[][] key) {
+  public BigInteger[][] reverseKey(BigInteger[][] key) {
 	  //Erzeuge reversed Key (gefüllt mit 0)
 	  BigInteger[][] vR = new BigInteger[key.length][6];
 	  for (int i = 0; i < vR.length; i++) {
