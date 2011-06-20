@@ -48,6 +48,9 @@ public final class StationToStation implements Protocol {
 	 */
 	public void sendFirst() {
 		
+		//kleine Testrunde für den Idea-Kram
+		//BigInteger [][] in doEncipher und Ergebnis in doDecipher ergibt das gleiche BigInteger[][],
+		//der Fehler muss also in useIDEA und/oder useReverseIDEA stecken
 		if (DEBUG){
 			BigInteger test = new BigInteger(123, new Random());
 			System.out.println(">>>test"+test.toString(RADIX_SEND_));
