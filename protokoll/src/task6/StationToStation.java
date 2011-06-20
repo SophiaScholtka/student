@@ -47,6 +47,17 @@ public final class StationToStation implements Protocol {
 	 * dies die Aktionen von A.
 	 */
 	public void sendFirst() {
+		
+		if (DEBUG){
+			BigInteger test = new BigInteger(123, new Random());
+			System.out.println(">>>test"+test.toString(RADIX_SEND_));
+			BigInteger dummykey = new BigInteger(222, new Random());
+			BigInteger realkey[] = getIdeaKey(dummykey,128);
+			BigInteger rest = useIDEA(test,realkey);
+			rest = useReverseIDEA(test,realkey);
+			System.out.println(">>>rest"+rest.toString(RADIX_SEND_));
+		}
+		
 		if (DEBUG) {
 			System.out.println("DDD| sendFirst() by A");
 		}
@@ -157,15 +168,14 @@ public final class StationToStation implements Protocol {
 			boolean check = checkCertificate(partnerID,partnerEN,partnerSig);
 			// (4)c Prüfe S_B(yB,yA)^eB mod nB = h(yB,yA)
 			BigInteger hashed = computeHash(hf, myGamalP, partnerY, myY);
-			BigInteger sig = partnerCiph;
-			//BigInteger sig = useReverseIDEA(partnerCiph,keyIdea);
-			sig = sig.modPow(partnerRsaE, partnerRsaN);
-			if (!sig.equals(hashed.mod(partnerRsaN))) {
+			BigInteger sig = useReverseIDEA(partnerCiph,keyIdea);
+			BigInteger unsig = sig.modPow(partnerRsaE, partnerRsaN);
+			if (!unsig.equals(hashed.mod(partnerRsaN))) {
 				//check=false;
 				System.out.println("Prüfung S_B(yB,yA)^eB mod nB = h(yB,yA) fehlgeschlagen.");
 				System.out.println(">>>h = "+hashed);
 				System.out.println(">>>sig = "+sig);
-				System.out.println(">>>hmodN = "+hashed.mod(partnerRsaN));
+				System.out.println(">>>unsig ="+unsig);
 			}  else {
 				if (DEBUG) System.out.println("DDD| S_B(yB,yA)^eB mod nB = h(yB,yA) erfolgreich geprüft.");
 			}
@@ -188,8 +198,8 @@ public final class StationToStation implements Protocol {
 				// (6)b Bestimmte Ciffre E_K(S_A(yA,yB))
 				// d.h. einfach Idea mit Schlüssel k auf BigInteger sig anwenden
 				
-				// BigInteger myEk = useIDEA(sig, keyIdea);
-				BigInteger myEk = sig;
+				BigInteger myEk = useIDEA(sig, keyIdea);
+				//BigInteger myEk = sig;
 				
 				// (6)c A schickt (Z(Alice), yA, Ek(S_A(yA,yB))) an B
 				System.out.println(myCert.getID());
@@ -218,13 +228,13 @@ public final class StationToStation implements Protocol {
 					String message = "Dummy Message";
 					byte m1[] = message.getBytes();
 					BigInteger code = new BigInteger(m1);
-					System.out.println(">>>code "+code);
-					//code = useIDEA(code,keyIdea);
+					System.out.println(">>>code "+code.toString(RADIX_SEND_));
+					code = useIDEA(code,keyIdea);
 					Com.sendTo(1, code.toString(RADIX_SEND_));
 					message = Com.receive();
 					byte m2[] = message.getBytes();
 					code = new BigInteger(m2);
-					//code = useReverseIDEA(code,keyIdea);
+					code = useReverseIDEA(code,keyIdea);
 					byte m3[] = code.toByteArray();
 					char temp[] = new char[1];
 					for(int i=0; i<m3.length;i++){
@@ -386,8 +396,9 @@ public final class StationToStation implements Protocol {
 			Certificate myCert = TrustedAuthority.newCertificate(data);
 			// (3)b Bestimmte Ciffre E_K(S_B(yB,yA))
 			// d.h. einfach Idea mit Schlüssel k auf BigInteger sig anwenden
-			// BigInteger myEk = useIDEA(sig, keyIdea);
-			BigInteger myEk = sig;
+			BigInteger myEk = useIDEA(sig, keyIdea);
+			//BigInteger myEk = sig;
+			
 			// (3)c B schickt (Z(Bob), yB, Ek(sB(yB,yA))) an A
 			System.out.println(myCert.getID());
 			Com.sendTo(0, myCert.getID());
@@ -431,7 +442,7 @@ public final class StationToStation implements Protocol {
 			boolean check = checkCertificate(partnerID,partnerEN,partnerSig);
 			// (7)b Prüfe S_A(yA,yB)^eA mod nA = h(yA,YB)
 			hashed = computeHash(hf, partnerGamalP, partnerY, myY);
-			//partnerCiph = useReverseIDEA(partnerCiph,keyIdea);
+			partnerCiph = useReverseIDEA(partnerCiph,keyIdea);
 			sig = partnerCiph.modPow(partnerRsaE, partnerRsaN);
 			if (!sig.equals(hashed.mod(partnerRsaN))) {
 				check=false;
@@ -446,7 +457,7 @@ public final class StationToStation implements Protocol {
 				String message = Com.receive();
 				byte m2[] = message.getBytes();
 				BigInteger code = new BigInteger(m2);
-				//code = useReverseIDEA(code,keyIdea);
+				code = useReverseIDEA(code,keyIdea);
 				byte m3[] = code.toByteArray();
 				char temp[] = new char[1];
 				for(int i=0; i<m3.length;i++){
@@ -462,8 +473,8 @@ public final class StationToStation implements Protocol {
 				message = "Dummy Antwort";
 				byte m1[] = message.getBytes();
 				code = new BigInteger(m1);
-				System.out.println(">>>code "+code);
-				//code = useIDEA(code,keyIdea);
+				System.out.println(">>>code "+code.toString(RADIX_SEND_));
+				code = useIDEA(code,keyIdea);
 				Com.sendTo(0, code.toString(RADIX_SEND_));
 				
 				}
@@ -490,42 +501,57 @@ public final class StationToStation implements Protocol {
 		BigInteger deKey[][] = irgendwas.reverseKey(expKey);
 		BigInteger input[][] = convertForIDEA(code);
 		BigInteger output[][] = irgendwas.doDecipher(input,deKey);
-		//System.out.println(">>>Eksig"+Eksig);
-		BigInteger out = convertFromIDEA(output);
+		//iv wieder abschneiden
+		BigInteger newout[][] = new BigInteger[output.length-1][4];
+		for(int i=0;i<newout.length;i++){
+			for(int j=0;j<4;j++){
+				newout[i][j]=output[i+1][j];
+			}
+		}
+		BigInteger out = convertFromIDEA(newout);
 		return out;
 	}
 
-	private BigInteger convertFromIDEA(BigInteger[][] eksig) {
+	private BigInteger convertFromIDEA(BigInteger[][] sig) {
 		//eksig, was aus stücken der Länge 16 bit besteht, in ein riesen BigInt umwandeln
-		if (eksig.length < 1) {
+		if (sig.length < 1) {
 			System.err.println("eksig zu kurz in convertFromIDEA");
 			return null;
 		}
-		BigInteger result = BigInteger.ZERO;
-		for(int i=0; i< eksig.length;i++){
-			for(int j=0; j< eksig[i].length;j++){
-				//if (DEBUG) System.out.println(">>> eksig["+i+"].length ="+eksig[i].length);
-				if (eksig[i][j]!=null){
-					result = result.add(eksig[i][j].multiply(zwei.pow(16*(i*4+j))));
+		int laenge = sig.length*4;
+		byte sigbytes[] = new byte[laenge*2];
+		//System.out.println(">>>sigbytes.length "+sigbytes.length);
+		for(int i=0;i<sig.length;i++){
+			for(int j=0;j<4;j++){
+				byte temp[] = sig[i][j].toByteArray();
+				//System.out.println(">>>i"+i+"j"+j);
+				//System.out.println(">>>schreibe sigbytes "+2*(4*i+j)+" und "+(2*(4*i+j)+1));
+				sigbytes[2*(4*i+j)]=temp[0];
+				if (temp.length == 2){ 
+					sigbytes[(2*(4*i+j)+1)]=temp[1];
+				} else {
+					sigbytes[(2*(4*i+j)+1)]=0;
 				}
-				//if (DEBUG) System.out.println(">>> result="+result.toString(16));
 			}
 		}
+		BigInteger result = new BigInteger(sigbytes);
 		return result;
 	}
 
 	private BigInteger[][] convertForIDEA(BigInteger sig) {
 		// sig in BigInt der Länge 16 zerstückeln
-		int laenge = (int) Math.ceil(sig.bitLength()/16);
+		byte sigbytes[] = sig.toByteArray();
+		int laenge = (int) Math.ceil(sigbytes.length/2.0);
 		int viertel = (int) Math.ceil(laenge/4.0);
 		//if (DEBUG) System.out.println(">>>laenge "+laenge+"\n>>>viertel"+viertel);
 		BigInteger result[][] = new BigInteger[viertel][4];
-		for(int i=laenge-1; i>=0; i--){
-			//if(DEBUG) System.out.println(">>>sig"+sig.toString(16));
-			result[i/4][i%4] = sig.mod(zwei.pow(16));
-			//if(DEBUG) System.out.println(">>>result["+i/4+"]["+i%4+"]="+result[i/4][i%4]);
-			sig = sig.divide(zwei.pow(16));
+		byte temp[]=new byte[2];
+		for(int i=0; i<laenge; i++){
+			temp[0]=sigbytes[2*i];
+			temp[1]=sigbytes[2*i+1];
+			result[i/4][i%4] = new BigInteger(temp);
 		}
+		//  rest mit 0en füllen
 		int off = laenge%4;
 		for(int i=off; i>0;i--){
 			result[viertel-1][i]=BigInteger.ZERO;
@@ -575,10 +601,6 @@ public final class StationToStation implements Protocol {
 			mlist.add(mbyte[i]);
 		}
 		BigInteger hash = hf.hashIt(mlist);
-		// FIXME mlist ArrayIndexOutOfBoundsException: -1
-		// ArrayList<Byte> mlist = new
-		// ArrayList(java.util.Arrays.asList(mbyte));
-		// BigInteger hash = hf.hashIt(mlist);
 
 		return hash;
 	}
