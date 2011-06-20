@@ -157,7 +157,8 @@ public final class StationToStation implements Protocol {
 			boolean check = checkCertificate(partnerID,partnerEN,partnerSig);
 			// (4)c Prüfe S_B(yB,yA)^eB mod nB = h(yB,yA)
 			BigInteger hashed = computeHash(hf, myGamalP, partnerY, myY);
-			BigInteger sig = useReverseIDEA(partnerCiph,keyIdea);
+			BigInteger sig = partnerCiph;
+			//BigInteger sig = useReverseIDEA(partnerCiph,keyIdea);
 			sig = sig.modPow(partnerRsaE, partnerRsaN);
 			if (!sig.equals(hashed.mod(partnerRsaN))) {
 				//check=false;
@@ -165,6 +166,8 @@ public final class StationToStation implements Protocol {
 				System.out.println(">>>h = "+hashed);
 				System.out.println(">>>sig = "+sig);
 				System.out.println(">>>hmodN = "+hashed.mod(partnerRsaN));
+			}  else {
+				if (DEBUG) System.out.println("DDD| S_B(yB,yA)^eB mod nB = h(yB,yA) erfolgreich geprüft.");
 			}
 			//nur weiter machen, falls es tatsächlich Bob ist
 			if(check) {
@@ -430,7 +433,11 @@ public final class StationToStation implements Protocol {
 			hashed = computeHash(hf, partnerGamalP, partnerY, myY);
 			//partnerCiph = useReverseIDEA(partnerCiph,keyIdea);
 			sig = partnerCiph.modPow(partnerRsaE, partnerRsaN);
-			if (!sig.equals(hashed.mod(partnerRsaN))) check=false;
+			if (!sig.equals(hashed.mod(partnerRsaN))) {
+				check=false;
+			} else {
+				if (DEBUG) System.out.println("DDD| S_A(yA,yB)^eA mod nA = h(yA,YB) erfolgreich geprüft.");
+			}
 			//nur weiter machen, falls es tatsächlich Alice ist
 			if(check) {
 			//(8) Kommunikation
