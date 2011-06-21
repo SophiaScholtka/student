@@ -201,7 +201,7 @@ public BigInteger[][] doDecipher(BigInteger[][] vC,BigInteger[][] dekey) {
 
 public BigInteger[][] doEncipher(BigInteger[][] vM, BigInteger[][] keyExp) {
 	//String iv = generateIv();
-	  String iv = "0000000000000000";
+	  String iv = "1234567812345678";
 	  //Bereite Ciphertext vor
 	  BigInteger[][] vC = new BigInteger[vM.length+1][4];
 	  
