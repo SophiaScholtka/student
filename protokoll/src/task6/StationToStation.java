@@ -52,17 +52,32 @@ public final class StationToStation implements Protocol {
 		//BigInteger [][] in doEncipher und Ergebnis in doDecipher ergibt das gleiche BigInteger[][],
 		//der Fehler muss also in useIDEA und/oder useReverseIDEA stecken
 		if (DEBUG){
-			BigInteger test = new BigInteger(123, new Random());
+			BigInteger test = new BigInteger("127",10);
+			BigInteger testa[][] = convertForIDEA(test);
+			BigInteger test2 = convertFromIDEA(testa);
+			//System.out.println(">>>test "+test);
+			//System.out.println(">>>testarr "+testa[0][0]+"\t"+testa[0][1]+"\t"+testa[0][2]+"\t"+testa[0][3]);
+			//System.out.println(">>>test2 "+test2);
+			test = (zwei.pow(1024));
+			BigInteger testar[][] = convertForIDEA(test);
+			test2 = convertFromIDEA(testar);
+			//System.out.println(">>>test "+test);
+			//System.out.println(">>>testarr "+testar[0][0]+"\t"+testar[0][1]+"\t"+testar[0][2]+"\t"+testar[0][3]+"\t"+testar[1][0]+"\t"+testar[1][1]+"\t"+testar[1][2]+"\t"+testar[1][3]);
+			//System.out.println(">>>test2 "+test2);
+			testar = convertForIDEA(test2);
+			//System.out.println(">>>testarr "+testar[0][0]+"\t"+testar[0][1]+"\t"+testar[0][2]+"\t"+testar[0][3]+"\t"+testar[1][0]+"\t"+testar[1][1]+"\t"+testar[1][2]+"\t"+testar[1][3]);
+			//System.out.println(">>>test2 "+test2);
+			test = new BigInteger(123, new Random());
 			BigInteger testarr[][] = convertForIDEA(test);
-			BigInteger test2 = convertFromIDEA(testarr);
-			System.out.println(">>>test "+test);
-			System.out.println(">>>testarr "+testarr[0][0]+"\t"+testarr[0][1]+"\t"+testarr[0][2]+"\t"+testarr[0][3]+"\t"+testarr[1][0]+"\t"+testarr[1][1]+"\t"+testarr[1][2]+"\t"+testarr[1][3]);
-			System.out.println(">>>test2 "+test2);
+			test2 = convertFromIDEA(testarr);
+			//System.out.println(">>>test "+test);
+			//System.out.println(">>>testarr "+testarr[0][0]+"\t"+testarr[0][1]+"\t"+testarr[0][2]+"\t"+testarr[0][3]+"\t"+testarr[1][0]+"\t"+testarr[1][1]+"\t"+testarr[1][2]+"\t"+testarr[1][3]);
+			//System.out.println(">>>test2 "+test2);
 			BigInteger dummykey = new BigInteger(222, new Random());
 			BigInteger realkey[] = getIdeaKey(dummykey,128);
 			BigInteger rest = useIDEA(test,realkey);
 			rest = useReverseIDEA(rest,realkey);
-			System.out.println(">>>rest"+rest);
+			//System.out.println(">>>rest"+rest);
 		}
 		
 		if (DEBUG) {
@@ -180,9 +195,9 @@ public final class StationToStation implements Protocol {
 			if (!unsig.equals(hashed.mod(partnerRsaN))) {
 				//check=false;
 				System.out.println("Prüfung S_B(yB,yA)^eB mod nB = h(yB,yA) fehlgeschlagen.");
-				System.out.println(">>>h = "+hashed);
-				System.out.println(">>>sig = "+sig);
-				System.out.println(">>>unsig ="+unsig);
+				//System.out.println(">>>h = "+hashed);
+				//System.out.println(">>>sig = "+sig);
+				//System.out.println(">>>unsig ="+unsig);
 			}  else {
 				if (DEBUG) System.out.println("DDD| S_B(yB,yA)^eB mod nB = h(yB,yA) erfolgreich geprüft.");
 			}
@@ -235,7 +250,7 @@ public final class StationToStation implements Protocol {
 					String message = "Dummy Message";
 					byte m1[] = message.getBytes();
 					BigInteger code = new BigInteger(m1);
-					System.out.println(">>>code "+code.toString(RADIX_SEND_));
+					//System.out.println(">>>code "+code.toString(RADIX_SEND_));
 					code = useIDEA(code,keyIdea);
 					Com.sendTo(1, code.toString(RADIX_SEND_));
 					message = Com.receive();
@@ -379,8 +394,8 @@ public final class StationToStation implements Protocol {
 			BigInteger hashed = computeHash(hf, partnerGamalP, myY, partnerY);
 			BigInteger sig = hashed.modPow(myRsaD, myRsaN);
 			if (DEBUG){
-				System.out.println(">>>hashed is "+hashed);
-				System.out.println(">>>sig is "+sig);
+				//System.out.println(">>>hashed is "+hashed);
+				//System.out.println(">>>sig is "+sig);
 			}
 
 			// (2)e B berechnet IDEA Key ( 128 lowest bits of k)
@@ -480,7 +495,7 @@ public final class StationToStation implements Protocol {
 				message = "Dummy Antwort";
 				byte m1[] = message.getBytes();
 				code = new BigInteger(m1);
-				System.out.println(">>>code "+code.toString(RADIX_SEND_));
+				//System.out.println(">>>code "+code.toString(RADIX_SEND_));
 				code = useIDEA(code,keyIdea);
 				Com.sendTo(0, code.toString(RADIX_SEND_));
 				
@@ -495,26 +510,26 @@ public final class StationToStation implements Protocol {
 	private BigInteger useIDEA(BigInteger message, BigInteger[] keyIdea) {
 		IDEA irgendwas = new IDEA();
 		BigInteger expKey[][] = irgendwas.expandKey(keyIdea);
-		System.out.println(">>>useIDEA:expKey "+expKey[0][0]+"\t"+expKey[0][1]+"\t"+expKey[0][2]+"\t"+expKey[0][3]+"\t"+expKey[1][0]+"\t"+expKey[1][1]+"\t"+expKey[1][2]+"\t"+expKey[1][3]);
+		//System.out.println(">>>useIDEA:expKey "+expKey[0][0]+"\t"+expKey[0][1]+"\t"+expKey[0][2]+"\t"+expKey[0][3]+"\t"+expKey[1][0]+"\t"+expKey[1][1]+"\t"+expKey[1][2]+"\t"+expKey[1][3]);
 		BigInteger input[][] = convertForIDEA(message);
-		System.out.println(">>>useIDEA:input "+input[0][0]+"\t"+input[0][1]+"\t"+input[0][2]+"\t"+input[0][3]+"\t"+input[1][0]+"\t"+input[1][1]+"\t"+input[1][2]+"\t"+input[1][3]);
+		//System.out.println(">>>useIDEA:input "+input[0][0]+"\t"+input[0][1]+"\t"+input[0][2]+"\t"+input[0][3]+"\t"+input[1][0]+"\t"+input[1][1]+"\t"+input[1][2]+"\t"+input[1][3]);
 		BigInteger output[][] = irgendwas.doEncipher(input,expKey);
-		System.out.println(">>>useIDEA:output "+output[0][0]+"\t"+output[0][1]+"\t"+output[0][2]+"\t"+output[0][3]+"\t"+output[1][0]+"\t"+output[1][1]+"\t"+output[1][2]+"\t"+output[1][3]);
+		//System.out.println(">>>useIDEA:output "+output[0][0]+"\t"+output[0][1]+"\t"+output[0][2]+"\t"+output[0][3]+"\t"+output[1][0]+"\t"+output[1][1]+"\t"+output[1][2]+"\t"+output[1][3]);
 		BigInteger out = convertFromIDEA(output);
-		System.out.println(">>>useIDEA:out "+out);
+		//System.out.println(">>>useIDEA:out "+out);
 		return out;
 	}
 
 	private BigInteger useReverseIDEA(BigInteger code, BigInteger[] keyIdea) {
 		IDEA irgendwas = new IDEA();
 		BigInteger expKey[][] = irgendwas.expandKey(keyIdea);
-		System.out.println(">>>useReverseIDEA:expKey "+expKey[0][0]+"\t"+expKey[0][1]+"\t"+expKey[0][2]+"\t"+expKey[0][3]+"\t"+expKey[1][0]+"\t"+expKey[1][1]+"\t"+expKey[1][2]+"\t"+expKey[1][3]);
+		//System.out.println(">>>useReverseIDEA:expKey "+expKey[0][0]+"\t"+expKey[0][1]+"\t"+expKey[0][2]+"\t"+expKey[0][3]+"\t"+expKey[1][0]+"\t"+expKey[1][1]+"\t"+expKey[1][2]+"\t"+expKey[1][3]);
 		BigInteger deKey[][] = irgendwas.reverseKey(expKey);
-		System.out.println(">>>useReverseIDEA:deKey "+deKey[0][0]+"\t"+deKey[0][1]+"\t"+deKey[0][2]+"\t"+deKey[0][3]+"\t"+deKey[1][0]+"\t"+deKey[1][1]+"\t"+deKey[1][2]+"\t"+deKey[1][3]);
+		//System.out.println(">>>useReverseIDEA:deKey "+deKey[0][0]+"\t"+deKey[0][1]+"\t"+deKey[0][2]+"\t"+deKey[0][3]+"\t"+deKey[1][0]+"\t"+deKey[1][1]+"\t"+deKey[1][2]+"\t"+deKey[1][3]);
 		BigInteger input[][] = convertForIDEA(code);
-		System.out.println(">>>useReverseIDEA:input "+input[0][0]+"\t"+input[0][1]+"\t"+input[0][2]+"\t"+input[0][3]+"\t"+input[1][0]+"\t"+input[1][1]+"\t"+input[1][2]+"\t"+input[1][3]);
+		//System.out.println(">>>useReverseIDEA:input "+input[0][0]+"\t"+input[0][1]+"\t"+input[0][2]+"\t"+input[0][3]+"\t"+input[1][0]+"\t"+input[1][1]+"\t"+input[1][2]+"\t"+input[1][3]);
 		BigInteger output[][] = irgendwas.doDecipher(input,deKey);
-		System.out.println(">>>useReverseIDEA:output "+output[0][0]+"\t"+output[0][1]+"\t"+output[0][2]+"\t"+output[0][3]+"\t"+output[1][0]+"\t"+output[1][1]+"\t"+output[1][2]+"\t"+output[1][3]);
+		//System.out.println(">>>useReverseIDEA:output "+output[0][0]+"\t"+output[0][1]+"\t"+output[0][2]+"\t"+output[0][3]+"\t"+output[1][0]+"\t"+output[1][1]+"\t"+output[1][2]+"\t"+output[1][3]);
 		//iv wieder abschneiden
 		BigInteger newout[][] = new BigInteger[output.length-1][4];
 		for(int i=0;i<newout.length;i++){
@@ -522,9 +537,9 @@ public final class StationToStation implements Protocol {
 				newout[i][j]=output[i+1][j];
 			}
 		}
-		System.out.println(">>>useReverseIDEA:newout "+newout[0][0]+"\t"+newout[0][1]+"\t"+newout[0][2]+"\t"+newout[0][3]+"\t"+newout[1][0]+"\t"+newout[1][1]+"\t"+newout[1][2]+"\t"+newout[1][3]);
+		//System.out.println(">>>useReverseIDEA:newout "+newout[0][0]+"\t"+newout[0][1]+"\t"+newout[0][2]+"\t"+newout[0][3]+"\t"+newout[1][0]+"\t"+newout[1][1]+"\t"+newout[1][2]+"\t"+newout[1][3]);
 		BigInteger out = convertFromIDEA(newout);
-		System.out.println(">>>useReverseIDEA:out "+out);
+		//System.out.println(">>>useReverseIDEA:out "+out);
 		return out;
 	}
 
@@ -534,47 +549,28 @@ public final class StationToStation implements Protocol {
 			System.err.println("eksig zu kurz in convertFromIDEA");
 			return null;
 		}
-		int laenge = sig.length*4;
-		byte sigbytes[] = new byte[laenge*2];
-		//System.out.println(">>>sigbytes.length "+sigbytes.length);
+		BigInteger result = BigInteger.ZERO;
 		for(int i=0;i<sig.length;i++){
-			for(int j=0;j<4;j++){
-				byte temp[] = sig[i][j].toByteArray();
-				//System.out.println(">>>i"+i+"j"+j);
-				//System.out.println(">>>schreibe sigbytes "+2*(4*i+j)+" und "+(2*(4*i+j)+1));
-				sigbytes[2*(4*i+j)]=temp[0];
-				if (temp.length < 2){ 
-					sigbytes[(2*(4*i+j)+1)]=0;
-				} else {
-					sigbytes[(2*(4*i+j)+1)]=temp[1];
+			for(int j=0;j<sig[i].length;j++){
+				result = result.multiply(zwei.pow(16));
+				if(sig[i][j]!=null){
+					result = result.add(sig[i][j]);
 				}
 			}
 		}
-		BigInteger result = new BigInteger(sigbytes);
 		return result;
 	}
 
 	private BigInteger[][] convertForIDEA(BigInteger sig) {
 		// sig in BigInt der Länge 16 zerstückeln
-		byte sigbytes[] = sig.toByteArray();
-		int laenge = (int) Math.ceil(sigbytes.length/2.0);
-		int viertel = (int) Math.ceil(laenge/4.0);
-		//if (DEBUG) System.out.println(">>>laenge "+laenge+"\n>>>viertel"+viertel);
-		BigInteger result[][] = new BigInteger[viertel][4];
-		byte temp[]=new byte[2];
-		for(int i=0; i<laenge; i++){
-			temp[0]=sigbytes[2*i];
-			if(2*i+1<sigbytes.length){
-				temp[1]=sigbytes[2*i+1];
-			} else {
-				temp[1]=0;
+		int bitlength = sig.bitLength();
+		int reslength = (int) Math.ceil(bitlength/64.0);
+		BigInteger result[][] = new BigInteger[reslength][4];
+		for(int i=reslength-1;i>=0;i--){
+			for(int j=3;j>=0;j--){
+				result[i][j]=sig.mod(zwei.pow(16));
+				sig = sig.divide(zwei.pow(16));
 			}
-			result[i/4][i%4] = new BigInteger(temp);
-		}
-		//  rest mit 0en füllen
-		int off = laenge%4;
-		for(int i=off; i>0;i--){
-			result[viertel-1][i]=BigInteger.ZERO;
 		}
 		return result;
 	}
