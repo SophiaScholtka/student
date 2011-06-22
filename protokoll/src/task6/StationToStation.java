@@ -50,9 +50,10 @@ public final class StationToStation implements Protocol {
 	public void sendFirst() {
 		
 		if (DEBUG) {
-			System.out.println("DDD| sendFirst() by A");
 			if (OSCAR_){
 				System.out.println("DDD| sendFirst() von O immitiert");
+			} else {
+				System.out.println("DDD| sendFirst() by A");
 			}
 		}
 		// Player 0 = A; Player 1 = B
@@ -226,16 +227,11 @@ public final class StationToStation implements Protocol {
 				}
 				
 				// (6)a Berechne Zertifikat Z(Alice)
-				//OSCAR kann zwar den gleichen Namen angeben, muss aber seine RSA-Werte nehmen
+				// Oscar nimmt einfach das Zertifikat, was ihm Alice vllt mal geschickt hat
 				byte[] dataE;
 				byte[] dataN;
-				if(OSCAR_){
-					dataE = osRsaE.toByteArray();
-					dataN = osRsaN.toByteArray();
-				} else {
-					dataE = myRsaE.toByteArray();
-					dataN = myRsaN.toByteArray();
-				}
+				dataE = myRsaE.toByteArray();
+				dataN = myRsaN.toByteArray();
 				byte[] data = new byte[dataE.length+dataN.length];
 				for(int i=0;i<dataE.length;i++){
 					data[i]=dataE[i];
@@ -263,8 +259,8 @@ public final class StationToStation implements Protocol {
 					if (OSCAR_){
 						System.out.println("DDD| (6) O sendet an B:");
 						System.out.println("DDD| \t ID(Alice)         = " + myCert.getID());
-						System.out.println("DDD| \t eO,nO           = " + myData.toString());
-						System.out.println("DDD| \t D_T(ID,eO,nO)   = " + myCert.getSignature());
+						System.out.println("DDD| \t eA,nA           = " + myData.toString());
+						System.out.println("DDD| \t D_T(ID,eA,nA)   = " + myCert.getSignature());
 						System.out.println("DDD| \t yO              = " + myY);
 						System.out.println("DDD| \t E_k(S_O(yO,yB)) = " + myEk);
 					}else{
@@ -466,8 +462,7 @@ public final class StationToStation implements Protocol {
 			// (2)e B berechnet IDEA Key ( 128 lowest bits of k)
 			BigInteger keyIdea[] = getIdeaKey(k, 128);
 			if (DEBUG) {
-				System.out.println("DDD| IDEA key = " + keyIdea + " ("
-						+ keyIdea.length + ")");
+				//System.out.println("DDD| IDEA key = " + keyIdea + " ("+ keyIdea.length + ")");
 			}
 
 			// (3)a Berechne Zertifikat Z(Bob)
