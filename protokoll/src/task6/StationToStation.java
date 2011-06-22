@@ -48,39 +48,6 @@ public final class StationToStation implements Protocol {
 	 * dies die Aktionen von A.
 	 */
 	public void sendFirst() {
-	
-		
-		//kleine Testrunde für den Idea-Kram
-		//BigInteger [][] in doEncipher und Ergebnis in doDecipher ergibt das gleiche BigInteger[][],
-		//der Fehler muss also in useIDEA und/oder useReverseIDEA stecken
-		/*if (DEBUG){
-			BigInteger test = new BigInteger("127",10);
-			BigInteger testa[][] = convertForIDEA(test);
-			BigInteger test2 = convertFromIDEA(testa);
-			//System.out.println(">>>test "+test);
-			//System.out.println(">>>testarr "+testa[0][0]+"\t"+testa[0][1]+"\t"+testa[0][2]+"\t"+testa[0][3]);
-			//System.out.println(">>>test2 "+test2);
-			test = (zwei.pow(1024));
-			BigInteger testar[][] = convertForIDEA(test);
-			test2 = convertFromIDEA(testar);
-			//System.out.println(">>>test "+test);
-			//System.out.println(">>>testarr "+testar[0][0]+"\t"+testar[0][1]+"\t"+testar[0][2]+"\t"+testar[0][3]+"\t"+testar[1][0]+"\t"+testar[1][1]+"\t"+testar[1][2]+"\t"+testar[1][3]);
-			//System.out.println(">>>test2 "+test2);
-			testar = convertForIDEA(test2);
-			//System.out.println(">>>testarr "+testar[0][0]+"\t"+testar[0][1]+"\t"+testar[0][2]+"\t"+testar[0][3]+"\t"+testar[1][0]+"\t"+testar[1][1]+"\t"+testar[1][2]+"\t"+testar[1][3]);
-			//System.out.println(">>>test2 "+test2);
-			test = new BigInteger(123, new Random());
-			BigInteger testarr[][] = convertForIDEA(test);
-			test2 = convertFromIDEA(testarr);
-			//System.out.println(">>>test "+test);
-			//System.out.println(">>>testarr "+testarr[0][0]+"\t"+testarr[0][1]+"\t"+testarr[0][2]+"\t"+testarr[0][3]+"\t"+testarr[1][0]+"\t"+testarr[1][1]+"\t"+testarr[1][2]+"\t"+testarr[1][3]);
-			//System.out.println(">>>test2 "+test2);
-			BigInteger dummykey = new BigInteger(222, new Random());
-			BigInteger realkey[] = getIdeaKey(dummykey,128);
-			BigInteger rest = useIDEA(test,realkey);
-			rest = useReverseIDEA(rest,realkey);
-			//System.out.println(">>>rest"+rest);
-		}*/
 		
 		if (DEBUG) {
 			System.out.println("DDD| sendFirst() by A");
