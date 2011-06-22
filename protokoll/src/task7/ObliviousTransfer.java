@@ -86,11 +86,31 @@ public final class ObliviousTransfer implements Protocol {
 		}
 		//(3)a Alice berechnet k0' und k1' und signiert sie
 		//ki'=(D_A((q-m[i])mod p²))mod p
-		BigInteger k0 = (q.subtract(m[0])).mod(myGamalP.multiply(myGamalP));
-		BigInteger k1 = (q.subtract(m[1])).mod(myGamalP.multiply(myGamalP));
-		//(3)b Alice sendet beide Signaturen an Bob
-		//(3)c Alice wählt zufällig s aus {0,1}
-		//(3)d Alice berechnet (M_0+ks')mod n, (M_1+ks+1')mod n und sendet beides und s an Bob
+		BigInteger[] k = new BigInteger[2];
+		k[0] = (q.subtract(m[0])).mod(myGamalP.multiply(myGamalP));
+		k[0] = Grundlagen.elGamalDecipher(k[0], myX, myGamalP);
+		k[0] = k[0].mod(myGamalP);
+		k[1] = (q.subtract(m[1])).mod(myGamalP.multiply(myGamalP));
+		k[1] = Grundlagen.elGamalDecipher(k[1], myX, myGamalP);
+		k[1] = k[1].mod(myGamalP);
+		//(3)b Alice signiert k0 und k1
+		BigInteger[] Sk = new BigInteger[2];
+		Sk[0] = Grundlagen.elGamalSign(k[0], myGamalP, myGamalG, myY, myX);
+		Sk[1] = Grundlagen.elGamalSign(k[1], myGamalP, myGamalG, myY, myX);
+		//(3)c Alice sendet beide Signaturen an Bob
+		Com.sendTo(1, Sk[0].toString(RADIX_SEND_));
+		Com.sendTo(1, Sk[1].toString(RADIX_SEND_));
+		if (DEBUG) {
+			System.out.println("DDD| (3) A sendet an B:");
+			System.out.println("DDD| \t S(k0) = " + Sk[0]);
+			System.out.println("DDD| \t S(k1) = " + Sk[1]);
+		}
+		//(3)d Alice wählt zufällig s aus {0,1}
+		BigInteger sbig = BigIntegerUtil.randomBetween(BigInteger.ONE, help);
+		sbig = sbig.mod(zwei);
+		int s = sbig.intValue();
+		//(3)e Alice berechnet (M_0+ks')mod n, (M_1+ks+1')mod n und sendet beides und s an Bob
+		
 		//(4) nichts tun
 	}
 	
@@ -127,17 +147,24 @@ public final class ObliviousTransfer implements Protocol {
 		BigInteger r_z = BigIntegerUtil.randomBetween(BigInteger.ONE, zwei.multiply(zwei));
 		int r = (r_z.mod(zwei)).intValue();
 		//(2)b Bob berechnet q=(E_A(k)+m_r)mod p²
-		BigInteger a = partnerGamalG.modPow(k, partnerGamalP);
-		BigInteger b = k.multiply(partnerY.modPow(k, partnerGamalP));
-		BigInteger eak = a.add(b.multiply(partnerGamalP));
+		BigInteger eak = Grundlagen.elGamalEncipher(k, partnerGamalP, partnerGamalG, partnerY);
 		BigInteger q = (eak.add(m[r])).mod(partnerGamalP.multiply(partnerGamalP)) ;
 		//(2)c Bob sendet q an Alice
 		Com.sendTo(0, q.toString(RADIX_SEND_));
 		if (DEBUG) {
-			System.out.println("DDD| (0) B sendet an A:");
+			System.out.println("DDD| (2) B sendet an A:");
 			System.out.println("DDD| \t q = " + q);
 		}
 		//(3)b Bob empfängt die Signaturen von k0' und k1' von Alice
+		sReceive = Com.receive();
+		BigInteger Sk0 = new BigInteger(sReceive, RADIX_SEND_);
+		sReceive = Com.receive();
+		BigInteger Sk1 = new BigInteger(sReceive, RADIX_SEND_);
+		if (DEBUG) {
+			System.out.println("DDD| (3) B empfängt von A:");
+			System.out.println("DDD| \t Sk0 = " + Sk0);
+			System.out.println("DDD| \t Sk1 = " + Sk1);
+		}
 		//(3)d Bob empfängt (M_0+ks')mod n, (M_1+ks+1')mod n und s von Alice
 		//(4)a Bob berechnet M_s+r
 		//(4)b Bob prüft, ob Alice betrogen hat

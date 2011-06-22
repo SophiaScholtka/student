@@ -1,5 +1,7 @@
 package chiffre;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.util.Random;
 
@@ -97,4 +99,89 @@ public class Grundlagen {
 		return reducedRest;
 
 	}
+	
+	public static BigInteger elGamalDecipher(BigInteger code, BigInteger priX, BigInteger pubP){
+		BigInteger a = code.mod(pubP);
+		BigInteger b = code.divide(pubP);
+		BigInteger z = (a.modPow(priX,pubP)).modInverse(pubP);
+		BigInteger back = (z.multiply(b)).mod(pubP);
+		return back;
+	}
+	public static BigInteger elGamalEncipher(BigInteger mess, BigInteger pubP, BigInteger pubG, BigInteger pubY){
+		BigInteger a = pubG.modPow(mess, pubP);
+		BigInteger b = mess.multiply(pubY.modPow(mess, pubP));
+		BigInteger back = a.add(b.multiply(pubP));
+		return back;
+		
+	}
+	  public static BigInteger elGamalSign(BigInteger mess, BigInteger pubP, BigInteger pubG, BigInteger pubY, BigInteger priX) {	  
+		  // Algo 7.8 (1) Signiere Nachricht M
+		  final BigInteger BIGINTP1 = pubP.subtract(BigInteger.ONE); // P-1
+		  
+		  // (1a) Zufälliges k in {1,...,p-2} mit ggt(k,p-1)=1 wählen
+		  BigInteger lower = BigInteger.ONE;
+		  BigInteger upper = pubP.subtract(BigIntegerUtil.TWO);
+		  BigInteger myK;
+		  boolean check = true;
+		  do {
+			  myK = BigIntegerUtil.randomBetween(lower, upper);
+			  check = !(myK.gcd(BIGINTP1).equals(BigInteger.ONE));
+		  } while (check);
+		  
+		  // (1b) Berechne r = g^k mod p
+		  BigInteger myR;
+		  myR = pubG.modPow(myK, pubP); // r = g^k mod p
+		  
+		  // (1c) Berechne k^(-1) mod (p-1)
+		  BigInteger myKN = myK.modInverse(BIGINTP1); // k^(-1) mod (p-1)
+		  
+		  // (1d) Nachricht Element M in Z_p^*: M mod p, ggt(M,p)=1
+		  BigInteger myM = mess.mod(pubP);
+		  
+		  // (1e) Berechne s = (M-xr)k^(-1) mod (p-1)
+		  BigInteger myS = priX.multiply(myR); // x * r
+		  myS = myM.subtract(myS); // M-xr
+		  myS = myS.multiply(myKN); // (M-xr)*k^(-1) 
+		  myS = myS.mod(BIGINTP1); // (M-xr)*k^(-1) mod p-1
+		  
+		  // Modifikation: C = (r,s) zu C' = r + s*p geändert
+		  BigInteger myC = myS.multiply(pubP);
+		  myC = myC.add(myR);
+		  return myC;
+	  }
+
+	  public static boolean elGamalVerify(BigInteger mess, BigInteger sig, BigInteger pubP, BigInteger pubG, BigInteger pubY) {
+		  // Algo 7.8 - (2) Prüfe Signatur (r,s) auf M
+	  boolean isBad = false;
+		  // (1d) Nachricht Element M in Z_p^*: M mod p, ggt(M,p)=1
+		  mess = mess.mod(pubP); // M mod P
+		  // Ermittle s = c mod p
+		  BigInteger s = sig.mod(pubP);
+		  // Ermittle r = c % p
+		  BigInteger r = sig.divide(pubP);
+		  
+		  // (2b) Prüfe ob 1 <= r <= p-1; false: abbruch
+		  boolean ifLess = (r.compareTo(BigInteger.ONE) == -1);
+		  boolean ifMore = (r.compareTo(pubP.subtract(BigInteger.ONE)) == 1);
+		  if(ifLess || ifMore) {
+			  isBad = true;
+		  }
+		  
+		  // (2c) Berechne v1 = y^r r^s mod p
+		  BigInteger v1 = pubY.modPow(r,pubP);
+		  BigInteger h = r.modPow(s, pubP);
+		  v1 = v1.multiply(h);
+		  v1 = v1.mod(pubP);
+		  
+		  // (2c) Berechne v2 = g^M mod p
+		  BigInteger v2 = pubG.modPow(mess, pubP);
+		  
+		  if(!v2.equals(v1)) {
+			  isBad = true;
+		  }
+		  
+		  // (2d) Akzeptiere, wenn v1==v2
+		  return !isBad;
+	  }
+	
 }
