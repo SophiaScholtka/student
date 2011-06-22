@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -47,11 +48,15 @@ public final class StationToStation implements Protocol {
 	 * dies die Aktionen von A.
 	 */
 	public void sendFirst() {
+		//TEst
+		String something = "hay You!";
+		BigInteger some = StringToBigInt(something);
+		BigIntToString(some);
 		
 		//kleine Testrunde für den Idea-Kram
 		//BigInteger [][] in doEncipher und Ergebnis in doDecipher ergibt das gleiche BigInteger[][],
 		//der Fehler muss also in useIDEA und/oder useReverseIDEA stecken
-		if (DEBUG){
+		/*if (DEBUG){
 			BigInteger test = new BigInteger("127",10);
 			BigInteger testa[][] = convertForIDEA(test);
 			BigInteger test2 = convertFromIDEA(testa);
@@ -78,7 +83,7 @@ public final class StationToStation implements Protocol {
 			BigInteger rest = useIDEA(test,realkey);
 			rest = useReverseIDEA(rest,realkey);
 			//System.out.println(">>>rest"+rest);
-		}
+		}*/
 		
 		if (DEBUG) {
 			System.out.println("DDD| sendFirst() by A");
@@ -244,27 +249,21 @@ public final class StationToStation implements Protocol {
 				boolean communicate = true;
 				while(communicate){
 					System.out.println("Möchten Sie eine Nachricht senden?");
-					// TODO ja/nein abfrage, ggf communicate = false und break
+					communicate = askYN();
+					if (communicate==false) break;
 					System.out.println("Geben Sie eine Nachricht ein.");
-					// TODO message einlesen
-					String message = "Dummy Message";
-					byte m1[] = message.getBytes();
-					BigInteger code = new BigInteger(m1);
+					String message = askString();
+					BigInteger code = StringToBigInt(message);
 					//System.out.println(">>>code "+code.toString(RADIX_SEND_));
 					code = useIDEA(code,keyIdea);
 					Com.sendTo(1, code.toString(RADIX_SEND_));
 					message = Com.receive();
-					byte m2[] = message.getBytes();
-					code = new BigInteger(m2);
+					code = new BigInteger(message, RADIX_SEND_);
 					code = useReverseIDEA(code,keyIdea);
-					byte m3[] = code.toByteArray();
-					char temp[] = new char[1];
-					for(int i=0; i<m3.length;i++){
-						temp[0] = (char) m3[i];
-						message = message.concat(temp.toString());
-					}
-					System.out.println("Nachricht empfangen: "+message);
-					communicate = false;
+					
+					message=BigIntToString(code);
+					System.out.print("Nachricht empfangen: "+message);
+					
 				}
 			} else {
 				System.err.println("Cheater!");
@@ -273,6 +272,38 @@ public final class StationToStation implements Protocol {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private BigInteger StringToBigInt(String message) {
+		char temp;
+		if (message.length()<1) return BigInteger.ZERO;
+		temp = message.charAt(message.length()-1);
+		BigInteger result = BigInteger.valueOf(temp);
+		for(int i=message.length()-2;i>=0;i--){
+			temp = message.charAt(i);
+			//System.out.println(">>>temp is "+temp);
+			result = result.add(BigInteger.valueOf(temp));
+			result = result.multiply(zwei.pow(16));
+			//System.out.println(">>>result is "+result.toString(RADIX_SEND_));
+		}
+		return result;
+	}
+
+	private String BigIntToString(BigInteger code) {
+		String back = "";
+		BigInteger temp0;
+		char temp1;
+		while (!code.equals(BigInteger.ZERO)){
+			temp0 = code.mod(zwei.pow(16));
+			//System.out.println(">>>temp0 is "+temp0.toString(RADIX_SEND_));
+			temp1 = (char) temp0.intValue();
+			System.out.println(">>>temp1 is"+temp1);
+			code = code.divide(zwei.pow(16));
+			back = back+""+temp1;
+			//System.out.println(">>>code is "+code.toString(RADIX_SEND_));
+		}
+		System.out.println();
+		return back;
 	}
 
 	private boolean checkCertificate(String partnerID, BigInteger partnerEN,
@@ -476,35 +507,53 @@ public final class StationToStation implements Protocol {
 			//(8) Kommunikation
 				boolean communicate = true;
 				while (communicate){
-				String message = Com.receive();
-				byte m2[] = message.getBytes();
-				BigInteger code = new BigInteger(m2);
-				code = useReverseIDEA(code,keyIdea);
-				byte m3[] = code.toByteArray();
-				char temp[] = new char[1];
-				for(int i=0; i<m3.length;i++){
-					temp[0] = (char) m3[i];
-					message = message.concat(temp.toString());
+					String message = Com.receive();
+					BigInteger code = new BigInteger(message,RADIX_SEND_);
+					code = useReverseIDEA(code,keyIdea);
+					
+					message = BigIntToString(code);
+					System.out.print("Nachricht empfangen: "+message);
+					
+					System.out.println("Wollen Sie antworten?");
+					communicate = askYN();
+					if (communicate==false) break;
+					System.out.println("Schreiben Sie eine Antwort: ");
+					message = askString();
+					code = StringToBigInt(message);
+					//System.out.println(">>>code "+code.toString(RADIX_SEND_));
+					code = useIDEA(code,keyIdea);
+					Com.sendTo(0, code.toString(RADIX_SEND_));
 				}
-				System.out.println("Nachricht empfangen: "+message);
-				System.out.println("Wollen Sie antworten?");
-				// TODO j/n einlesen
-				communicate = false;
-				System.out.println("Schreiben Sie eine Antwort: ");
-				// TODO message einlesen
-				message = "Dummy Antwort";
-				byte m1[] = message.getBytes();
-				code = new BigInteger(m1);
-				//System.out.println(">>>code "+code.toString(RADIX_SEND_));
-				code = useIDEA(code,keyIdea);
-				Com.sendTo(0, code.toString(RADIX_SEND_));
-				
-				}
+			} else {
+				System.err.println("Cheater!");
+				System.err.println("abort game");
 			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private String askString() {
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+	    String s="Tschüss bis zum nächsten Mal"; //dummymessage
+	    try {
+			if ((s = in.readLine()) != null && s.length() != 0){
+				//nix tun, in s steht jetzt der String
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return s;
+	}
+
+	private boolean askYN() {
+	    String s=askString();
+	    if (s.charAt(0) == 'y'||s.charAt(0) == 'Y'){
+	    	return true;
+	    }
+	    return false;
 	}
 
 	private BigInteger useIDEA(BigInteger message, BigInteger[] keyIdea) {
