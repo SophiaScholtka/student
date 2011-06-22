@@ -29,7 +29,7 @@ import task6.StationToStation;
 
 public final class StationToStation implements Protocol {
 	private final boolean DEBUG = true;
-	private final boolean OSCAR_ = false;
+	private final boolean OSCAR_ = true;
 
 	private static final int RADIX_SEND_ = 16;
 	private BigInteger zwei = new BigInteger("2",10);
@@ -48,10 +48,7 @@ public final class StationToStation implements Protocol {
 	 * dies die Aktionen von A.
 	 */
 	public void sendFirst() {
-		//TEst
-		String something = "hay You!";
-		BigInteger some = StringToBigInt(something);
-		BigIntToString(some);
+	
 		
 		//kleine Testrunde für den Idea-Kram
 		//BigInteger [][] in doEncipher und Ergebnis in doDecipher ergibt das gleiche BigInteger[][],
@@ -87,11 +84,27 @@ public final class StationToStation implements Protocol {
 		
 		if (DEBUG) {
 			System.out.println("DDD| sendFirst() by A");
+			if (OSCAR_){
+				System.out.println("DDD| sendFirst() von O immitiert");
+			}
 		}
 		// Player 0 = A; Player 1 = B
 		try {
+			BigInteger[] oskeyRSA;
+			BigInteger osRsaN;
+			BigInteger osRsaE;
+			BigInteger osRsaD;
+			if (OSCAR_){
+				System.out.print("Oskar generiert sich einen RSA Key... Augenblick...");
+				oskeyRSA = RSA.generateKey(1024);
+				osRsaN = oskeyRSA[0];
+				osRsaE = oskeyRSA[1];
+				osRsaD = oskeyRSA[2];
+				System.out.println("\t [OK]");
+			}
+			
 			// Erhalte RSA-Keys
-			System.out.print("Generiere RSA Key für mich... Augenblick...");
+			System.out.print("A: Generiere RSA Key für mich... Augenblick...");
 			BigInteger[] keyRSA = RSA.generateKey(1024);
 			BigInteger myRsaN = keyRSA[0];
 			BigInteger myRsaE = keyRSA[1];
@@ -103,12 +116,12 @@ public final class StationToStation implements Protocol {
 			BufferedReader hashParam = createReader(fileHash);
 
 			Fingerprint hf = new Fingerprint();
-			hf.setDebug(DEBUG);
+			hf.setDebug(false);
 			hf.readParam(hashParam); // d.h. Hashparameter sind jetzt im Objekt
 										// gespeichert
 			
 			// (0)b1 A Parameter p, g generieren
-			System.out.print("Generiere El-Gamal Key für mich... "
+			System.out.print("A: Generiere El-Gamal Key für mich... "
 					+ "Augenblick...");
 			int bitLength = 512;
 			BigInteger[] prime = Grundlagen.generatePrimePQ(bitLength);
@@ -120,7 +133,11 @@ public final class StationToStation implements Protocol {
 			Com.sendTo(1, myGamalP.toString(RADIX_SEND_)); // p
 			Com.sendTo(1, myGamalG.toString(RADIX_SEND_)); // g
 			if (DEBUG) {
-				System.out.println("DDD| (0) A sendet an B:");
+				if (OSCAR_){
+					System.out.println("DDD| (0) O sendet an B:");
+				}else{
+					System.out.println("DDD| (0) A sendet an B:");
+				}
 				System.out.println("DDD| \t p = " + myGamalP);
 				System.out.println("DDD| \t g = " + myGamalG);
 				
@@ -133,7 +150,11 @@ public final class StationToStation implements Protocol {
 				System.out.println("DDD| (0) A sendet RSA an B:");
 				System.out.println("DDD| \t eA = " + myRsaE);
 				System.out.println("DDD| \t nA = " + myRsaN);
+				if(OSCAR_){
+					System.out.println("DDD| Bob kennt den öffentlichen RSA-Key von Alice. Oscar kann dies nicht verhindern.");
+				}
 			}
+			
 
 			// (0)d A empfängt B Public RSA (eB, nB)
 			String sReceive;
@@ -145,6 +166,7 @@ public final class StationToStation implements Protocol {
 				System.out.println("DDD| (0) A empfängt RSA von B:");
 				System.out.println("DDD| \t eB = " + partnerRsaE);
 				System.out.println("DDD| \t nB = " + partnerRsaN);
+				if(OSCAR_) System.out.println("DDD| Oscar kann sich eB und nB ebenfalls leicht besorgen.");
 			}
 
 			// (1)a A wählt x zufällig in {1,...,p-2}
@@ -155,7 +177,11 @@ public final class StationToStation implements Protocol {
 			// (1)c A sendet y an B
 			Com.sendTo(1, myY.toString(RADIX_SEND_)); // yA
 			if (DEBUG) {
-				System.out.println("DDD| (1) A sendet yA an B: " + myY);
+				if(OSCAR_){
+					System.out.println("DDD| (1) O sendet yO an B: " + myY);
+				} else {
+					System.out.println("DDD| (1) A sendet yA an B: " + myY);
+				}
 			}
 
 			// (3) Empfange Z(Bob),yB, Ek(SB(yB,yA)))
@@ -175,7 +201,11 @@ public final class StationToStation implements Protocol {
 				System.out.println("DDD| \t eBnB            = " + partnerEN);
 				System.out.println("DDD| \t D_T(ID,eBnB)    = " + partnerSig);
 				System.out.println("DDD| \t yB              = " + partnerY);
-				System.out.println("DDD| \t E_k(S_B(yB,yA)) = " + partnerCiph);
+				if(OSCAR_){
+					System.out.println("DDD| \t E_k(S_B(yB,yO)) = " + partnerCiph);
+				}else{
+					System.out.println("DDD| \t E_k(S_B(yB,yA)) = " + partnerCiph);
+				}
 			}
 
 			// (4)a Berechne k = yB ^ xA mod p
@@ -193,27 +223,52 @@ public final class StationToStation implements Protocol {
 
 			// (4)b Prüfe Zertifikat von Bob
 			boolean check = checkCertificate(partnerID,partnerEN,partnerSig);
+	
 			// (4)c Prüfe S_B(yB,yA)^eB mod nB = h(yB,yA)
 			BigInteger hashed = computeHash(hf, myGamalP, partnerY, myY);
 			BigInteger sig = useReverseIDEA(partnerCiph,keyIdea);
 			BigInteger unsig = sig.modPow(partnerRsaE, partnerRsaN);
-			if (!unsig.equals(hashed.mod(partnerRsaN))) {
-				//check=false;
-				System.out.println("Prüfung S_B(yB,yA)^eB mod nB = h(yB,yA) fehlgeschlagen.");
-				//System.out.println(">>>h = "+hashed);
-				//System.out.println(">>>sig = "+sig);
-				//System.out.println(">>>unsig ="+unsig);
-			}  else {
-				if (DEBUG) System.out.println("DDD| S_B(yB,yA)^eB mod nB = h(yB,yA) erfolgreich geprüft.");
+			if(DEBUG){
+				if(check) {
+					System.out.println("DDD| Zertifikat von Bob erfolgreich geprüft");
+					if (!unsig.equals(hashed.mod(partnerRsaN))) {
+						check=false;
+						System.out.println("Prüfung S_B(yB,yA)^eB mod nB = h(yB,yA) fehlgeschlagen.");
+						//System.out.println(">>>h = "+hashed);
+						//System.out.println(">>>sig = "+sig);
+						//System.out.println(">>>unsig ="+unsig);
+					}  else {
+						if (DEBUG) {
+							if(OSCAR_){
+								System.out.println("DDD| S_B(yB,yO)^eB mod nB = h(yB,yO) erfolgreich geprüft.");
+							} else {
+								System.out.println("DDD| S_B(yB,yA)^eB mod nB = h(yB,yA) erfolgreich geprüft.");
+							}
+						}
+					}
+				}
 			}
 			//nur weiter machen, falls es tatsächlich Bob ist
 			if(check) {
 				// (5) Berechne S_A(yA,yB)=h(yA,YB)^dA mod nA
 				BigInteger hashedY = computeHash(hf, myGamalP, myY, partnerY);
 				sig = hashedY.modPow(myRsaD, myRsaN);
+				//OSCAR kennt diese Werte nicht. Wenn er aktiv ist, überschreibe sie mit seinen
+				if(OSCAR_){
+					sig = hashedY.modPow(osRsaD, osRsaN);
+				}
+				
 				// (6)a Berechne Zertifikat Z(Alice)
-				byte[] dataE = myRsaE.toByteArray();
-				byte[] dataN = myRsaN.toByteArray();
+				//OSCAR kann zwar den gleichen Namen angeben, muss aber seine RSA-Werte nehmen
+				byte[] dataE;
+				byte[] dataN;
+				if(OSCAR_){
+					dataE = osRsaE.toByteArray();
+					dataN = osRsaN.toByteArray();
+				} else {
+					dataE = myRsaE.toByteArray();
+					dataN = myRsaN.toByteArray();
+				}
 				byte[] data = new byte[dataE.length+dataN.length];
 				for(int i=0;i<dataE.length;i++){
 					data[i]=dataE[i];
@@ -221,6 +276,7 @@ public final class StationToStation implements Protocol {
 				for(int i=0;i<dataN.length;i++){
 					data[dataE.length+i]=dataN[i];
 				}
+				
 				Certificate myCert = TrustedAuthority.newCertificate(data);
 				// (6)b Bestimmte Ciffre E_K(S_A(yA,yB))
 				// d.h. einfach Idea mit Schlüssel k auf BigInteger sig anwenden
@@ -237,12 +293,21 @@ public final class StationToStation implements Protocol {
 				Com.sendTo(1, myY.toString(RADIX_SEND_));
 				Com.sendTo(1, myEk.toString(RADIX_SEND_));
 				if (DEBUG) {
-					System.out.println("DDD| (6) Alice sendet an Bob:");
-					System.out.println("DDD| \t ID(Alice)         = " + myCert.getID());
-					System.out.println("DDD| \t eA,nA           = " + myData.toString());
-					System.out.println("DDD| \t D_T(ID,eA,nA)   = " + myCert.getSignature());
-					System.out.println("DDD| \t yA              = " + myY);
-					System.out.println("DDD| \t E_k(S_A(yA,yB)) = " + myEk);
+					if (OSCAR_){
+						System.out.println("DDD| (6) O sendet an B:");
+						System.out.println("DDD| \t ID(Alice)         = " + myCert.getID());
+						System.out.println("DDD| \t eO,nO           = " + myData.toString());
+						System.out.println("DDD| \t D_T(ID,eO,nO)   = " + myCert.getSignature());
+						System.out.println("DDD| \t yO              = " + myY);
+						System.out.println("DDD| \t E_k(S_O(yO,yB)) = " + myEk);
+					}else{
+						System.out.println("DDD| (6) A sendet an B:");
+						System.out.println("DDD| \t ID(Alice)         = " + myCert.getID());
+						System.out.println("DDD| \t eA,nA           = " + myData.toString());
+						System.out.println("DDD| \t D_T(ID,eA,nA)   = " + myCert.getSignature());
+						System.out.println("DDD| \t yA              = " + myY);
+						System.out.println("DDD| \t E_k(S_A(yA,yB)) = " + myEk);
+					}
 				}
 				// (7) nichts tun
 				// (8) beginne Kommunikation
@@ -290,6 +355,8 @@ public final class StationToStation implements Protocol {
 	}
 
 	private String BigIntToString(BigInteger code) {
+		//FIXME irgendwie klappt das nicht mit dem String, 
+		//der char liest aber die richtigen Buchstaben (bis auf die letzten 2 jeweils)
 		String back = "";
 		BigInteger temp0;
 		char temp1;
@@ -334,7 +401,7 @@ public final class StationToStation implements Protocol {
 		M = new BigInteger(digest);
 		//Vergleichen
 		if (M.mod(modTA).equals(partnerData.mod(modTA))){
-			System.out.println("Zertifikat erfolgreich überprüft.");
+			//System.out.println("Zertifikat erfolgreich überprüft.");
 			return true;
 		}
 		System.err.println("Falsches Zertifikat!");
@@ -363,7 +430,7 @@ public final class StationToStation implements Protocol {
 			// (0)a2 Auslesen der Hashparameter
 			BufferedReader hashParam = createReader(fileHash);
 			Fingerprint hf = new Fingerprint();
-			hf.setDebug(DEBUG);
+			hf.setDebug(false);
 			hf.readParam(hashParam); // d.h. Hashparameter sind jetzt im Objekt
 										// gespeichert
 
@@ -542,7 +609,6 @@ public final class StationToStation implements Protocol {
 				//nix tun, in s steht jetzt der String
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return s;
