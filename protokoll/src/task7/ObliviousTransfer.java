@@ -66,6 +66,9 @@ public final class ObliviousTransfer implements Protocol {
 		String m1 = mess1.toString(36);//radix 36 damit auch viele Buchstaben raus kommen
 		BigInteger mess2 = BigIntegerUtil.randomBetween(BigInteger.ONE, help);
 		String m2 = mess2.toString(36);
+		BigInteger[] m = new BigInteger[2];
+		m[0]= mess1;
+		m[1]= mess2;
 		//(1)b Alice sendet m1 und m2 an Bob
 		Com.sendTo(1, m1); // m1
 		Com.sendTo(1, m2); // m2
@@ -82,6 +85,9 @@ public final class ObliviousTransfer implements Protocol {
 			System.out.println("DDD| \t q = " + q);
 		}
 		//(3)a Alice berechnet k0' und k1' und signiert sie
+		//ki'=(D_A((q-m[i])mod p²))mod p
+		BigInteger k0 = (q.subtract(m[0])).mod(myGamalP.multiply(myGamalP));
+		BigInteger k1 = (q.subtract(m[1])).mod(myGamalP.multiply(myGamalP));
 		//(3)b Alice sendet beide Signaturen an Bob
 		//(3)c Alice wählt zufällig s aus {0,1}
 		//(3)d Alice berechnet (M_0+ks')mod n, (M_1+ks+1')mod n und sendet beides und s an Bob
@@ -111,13 +117,26 @@ public final class ObliviousTransfer implements Protocol {
 			System.out.println("DDD| \t m1 = " + m1);
 			System.out.println("DDD| \t m2 = " + m2);
 		}
-		//(2)a Bob wählt zufällig r aus {0,1} und k aus Z_n
+		BigInteger[] m = new BigInteger[2];
+		byte[] t1 = m1.getBytes();
+		m[0]= new BigInteger(t1);
+		byte[] t2 = m2.getBytes();
+		m[1]= new BigInteger(t2);
+		//(2)a Bob wählt zufällig r aus {0,1} und k aus Z_p
 		BigInteger k = BigIntegerUtil.randomBetween(BigInteger.ONE, partnerGamalP);
-		BigInteger r = BigIntegerUtil.randomBetween(BigInteger.ONE, zwei.multiply(zwei));
-		//(2)b Bob berechnet q=(E_A(k)+m_r)mod n
-		BigInteger q = k.add(r);//TODO durch richtige Rechnung ersetzen
+		BigInteger r_z = BigIntegerUtil.randomBetween(BigInteger.ONE, zwei.multiply(zwei));
+		int r = (r_z.mod(zwei)).intValue();
+		//(2)b Bob berechnet q=(E_A(k)+m_r)mod p²
+		BigInteger a = partnerGamalG.modPow(k, partnerGamalP);
+		BigInteger b = k.multiply(partnerY.modPow(k, partnerGamalP));
+		BigInteger eak = a.add(b.multiply(partnerGamalP));
+		BigInteger q = (eak.add(m[r])).mod(partnerGamalP.multiply(partnerGamalP)) ;
 		//(2)c Bob sendet q an Alice
 		Com.sendTo(0, q.toString(RADIX_SEND_));
+		if (DEBUG) {
+			System.out.println("DDD| (0) B sendet an A:");
+			System.out.println("DDD| \t q = " + q);
+		}
 		//(3)b Bob empfängt die Signaturen von k0' und k1' von Alice
 		//(3)d Bob empfängt (M_0+ks')mod n, (M_1+ks+1')mod n und s von Alice
 		//(4)a Bob berechnet M_s+r
