@@ -29,7 +29,7 @@ import task6.StationToStation;
 
 public final class StationToStation implements Protocol {
 	private final boolean DEBUG = true;
-	private final boolean OSCAR_ = true;
+	private final boolean OSCAR_ = false;
 
 	private static final int RADIX_SEND_ = 16;
 	private BigInteger zwei = new BigInteger("2",10);
@@ -48,6 +48,15 @@ public final class StationToStation implements Protocol {
 	 * dies die Aktionen von A.
 	 */
 	public void sendFirst() {
+		
+		//TEST-CODE
+		String mess = "Some Test Message  ";
+		BigInteger mess1 = StringToBigInt(mess);
+		mess = BigIntToString(mess1);
+		System.out.println(">>>mess is "+mess);
+		
+		
+		//TEST-CODE Ende
 		
 		if (DEBUG) {
 			if (OSCAR_){
@@ -303,7 +312,7 @@ public final class StationToStation implements Protocol {
 	}
 
 	private BigInteger StringToBigInt(String message) {
-		char temp;
+		/*char temp;
 		if (message.length()<1) return BigInteger.ZERO;
 		temp = message.charAt(message.length()-1);
 		BigInteger result = BigInteger.valueOf(temp);
@@ -314,25 +323,31 @@ public final class StationToStation implements Protocol {
 			result = result.multiply(zwei.pow(16));
 			//System.out.println(">>>result is "+result.toString(RADIX_SEND_));
 		}
-		return result;
+		return result;*/
+		byte mes[] = message.getBytes();
+		BigInteger back = new BigInteger(mes);
+		return back;
 	}
 
 	private String BigIntToString(BigInteger code) {
 		//FIXME irgendwie klappt das nicht mit dem String, 
 		//der char liest aber die richtigen Buchstaben (bis auf die letzten 2 jeweils)
-		String back = "";
+		/*String back = "";
 		BigInteger temp0;
 		char temp1;
 		while (!code.equals(BigInteger.ZERO)){
 			temp0 = code.mod(zwei.pow(16));
 			//System.out.println(">>>temp0 is "+temp0.toString(RADIX_SEND_));
 			temp1 = (char) temp0.intValue();
-			System.out.println(">>>temp1 is"+temp1);
+			System.out.println("> "+((char) temp1));
 			code = code.divide(zwei.pow(16));
-			back = back+""+temp1;
+			back = back + String.valueOf(temp1);
 			//System.out.println(">>>code is "+code.toString(RADIX_SEND_));
 		}
 		System.out.println();
+		return back;*/
+		byte[] mes = code.toByteArray();
+		String back = new String(mes);
 		return back;
 	}
 
