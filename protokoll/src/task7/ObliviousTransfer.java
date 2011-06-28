@@ -66,8 +66,10 @@ public final class ObliviousTransfer implements Protocol {
 		
 		if(DEBUG) {
 			System.out.println("DDD| (0)c Alice Nachrichten");
-			System.out.println("DDD| \t Nachricht 1: " + messM0.toString(16));
-			System.out.println("DDD| \t Nachricht 2: " + messM1.toString(16));
+			System.out.println("DDD| \t Nachricht 1: " + messM0);
+			System.out.println("DDD| \t Nachricht 1: " + messM0.toString(36));
+			System.out.println("DDD| \t Nachricht 2: " + messM1);
+			System.out.println("DDD| \t Nachricht 2: " + messM1.toString(36));
 		}
 		
 		//(1)a Alice wählt zufällig zwei weitere Nachrichten m1 und m2;
@@ -223,7 +225,8 @@ public final class ObliviousTransfer implements Protocol {
 		if(DEBUG) { 
 			System.out.println("DDD| (4)a Bob berechnet M_(s xor r)");
 			System.out.println("DDD| \t s xor r = " + s + " xor " + r + "=" + t);
-			System.out.println("DDD| \t M_(s xor r) = " + calc.toString(16));
+			System.out.println("DDD| \t M_(s xor r) = " + calc);
+			System.out.println("DDD| \t M_(s xor r) = " + calc.toString(36));
 		}
 		
 		//(4)b Bob prüft, ob Alice betrogen hat
