@@ -58,9 +58,11 @@ public final class ObliviousTransfer implements Protocol {
 		//(0)c Alice gibt zwei Nachrichten M1 und M2 an, von denen Bob eine erhalten soll
 		System.out.println("Geben sie jetzt die beiden Nachrichten an, von denen Bob eine erhalten soll.");
 		System.out.println("Nachricht 1: ");
-		String M1 = askString();
+		String M0 = askString();
+		BigInteger messM0 = new BigInteger(M0,36);
 		System.out.println("Nachricht 2: ");
-		String M2 = askString();
+		String M1 = askString();
+		BigInteger messM1 = new BigInteger(M1,36);
 		//(1)a Alice wählt zufällig zwei weitere Nachrichten m1 und m2;
 		BigInteger mess1 = BigIntegerUtil.randomBetween(BigInteger.ONE, help);
 		String m1 = mess1.toString(36);//radix 36 damit auch viele Buchstaben raus kommen
@@ -108,8 +110,15 @@ public final class ObliviousTransfer implements Protocol {
 		//(3)d Alice wählt zufällig s aus {0,1}
 		BigInteger sbig = BigIntegerUtil.randomBetween(BigInteger.ONE, help);
 		sbig = sbig.mod(zwei);
-		int s = sbig.intValue();
-		//(3)e Alice berechnet (M_0+ks')mod n, (M_1+ks+1')mod n und sendet beides und s an Bob
+		int s;
+		//(3)e Alice berechnet (M_0+ks')mod n, (M_1+ks+1')mod n
+		s = sbig.intValue(); // s
+		BigInteger send0 = k[s].add(messM0).mod(myGamalP); // (M_0 + k[s]') mod n
+		s = sbig.xor(BigInteger.ONE).intValue(); // s xor 1
+		BigInteger send1 = k[s].add(messM1).mod(myGamalP); // (M_1 + k[s+1]') mod n
+		//(3)f send0 und send1 beides und s an Bob senden
+		Com.sendTo(1,send0.toString(RADIX_SEND_));
+		Com.sendTo(1,send1.toString(RADIX_SEND_));
 		
 		//(4) nichts tun
 	}

@@ -330,7 +330,7 @@ public final class StationToStation implements Protocol {
 	}
 
 	private String BigIntToString(BigInteger code) {
-		//FIXME irgendwie klappt das nicht mit dem String, 
+		//FIX.ME irgendwie klappt das nicht mit dem String, 
 		//der char liest aber die richtigen Buchstaben (bis auf die letzten 2 jeweils)
 		/*String back = "";
 		BigInteger temp0;
