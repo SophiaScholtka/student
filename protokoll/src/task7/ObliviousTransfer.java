@@ -63,6 +63,13 @@ public final class ObliviousTransfer implements Protocol {
 		System.out.println("Nachricht 2: ");
 		String M1 = askString();
 		BigInteger messM1 = new BigInteger(M1,36);
+		
+		if(DEBUG) {
+			System.out.println("DDD| (0)c Alice Nachrichten");
+			System.out.println("DDD| \t Nachricht 1: " + messM0.toString(16));
+			System.out.println("DDD| \t Nachricht 2: " + messM1.toString(16));
+		}
+		
 		//(1)a Alice wählt zufällig zwei weitere Nachrichten m1 und m2;
 		BigInteger mess1 = BigIntegerUtil.randomBetween(BigInteger.ONE, help);
 		String m1 = mess1.toString(36);//radix 36 damit auch viele Buchstaben raus kommen
@@ -186,40 +193,54 @@ public final class ObliviousTransfer implements Protocol {
 		//(4)a Bob berechnet M_(s xor r)
 		BigInteger biR = new BigInteger(""+r,10);
 		BigInteger calc;
+		BigInteger calcQuer; // Das ungenutzte, andere received
 		BigInteger t = biR.xor(s); // t = r xor s
 		if (t.intValue() == 0 && s.intValue() == 0 && r == 0) {
 			calc = rec0; // M0 = M0 + k0
+			calcQuer = rec1; // M1 = M1 + k1
 		}
 		else if (t.intValue() == 0 && s.intValue() == 0 && r == 0) {
 			calc = rec1; // M1 = M1 + k1
+			calcQuer = rec0; // M0 = M0 + k0
 		}
 		else if (t.intValue() == 0 && s.intValue() == 0 && r == 0) {
 			calc = rec1; // M0 = M0 + k1
+			calcQuer = rec0; // M1 = M1 + k0
 		} 
 		else {
 			calc = rec0; // M1 = M1+k0
+			calcQuer = rec1; // M0 = M0 + k1
 		}
+		// M_(s xor r)
 		calc = calc.subtract(k); // sendT - k
 		calc = calc.mod(partnerGamalP); // sendT - k mod p
+		
+		// kQuer_(r xor 1) = (calcQuer mod p - calc) mod p
+		BigInteger kQuer = calcQuer.mod(partnerGamalP);
+		kQuer = kQuer.subtract(calc);
+		kQuer = kQuer.mod(partnerGamalP);
+		
 		if(DEBUG) { 
 			System.out.println("DDD| (4)a Bob berechnet M_(s xor r)");
 			System.out.println("DDD| \t s xor r = " + s + " xor " + r + "=" + t);
+			System.out.println("DDD| \t M_(s xor r) = " + calc.toString(16));
 		}
 		
 		//(4)b Bob prüft, ob Alice betrogen hat
 		// FIXME Fehlerquelle - was ist genau kQuer?
 		boolean checkCheat = false;
 		if (biR.xor(BigInteger.ONE).equals(BigInteger.ZERO)) { // r xor 1 = 0
-			checkCheat = Grundlagen.elGamalVerify(k, Sk1, partnerGamalP, partnerGamalP, partnerY);
+			checkCheat = Grundlagen.elGamalVerify(kQuer, Sk0, partnerGamalP, partnerGamalP, partnerY);
 		} else { // r xor 1 = 1
-			checkCheat = Grundlagen.elGamalVerify(k, Sk0, partnerGamalP, partnerGamalP, partnerY);
+			checkCheat = Grundlagen.elGamalVerify(kQuer, Sk1, partnerGamalP, partnerGamalP, partnerY);
 		}
 		
 		if(!checkCheat) {
 			System.out.println("Kein Betrug von Alice festgestellt.");
-			System.out.println("Nachricht: " + calc.toString(16));
+			System.out.println("Nachricht: " + calc.toString(36));
 		} else {
 			System.out.println("Betrüger!");
+			System.out.println("\t ( kQuer_(r xor 1) == k'_(r xor 1) identisch, daher auch M0 == M1 )");
 		}
 
 	}
