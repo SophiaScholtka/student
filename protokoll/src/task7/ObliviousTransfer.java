@@ -117,8 +117,9 @@ public final class ObliviousTransfer implements Protocol {
 		s = sbig.xor(BigInteger.ONE).intValue(); // s xor 1
 		BigInteger send1 = k[s].add(messM1).mod(myGamalP); // (M_1 + k[s+1]') mod n
 		//(3)f send0 und send1 beides und s an Bob senden
-		Com.sendTo(1,send0.toString(RADIX_SEND_));
-		Com.sendTo(1,send1.toString(RADIX_SEND_));
+		Com.sendTo(1,send0.toString(RADIX_SEND_)); // send0
+		Com.sendTo(1,send1.toString(RADIX_SEND_)); // send1
+		Com.sendTo(1, sbig.toString(RADIX_SEND_)); // s
 		
 		//(4) nichts tun
 	}
@@ -175,8 +176,51 @@ public final class ObliviousTransfer implements Protocol {
 			System.out.println("DDD| \t Sk1 = " + Sk1);
 		}
 		//(3)d Bob empfängt (M_0+ks')mod n, (M_1+ks+1')mod n und s von Alice
-		//(4)a Bob berechnet M_s+r
+		sReceive = Com.receive();
+		BigInteger rec0 = new BigInteger(sReceive, RADIX_SEND_);
+		sReceive = Com.receive();
+		BigInteger rec1 = new BigInteger(sReceive, RADIX_SEND_);
+		sReceive = Com.receive();
+		BigInteger s = new BigInteger(sReceive, RADIX_SEND_);
+		
+		//(4)a Bob berechnet M_(s xor r)
+		BigInteger biR = new BigInteger(""+r,10);
+		BigInteger calc;
+		BigInteger t = biR.xor(s); // t = r xor s
+		if (t.intValue() == 0 && s.intValue() == 0 && r == 0) {
+			calc = rec0; // M0 = M0 + k0
+		}
+		else if (t.intValue() == 0 && s.intValue() == 0 && r == 0) {
+			calc = rec1; // M1 = M1 + k1
+		}
+		else if (t.intValue() == 0 && s.intValue() == 0 && r == 0) {
+			calc = rec1; // M0 = M0 + k1
+		} 
+		else {
+			calc = rec0; // M1 = M1+k0
+		}
+		calc = calc.subtract(k); // sendT - k
+		calc = calc.mod(partnerGamalP); // sendT - k mod p
+		if(DEBUG) { 
+			System.out.println("DDD| (4)a Bob berechnet M_(s xor r)");
+			System.out.println("DDD| \t s xor r = " + s + " xor " + r + "=" + t);
+		}
+		
 		//(4)b Bob prüft, ob Alice betrogen hat
+		// FIXME Fehlerquelle - was ist genau kQuer?
+		boolean checkCheat = false;
+		if (biR.xor(BigInteger.ONE).equals(BigInteger.ZERO)) { // r xor 1 = 0
+			checkCheat = Grundlagen.elGamalVerify(k, Sk1, partnerGamalP, partnerGamalP, partnerY);
+		} else { // r xor 1 = 1
+			checkCheat = Grundlagen.elGamalVerify(k, Sk0, partnerGamalP, partnerGamalP, partnerY);
+		}
+		
+		if(!checkCheat) {
+			System.out.println("Kein Betrug von Alice festgestellt.");
+			System.out.println("Nachricht: " + calc.toString(16));
+		} else {
+			System.out.println("Betrüger!");
+		}
 
 	}
 	
