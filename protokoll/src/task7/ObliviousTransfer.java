@@ -66,8 +66,10 @@ public final class ObliviousTransfer implements Protocol {
 		
 		if(DEBUG) {
 			System.out.println("DDD| (0)c Alice Nachrichten");
+			System.out.println("DDD| \t Nachricht 1: " + M0);
 			System.out.println("DDD| \t Nachricht 1: " + messM0);
 			System.out.println("DDD| \t Nachricht 1: " + messM0.toString(36));
+			System.out.println("DDD| \t Nachricht 2: " + M1);
 			System.out.println("DDD| \t Nachricht 2: " + messM1);
 			System.out.println("DDD| \t Nachricht 2: " + messM1.toString(36));
 		}
@@ -201,11 +203,11 @@ public final class ObliviousTransfer implements Protocol {
 			calc = rec0; // M0 = M0 + k0
 			calcQuer = rec1; // M1 = M1 + k1
 		}
-		else if (t.intValue() == 0 && s.intValue() == 0 && r == 0) {
+		else if (t.intValue() == 1 && s.intValue() == 0 && r == 1) {
 			calc = rec1; // M1 = M1 + k1
 			calcQuer = rec0; // M0 = M0 + k0
 		}
-		else if (t.intValue() == 0 && s.intValue() == 0 && r == 0) {
+		else if (t.intValue() == 0 && s.intValue() == 1 && r == 1) {
 			calc = rec1; // M0 = M0 + k1
 			calcQuer = rec0; // M1 = M1 + k0
 		} 
