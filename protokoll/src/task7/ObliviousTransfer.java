@@ -131,11 +131,11 @@ public final class ObliviousTransfer implements Protocol {
 		Com.sendTo(1,send0.toString(RADIX_SEND_)); // send0
 		Com.sendTo(1,send1.toString(RADIX_SEND_)); // send1
 		Com.sendTo(1, sbig.toString(RADIX_SEND_)); // s
-		if(DEBUG){
-			System.out.println("DDD| Alice sendet an Bob :");
-			System.out.println("DDD| (M_0+ks')mod n " + send0);
-			System.out.println("DDD| (M_1+ks+1')mod n "+ send1);
-			System.out.println("DDD| s "+sbig);
+		if (DEBUG) {
+			System.out.println("DDD| (3)d-f Berechnete Werte");
+			System.out.println("DDD| \t s = " + sbig);
+			System.out.println("DDD| \t send0 = " + send0.toString(16));
+			System.out.println("DDD| \t send1 = " + send1.toString(16));
 		}
 		
 		//(4) nichts tun
@@ -180,6 +180,7 @@ public final class ObliviousTransfer implements Protocol {
 		Com.sendTo(0, q.toString(RADIX_SEND_));
 		if (DEBUG) {
 			System.out.println("DDD| (2) B sendet an A:");
+			System.out.println("DDD| \t r = " + r);
 			System.out.println("DDD| \t q = " + q);
 		}
 		//(3)b Bob empfängt die Signaturen von k0' und k1' von Alice
@@ -199,11 +200,11 @@ public final class ObliviousTransfer implements Protocol {
 		BigInteger rec1 = new BigInteger(sReceive, RADIX_SEND_);
 		sReceive = Com.receive();
 		BigInteger s = new BigInteger(sReceive, RADIX_SEND_);
-		if(DEBUG){
-			System.out.println("DDD| Bob empfängt von Alice :");
-			System.out.println("DDD| (M_0+ks')mod n " + rec0);
-			System.out.println("DDD| (M_1+ks+1')mod n "+ rec1);
-			System.out.println("DDD| s "+s);
+		if(DEBUG) {
+			System.out.println("DDD| (3)d Bob hat empfangen");
+			System.out.println("DDD| \t rec0 (send0) = " + rec0.toString(16));
+			System.out.println("DDD| \t rec1 (send1) = " + rec1.toString(16));
+			System.out.println("DDD| \t s = " + s.toString(16));
 		}
 		
 		//(4)a Bob berechnet M_(s xor r)
@@ -211,15 +212,15 @@ public final class ObliviousTransfer implements Protocol {
 		BigInteger calc;
 		BigInteger calcQuer; // Das ungenutzte, andere received
 		BigInteger t = biR.xor(s); // t = r xor s
-		if (t.intValue() == 0 && s.intValue() == 0 && r == 0) {
+		if (s.intValue() == 0 && r == 0) {
 			calc = rec0; // M0 = M0 + k0
 			calcQuer = rec1; // M1 = M1 + k1
 		}
-		else if (t.intValue() == 1 && s.intValue() == 0 && r == 1) {
+		else if (s.intValue() == 0 && r == 1) {
 			calc = rec1; // M1 = M1 + k1
 			calcQuer = rec0; // M0 = M0 + k0
 		}
-		else if (t.intValue() == 0 && s.intValue() == 1 && r == 1) {
+		else if (s.intValue() == 1 && r == 1) {
 			calc = rec0; // M0 = M0 + k1
 			calcQuer = rec1; // M1 = M1 + k0
 		} 
