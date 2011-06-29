@@ -268,6 +268,14 @@ public final class ObliviousTransfer implements Protocol {
 		} else { // r xor 1 = 1
 			checkCheat = Grundlagen.elGamalVerify(kQuer, Sk1, partnerGamalP, partnerGamalP, partnerY);
 		}
+		// (4)b Signatur auf k ist falsch
+		if(!checkCheat){
+			if (biR.equals(BigInteger.ZERO)) { // r = 0
+				checkCheat = !Grundlagen.elGamalVerify(k, Sk0, partnerGamalP, partnerGamalP, partnerY);
+			} else { // r = 1
+				checkCheat = !Grundlagen.elGamalVerify(k, Sk1, partnerGamalP, partnerGamalP, partnerY);
+			}
+		}
 		// (4)b Sk0=Sk1, Identische Signaturen
 		if(checkCheat == false) {
 			checkCheat = Sk0.equals(Sk1);
@@ -282,6 +290,8 @@ public final class ObliviousTransfer implements Protocol {
 			System.out.println("DDD| BETRUGSVERSUCHE:");
 			System.out.println("DDD| S(kQuer)=Sk0       : " + Grundlagen.elGamalVerify(kQuer, Sk0, partnerGamalP, partnerGamalP, partnerY));
 			System.out.println("DDD| S(kQuer)=Sk1       : " + Grundlagen.elGamalVerify(kQuer, Sk1, partnerGamalP, partnerGamalP, partnerY));
+			System.out.println("DDD| S(k)=Sk0"+Grundlagen.elGamalVerify(k, Sk0, partnerGamalP, partnerGamalP, partnerY));
+			System.out.println("DDD| S(k)=Sk1"+Grundlagen.elGamalVerify(k, Sk1, partnerGamalP, partnerGamalP, partnerY));
 			System.out.println("DDD| Sk0=Sk1            : " + Sk0.equals(Sk1));
 			System.out.println("DDD| EA(kQuer)=qQuerEtc : " + eQuer.equals(qQuer));
 		}
