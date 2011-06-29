@@ -262,11 +262,22 @@ public final class ObliviousTransfer implements Protocol {
 		
 		// (4)b Bob prüft, ob Alice betrogen hat
 		boolean checkCheat = false;
+		// (4)b Prüfe, ob Signaturen für k und/oder kQuer gelten
+			boolean s0OK = Grundlagen.elGamalVerify(k, Sk0, partnerGamalP, partnerGamalP, partnerY);
+			boolean s1OK = Grundlagen.elGamalVerify(k, Sk1, partnerGamalP, partnerGamalP, partnerY);
+			boolean sQ0OK = Grundlagen.elGamalVerify(kQuer, Sk0, partnerGamalP, partnerGamalP, partnerY);
+			boolean sQ1OK = Grundlagen.elGamalVerify(kQuer, Sk1, partnerGamalP, partnerGamalP, partnerY);
+			System.out.println(">>>| k  : " + s0OK  + " \t "  + s1OK) ;
+			System.out.println(">>>| kQ : " + sQ0OK + " \t "  + sQ1OK) ;
+
 		// (4)b Signatur gilt für beide k
-		if (biR.xor(BigInteger.ONE).equals(BigInteger.ONE)) { // r xor 1 = 0
-			checkCheat = Grundlagen.elGamalVerify(kQuer, Sk0, partnerGamalP, partnerGamalP, partnerY);
-		} else { // r xor 1 = 1
-			checkCheat = Grundlagen.elGamalVerify(kQuer, Sk1, partnerGamalP, partnerGamalP, partnerY);
+		if(checkCheat == false) {
+			if (biR.xor(BigInteger.ONE).equals(BigInteger.ONE)) { // r xor 1 = 0
+				checkCheat = Grundlagen.elGamalVerify(kQuer, Sk0, partnerGamalP, partnerGamalP, partnerY);
+			} else { // r xor 1 = 1
+				checkCheat = Grundlagen.elGamalVerify(kQuer, Sk1, partnerGamalP, partnerGamalP, partnerY);
+			}
+			System.out.println(">>>| Signatur für beide k : " + checkCheat);
 		}
 		// (4)b Signatur auf k ist falsch
 		if(!checkCheat){
@@ -275,23 +286,26 @@ public final class ObliviousTransfer implements Protocol {
 			} else { // r = 1
 				checkCheat = !Grundlagen.elGamalVerify(k, Sk1, partnerGamalP, partnerGamalP, partnerY);
 			}
+			System.out.println(">>>| Signatur auf k ist falsch : " + checkCheat);
 		}
 		// (4)b Sk0=Sk1, Identische Signaturen
 		if(checkCheat == false) {
 			checkCheat = Sk0.equals(Sk1);
+			System.out.println(">>>| Sk0 == Sk1 : " + checkCheat);
 		}
 		// (4)b EA(kQuer(rxor1)) = (q-m(rxor1)) mod p
 		BigInteger eQuer = Grundlagen.elGamalEncipher(kQuer, partnerGamalP, partnerGamalG, partnerY);
 		BigInteger qQuer = q.subtract(m[biR.xor(BigInteger.ONE).intValue()]).mod(partnerGamalP);
 		if(checkCheat == false) {
 			checkCheat = eQuer.equals(qQuer);
+			System.out.println(">>>| E(...) = (q-m) mod p : " + checkCheat);
 		}
 		if(DEBUG) {
 			System.out.println("DDD| BETRUGSVERSUCHE:");
 			System.out.println("DDD| S(kQuer)=Sk0       : " + Grundlagen.elGamalVerify(kQuer, Sk0, partnerGamalP, partnerGamalP, partnerY));
 			System.out.println("DDD| S(kQuer)=Sk1       : " + Grundlagen.elGamalVerify(kQuer, Sk1, partnerGamalP, partnerGamalP, partnerY));
-			System.out.println("DDD| S(k)=Sk0"+Grundlagen.elGamalVerify(k, Sk0, partnerGamalP, partnerGamalP, partnerY));
-			System.out.println("DDD| S(k)=Sk1"+Grundlagen.elGamalVerify(k, Sk1, partnerGamalP, partnerGamalP, partnerY));
+			System.out.println("DDD| S(k)=Sk0           : " + Grundlagen.elGamalVerify(k, Sk0, partnerGamalP, partnerGamalP, partnerY));
+			System.out.println("DDD| S(k)=Sk1           : " + Grundlagen.elGamalVerify(k, Sk1, partnerGamalP, partnerGamalP, partnerY));
 			System.out.println("DDD| Sk0=Sk1            : " + Sk0.equals(Sk1));
 			System.out.println("DDD| EA(kQuer)=qQuerEtc : " + eQuer.equals(qQuer));
 		}
