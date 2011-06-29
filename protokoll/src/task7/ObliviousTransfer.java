@@ -208,12 +208,12 @@ public final class ObliviousTransfer implements Protocol {
 			calcQuer = rec0; // M0 = M0 + k0
 		}
 		else if (t.intValue() == 0 && s.intValue() == 1 && r == 1) {
-			calc = rec1; // M0 = M0 + k1
-			calcQuer = rec0; // M1 = M1 + k0
+			calc = rec0; // M0 = M0 + k1
+			calcQuer = rec1; // M1 = M1 + k0
 		} 
 		else {
-			calc = rec0; // M1 = M1+k0
-			calcQuer = rec1; // M0 = M0 + k1
+			calc = rec1; // M1 = M1+k0
+			calcQuer = rec0; // M0 = M0 + k1
 		}
 		// M_(s xor r)
 		calc = calc.subtract(k); // sendT - k
