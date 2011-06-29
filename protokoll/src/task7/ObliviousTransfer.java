@@ -239,11 +239,17 @@ public final class ObliviousTransfer implements Protocol {
 		kQuer = kQuer.subtract(calc);
 		kQuer = kQuer.mod(partnerGamalP);
 		
+		BigInteger test = calcQuer.mod(partnerGamalP);
+		test = test.subtract(k);
+		test = test.mod(partnerGamalP);
+		
 		if(DEBUG) { 
 			System.out.println("DDD| (4)a Bob berechnet M_(s xor r)");
 			System.out.println("DDD| \t s xor r = " + s + " xor " + r + "=" + t);
 			System.out.println("DDD| \t M_(s xor r) = " + calc);
 			System.out.println("DDD| \t M_(s xor r) = " + calc.toString(36));
+			System.out.println("DDD| \t Test = " + test);
+			System.out.println("DDD| \t Test = " + test.toString(36));
 		}
 		
 		//(4)b Bob prüft, ob Alice betrogen hat
