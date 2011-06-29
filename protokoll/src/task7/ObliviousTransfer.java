@@ -131,6 +131,12 @@ public final class ObliviousTransfer implements Protocol {
 		Com.sendTo(1,send0.toString(RADIX_SEND_)); // send0
 		Com.sendTo(1,send1.toString(RADIX_SEND_)); // send1
 		Com.sendTo(1, sbig.toString(RADIX_SEND_)); // s
+		if(DEBUG){
+			System.out.println("DDD| Alice sendet an Bob :");
+			System.out.println("DDD| (M_0+ks')mod n " + send0);
+			System.out.println("DDD| (M_1+ks+1')mod n "+ send1);
+			System.out.println("DDD| s "+sbig);
+		}
 		
 		//(4) nichts tun
 	}
@@ -193,6 +199,12 @@ public final class ObliviousTransfer implements Protocol {
 		BigInteger rec1 = new BigInteger(sReceive, RADIX_SEND_);
 		sReceive = Com.receive();
 		BigInteger s = new BigInteger(sReceive, RADIX_SEND_);
+		if(DEBUG){
+			System.out.println("DDD| Bob empfängt von Alice :");
+			System.out.println("DDD| (M_0+ks')mod n " + rec0);
+			System.out.println("DDD| (M_1+ks+1')mod n "+ rec1);
+			System.out.println("DDD| s "+s);
+		}
 		
 		//(4)a Bob berechnet M_(s xor r)
 		BigInteger biR = new BigInteger(""+r,10);
