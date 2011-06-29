@@ -212,28 +212,30 @@ public final class ObliviousTransfer implements Protocol {
 		BigInteger calc;
 		BigInteger calcQuer; // Das ungenutzte, andere received
 		BigInteger t = biR.xor(s); // t = r xor s
-		if (s.intValue() == 0 && r == 0) {
-			calc = rec0; // M0 = M0 + k0
+		if (s.intValue() == 0 && r == 0) { // t=0
+			calc = rec0;     // M0 = M0 + k0
 			calcQuer = rec1; // M1 = M1 + k1
 		}
-		else if (s.intValue() == 0 && r == 1) {
-			calc = rec1; // M1 = M1 + k1
+		else if (s.intValue() == 0 && r == 1) { // t=1
+			calc = rec1;     // M1 = M1 + k1
 			calcQuer = rec0; // M0 = M0 + k0
 		}
-		else if (s.intValue() == 1 && r == 1) {
-			calc = rec0; // M0 = M0 + k1
+		else if (s.intValue() == 1 && r == 1) { // t=0
+			calc = rec0;     // M0 = M0 + k1
 			calcQuer = rec1; // M1 = M1 + k0
 		} 
-		else {
-			calc = rec1; // M1 = M1+k0
+		else { // t=1
+			calc = rec1;     // M1 = M1+k0
 			calcQuer = rec0; // M0 = M0 + k1
 		}
 		// M_(s xor r)
+		calc = calc.mod(partnerGamalP);
 		calc = calc.subtract(k); // sendT - k
 		calc = calc.mod(partnerGamalP); // sendT - k mod p
 		
 		// kQuer_(r xor 1) = (calcQuer mod p - calc) mod p
-		BigInteger kQuer = calcQuer.mod(partnerGamalP);
+		BigInteger kQuer;
+		kQuer = calcQuer.mod(partnerGamalP);
 		kQuer = kQuer.subtract(calc);
 		kQuer = kQuer.mod(partnerGamalP);
 		
