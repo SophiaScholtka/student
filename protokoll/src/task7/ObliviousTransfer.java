@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
+import java.util.Random;
 
 import chiffre.Grundlagen;
 import task6.StationToStation;
@@ -19,7 +20,7 @@ public final class ObliviousTransfer implements Protocol {
 	static private String NameOfTheGame = "ObliviousTransfer";
 
     private Communicator Com;
-	
+	private boolean betrug_ = false;
 	public void setCommunicator(Communicator com)
 	{
 	  Com = com;
@@ -64,6 +65,11 @@ public final class ObliviousTransfer implements Protocol {
 		String M1 = askString();
 		BigInteger messM1 = new BigInteger(M1,36);
 		
+		if(messM0.equals(messM1)){
+			betrug_ = true;
+			System.out.println("DDD| Alice betrügt, indem sie zwei gleiche Nachrichten eingibt.");
+		}
+		
 		if(DEBUG) {
 			System.out.println("DDD| (0)c Alice Nachrichten");
 			System.out.println("DDD| \t Nachricht 1: " + M0);
@@ -106,6 +112,12 @@ public final class ObliviousTransfer implements Protocol {
 		BigInteger[] Sk = new BigInteger[2];
 		Sk[0] = Grundlagen.elGamalSign(k[0], myGamalP, myGamalG, myY, myX);
 		Sk[1] = Grundlagen.elGamalSign(k[1], myGamalP, myGamalG, myY, myX);
+		if(betrug_){
+			BigInteger i = BigIntegerUtil.randomBetween(BigInteger.ONE, help);
+			int ii = (i.mod(zwei)).intValue();
+			System.out.println("DDD| Fälsche Signatur k"+ii);
+			Sk[ii] = BigIntegerUtil.randomBetween(BigInteger.ONE, myGamalP.subtract(zwei));
+		}
 		//(3)c Alice sendet beide Signaturen an Bob
 		Com.sendTo(1, Sk[0].toString(RADIX_SEND_));
 		Com.sendTo(1, Sk[1].toString(RADIX_SEND_));
