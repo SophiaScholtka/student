@@ -260,13 +260,30 @@ public final class ObliviousTransfer implements Protocol {
 			System.out.println("DDD| \t Test = " + test.toString(36));
 		}
 		
-		//(4)b Bob prüft, ob Alice betrogen hat
-		// FIXME Fehlerquelle - was ist genau kQuer?
+		// (4)b Bob prüft, ob Alice betrogen hat
 		boolean checkCheat = false;
-		if (biR.xor(BigInteger.ONE).equals(BigInteger.ZERO)) { // r xor 1 = 0
+		// (4)b Signatur gilt für beide k
+		if (biR.xor(BigInteger.ONE).equals(BigInteger.ONE)) { // r xor 1 = 0
 			checkCheat = Grundlagen.elGamalVerify(kQuer, Sk0, partnerGamalP, partnerGamalP, partnerY);
 		} else { // r xor 1 = 1
 			checkCheat = Grundlagen.elGamalVerify(kQuer, Sk1, partnerGamalP, partnerGamalP, partnerY);
+		}
+		// (4)b Sk0=Sk1, Identische Signaturen
+		if(checkCheat == false) {
+			checkCheat = Sk0.equals(Sk1);
+		}
+		// (4)b EA(kQuer(rxor1)) = (q-m(rxor1)) mod p
+		BigInteger eQuer = Grundlagen.elGamalEncipher(kQuer, partnerGamalP, partnerGamalG, partnerY);
+		BigInteger qQuer = q.subtract(m[biR.xor(BigInteger.ONE).intValue()]).mod(partnerGamalP);
+		if(checkCheat == false) {
+			checkCheat = eQuer.equals(qQuer);
+		}
+		if(DEBUG) {
+			System.out.println("DDD| BETRUGSVERSUCHE:");
+			System.out.println("DDD| S(kQuer)=Sk0       : " + Grundlagen.elGamalVerify(kQuer, Sk0, partnerGamalP, partnerGamalP, partnerY));
+			System.out.println("DDD| S(kQuer)=Sk1       : " + Grundlagen.elGamalVerify(kQuer, Sk1, partnerGamalP, partnerGamalP, partnerY));
+			System.out.println("DDD| Sk0=Sk1            : " + Sk0.equals(Sk1));
+			System.out.println("DDD| EA(kQuer)=qQuerEtc : " + eQuer.equals(qQuer));
 		}
 		
 		if(!checkCheat) {
@@ -274,7 +291,6 @@ public final class ObliviousTransfer implements Protocol {
 			System.out.println("Nachricht: " + calc.toString(36));
 		} else {
 			System.out.println("Betrüger!");
-			System.out.println("\t ( kQuer_(r xor 1) == k'_(r xor 1) identisch, daher auch M0 == M1 )");
 		}
 
 	}
