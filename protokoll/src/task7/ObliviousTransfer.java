@@ -212,15 +212,15 @@ public final class ObliviousTransfer implements Protocol {
 		BigInteger calc;
 		BigInteger calcQuer; // Das ungenutzte, andere received
 		BigInteger t = biR.xor(s); // t = r xor s
-		if (t.intValue() == 0 && s.intValue() == 0 && r == 0) {
+		if (s.intValue() == 0 && r == 0) {
 			calc = rec0; // M0 = M0 + k0
 			calcQuer = rec1; // M1 = M1 + k1
 		}
-		else if (t.intValue() == 1 && s.intValue() == 0 && r == 1) {
+		else if (s.intValue() == 0 && r == 1) {
 			calc = rec1; // M1 = M1 + k1
 			calcQuer = rec0; // M0 = M0 + k0
 		}
-		else if (t.intValue() == 0 && s.intValue() == 1 && r == 1) {
+		else if (s.intValue() == 1 && r == 1) {
 			calc = rec0; // M0 = M0 + k1
 			calcQuer = rec1; // M1 = M1 + k0
 		} 
