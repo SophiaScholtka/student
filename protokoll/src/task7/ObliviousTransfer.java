@@ -118,6 +118,14 @@ public final class ObliviousTransfer implements Protocol {
 			System.out.println("DDD| Fälsche Signatur k"+ii);
 			Sk[ii] = BigIntegerUtil.randomBetween(BigInteger.ONE, myGamalP.subtract(zwei));
 		}
+		if(DEBUG) {
+			//FIXME Beide Signaturen können nicht verifiziert werden. Was ist falsch?
+			boolean t0 = Grundlagen.elGamalVerify(k[0], Sk[0], myGamalP, myGamalG, myY);
+			boolean t1 = Grundlagen.elGamalVerify(k[1], Sk[1], myGamalP, myGamalG, myY);
+			System.out.println("DDD| (3)b Prüfe Signaturen:");
+			System.out.println("DDD| \t Sk[0] ist " + t0);
+			System.out.println("DDD| \t Sk[1] ist " + t1);
+		}
 		//(3)c Alice sendet beide Signaturen an Bob
 		Com.sendTo(1, Sk[0].toString(RADIX_SEND_));
 		Com.sendTo(1, Sk[1].toString(RADIX_SEND_));

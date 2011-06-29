@@ -156,9 +156,11 @@ public class Grundlagen {
 		  // (1d) Nachricht Element M in Z_p^*: M mod p, ggt(M,p)=1
 		  mess = mess.mod(pubP); // M mod P
 		  // Ermittle s = c mod p
+//		  BigInteger s = sig.divideAndRemainder(pubP)[0];
 		  BigInteger s = sig.mod(pubP);
 		  // Ermittle r = c % p
 		  BigInteger r = sig.divide(pubP);
+//		  BigInteger r = sig.divideAndRemainder(pubP)[1];
 		  
 		  // (2b) Prüfe ob 1 <= r <= p-1; false: abbruch
 		  boolean ifLess = (r.compareTo(BigInteger.ONE) == -1);
@@ -181,7 +183,8 @@ public class Grundlagen {
 		  }
 		  
 		  // (2d) Akzeptiere, wenn v1==v2
-		  return !isBad;
+//		  return !isBad;
+		  return v2.equals(v1);
 	  }
 	
 }
