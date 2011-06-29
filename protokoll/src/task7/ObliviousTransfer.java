@@ -75,20 +75,16 @@ public final class ObliviousTransfer implements Protocol {
 		}
 		
 		//(1)a Alice wählt zufällig zwei weitere Nachrichten m1 und m2;
-		BigInteger mess1 = BigIntegerUtil.randomBetween(BigInteger.ONE, help);
-		String m1 = mess1.toString(36);//radix 36 damit auch viele Buchstaben raus kommen
-		BigInteger mess2 = BigIntegerUtil.randomBetween(BigInteger.ONE, help);
-		String m2 = mess2.toString(36);
 		BigInteger[] m = new BigInteger[2];
-		m[0]= mess1;
-		m[1]= mess2;
+		m[0] = BigIntegerUtil.randomBetween(BigInteger.ONE, help);
+		m[1] = BigIntegerUtil.randomBetween(BigInteger.ONE, help);
 		//(1)b Alice sendet m1 und m2 an Bob
-		Com.sendTo(1, m1); // m1
-		Com.sendTo(1, m2); // m2
+		Com.sendTo(1, m[0].toString(RADIX_SEND_)); // m1
+		Com.sendTo(1, m[1].toString(RADIX_SEND_)); // m2
 		if (DEBUG) {
 			System.out.println("DDD| (1) A sendet an B:");
-			System.out.println("DDD| \t m1 = " + m1);
-			System.out.println("DDD| \t m2 = " + m2);
+			System.out.println("DDD| \t m1 = " + m[0]);
+			System.out.println("DDD| \t m2 = " + m[1]);
 		}
 		//(2) Alice empfängt q von Bob
 		String getq = Com.receive();
@@ -159,16 +155,16 @@ public final class ObliviousTransfer implements Protocol {
 		//(1)b Bob empfängt m1 und m2
 		String m1 = Com.receive();
 		String m2 = Com.receive();
+		BigInteger[] m = new BigInteger[2];
+		m[0] = new BigInteger(m1,RADIX_SEND_);
+		m[1] = new BigInteger(m2,RADIX_SEND_);
 		if (DEBUG) {
 			System.out.println("DDD| (0) B empfängt von A:");
 			System.out.println("DDD| \t m1 = " + m1);
 			System.out.println("DDD| \t m2 = " + m2);
+			System.out.println("DDD| \t m[0] = " + m[0]);
+			System.out.println("DDD| \t m[1] = " + m[1]);
 		}
-		BigInteger[] m = new BigInteger[2];
-		byte[] t1 = m1.getBytes();
-		m[0]= new BigInteger(t1);
-		byte[] t2 = m2.getBytes();
-		m[1]= new BigInteger(t2);
 		//(2)a Bob wählt zufällig r aus {0,1} und k aus Z_p
 		BigInteger k = BigIntegerUtil.randomBetween(BigInteger.ONE, partnerGamalP);
 		BigInteger r_z = BigIntegerUtil.randomBetween(BigInteger.ONE, zwei.multiply(zwei));
