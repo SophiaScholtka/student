@@ -237,12 +237,6 @@ public final class ObliviousTransfer implements Protocol {
 			System.out.println("DDD| (3) B empfängt von A:");
 			System.out.println("DDD| \t Sk0 = " + Sk0);
 			System.out.println("DDD| \t Sk1 = " + Sk1);
-
-			boolean s0OK = Grundlagen.elGamalVerify(k, Sk0, partnerGamalP,
-					partnerGamalG, partnerY);
-			boolean s1OK = Grundlagen.elGamalVerify(k, Sk1, partnerGamalP,
-					partnerGamalG, partnerY);
-			System.out.println(">>>| k  : " + s0OK + " \t " + s1OK);
 		}
 		// (3)d Bob empfängt (M_0+ks')mod n, (M_1+ks+1')mod n und s von Alice
 		sReceive = Com.receive();
