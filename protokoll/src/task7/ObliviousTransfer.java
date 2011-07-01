@@ -30,7 +30,6 @@ public final class ObliviousTransfer implements Protocol {
 	}
 
 	public void sendFirst() {
-		// TODO User fragen, ob und wo Alice betrügen soll
 
 		// (0)a Alice erzeugt sich einen ElGamal Key
 		BigInteger myGamalP;
@@ -228,7 +227,6 @@ public final class ObliviousTransfer implements Protocol {
 			System.out.println("DDD| \t q = " + q);
 		}
 		// (3)b Bob empfängt die Signaturen von k0' und k1' von Alice
-		// FIXME Bob hat Probleme, Signaturen zu prüfen
 		sReceive = Com.receive();
 		BigInteger Sk0 = new BigInteger(sReceive, RADIX_SEND_);
 		sReceive = Com.receive();
