@@ -14,10 +14,20 @@ public final class SecretSharing implements Protocol {
 
 	private static final int RADIX_SEND_ = 16;
 	private BigInteger zwei = new BigInteger("2", 10);
+	private final BigInteger ZERO = new BigInteger("0");
+	private final BigInteger ONE = new BigInteger("1");
+	private final BigInteger TWO = new BigInteger("2");
 
 	static private int MinPlayer = 2;
 	static private int MaxPlayer = 2;
 	static private String NameOfTheGame = "ObliviousTransfer";
+
+	// Secret Sharing
+	private BigInteger ssk = new BigInteger("7"); // 0...7
+	private BigInteger ssn = new BigInteger("10"); // Geheimnispaare, max 10
+	private BigInteger ssm = new BigInteger("10"); // Länge der Wörter, max 10
+	private BigInteger ssChanceA; // Berechnungsvorteil A:B
+	private BigInteger ssChanceB; // Berechnungsvorteil A:B
 
 	private Communicator Com;
 	private boolean betrug_ = false;
@@ -96,6 +106,21 @@ public final class SecretSharing implements Protocol {
 			System.out.println("DDD| \t Nachricht 2: " + messM1);
 			System.out.println("DDD| \t Nachricht 2: " + messM1.toString(36));
 		}
+
+		// TODO (SS1) k für beide festlegen
+		// k global: ssk
+		BigInteger ssk = this.ssk;
+		// Berechnung der Berechnungsvorteile
+		ssChanceA = TWO.pow(ssk.intValue()).add(ONE);
+		ssChanceB = TWO.pow(ssk.intValue());
+
+		// TODO (SS2)a a_(i,j) mit i=1,...,n und j=1,2 erzeugen
+		BigInteger[][] ssa = new BigInteger[ssn.intValue()][2];
+		ssa = generateWords(ssn.intValue(), ONE); // TODO Wörter bilden
+		// alle 2^(k+1) Binärwörter der Länge k+1 abgespeichern
+		// (SS2)b nach Größe ordnen
+		ssa = sortWords(ssa);
+		// TODO (SS3) Senden, muss an anderer Stelle eingebaut werden
 
 		// (1)a Alice wählt zufällig zwei weitere Nachrichten m1 und m2;
 		BigInteger[] m = new BigInteger[2];
@@ -368,5 +393,19 @@ public final class SecretSharing implements Protocol {
 			e.printStackTrace();
 		}
 		return s;
+	}
+
+	private BigInteger[][] generateWords(int n, BigInteger secret) {
+		// TODO Wörter generieren
+		BigInteger[][] words = new BigInteger[n][2];
+
+		return words;
+	}
+
+	private BigInteger[][] sortWords(BigInteger[][] ssa) {
+		// TODO Wörter sortieren
+		BigInteger[][] words = ssa.clone();
+		
+		return words;
 	}
 }
