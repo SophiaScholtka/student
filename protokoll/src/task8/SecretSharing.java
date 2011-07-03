@@ -1,16 +1,14 @@
-package task7;
+package task8;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
-
 import chiffre.Grundlagen;
 import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
-import de.tubs.cs.iti.krypto.protokoll.Communicator;
-import de.tubs.cs.iti.krypto.protokoll.Protocol;
+import de.tubs.cs.iti.krypto.protokoll.*;
 
-public final class ObliviousTransfer implements Protocol {
+public final class SecretSharing implements Protocol {
 	private final boolean DEBUG = true;
 	private final boolean TEST = true;
 
