@@ -9,14 +9,17 @@ import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
 import de.tubs.cs.iti.krypto.protokoll.*;
 
 public final class SecretSharing implements Protocol {
-	private final boolean DEBUG = true;
-	private final boolean TEST = true;
+	// Schalter
+	private final boolean DEBUG    = true;  // DEBUG, Allgemein
+	private final boolean DEBUG_OB = false; // DEBUG für Task7 Elemente
+	private final boolean DEBUG_SS = true;  // DEBUG für Task8 Elemente
+	private final boolean TEST = true; // für Testwerte
 
 	private static final int RADIX_SEND_ = 16;
 	private BigInteger zwei = new BigInteger("2", 10);
 	private final BigInteger ZERO = new BigInteger("0");
-	private final BigInteger ONE = new BigInteger("1");
-	private final BigInteger TWO = new BigInteger("2");
+	private final BigInteger ONE  = new BigInteger("1");
+	private final BigInteger TWO  = new BigInteger("2");
 
 	static private int MinPlayer = 2;
 	static private int MaxPlayer = 2;
@@ -57,8 +60,8 @@ public final class SecretSharing implements Protocol {
 					"338247438063093584360735553456651782895945714953753136968197534452413025437614400799748890371900646240882573007655796701481099145579155445557798688838152");
 			help = myGamalP.subtract(BigIntegerUtil.TWO);
 		} else {
-			System.out.print("A: Generiere El-Gamal Key für mich... "
-					+ "Augenblick...");
+			System.out.print("A: Generiere El-Gamal Key für mich... ");
+			System.out.print("Augenblick...");
 			int bitLength = 512;
 			BigInteger[] prime = Grundlagen.generatePrimePQ(bitLength);
 			myGamalP = prime[0];
@@ -75,7 +78,7 @@ public final class SecretSharing implements Protocol {
 		Com.sendTo(1, myGamalP.toString(RADIX_SEND_)); // p
 		Com.sendTo(1, myGamalG.toString(RADIX_SEND_)); // g
 		Com.sendTo(1, myY.toString(RADIX_SEND_)); // yA
-		if (DEBUG) {
+		if (DEBUG_OB) {
 			System.out.println("DDD| (0) A sendet an B:");
 			System.out.println("DDD| \t p = " + myGamalP);
 			System.out.println("DDD| \t g = " + myGamalG);
@@ -100,7 +103,7 @@ public final class SecretSharing implements Protocol {
 			System.out.println();
 		}
 
-		if (DEBUG) {
+		if (DEBUG_OB) {
 			System.out.println("DDD| (0)c Alice Nachrichten");
 			// System.out.println("DDD| \t Nachricht 1: " + M0);
 			System.out.println("DDD| \t Nachricht 1: " + messM0);
@@ -121,24 +124,31 @@ public final class SecretSharing implements Protocol {
 		// Bob n und k senden
 		Com.sendTo(1, ssn.toString(RADIX_SEND_));
 		Com.sendTo(1, ssk.toString(RADIX_SEND_));
-		if (DEBUG) {
+		if (DEBUG_SS) {
 			System.out.println("DDD| (SS1) Sende n und k an Bob");
 			System.out.println("DDD| \t n = " + ssn.toString(16));
 			System.out.println("DDD| \t k = " + ssk.toString(16));
 		}
 
 		// (SS2)a a_(i,j) mit i=1,...,n und j=1,2 erzeugen
-		BigInteger[][] ssa = new BigInteger[ssn.intValue()][2];
-		ssa = generateWords(ssn.intValue());
-		if (DEBUG) {
+		SecretWord[][] ssa = new SecretWord[ssn.intValue()][2];
+		ssa = generateSecrets(ssn.intValue());
+		if (DEBUG_SS) {
 			System.out.println("DDD| (SS2) Generierte Wortpaare:");
 			for (int i = 0; i < ssa.length; i++) {
 				System.out.print("DDD| \t ");
-				System.out.print(ssa[i][0].toString(16));
+				System.out.print(ssa[i][0].getSecret().toString(16));
 				System.out.print("\t und ");
-				System.out.print(ssa[i][1].toString(16));
+				System.out.print(ssa[i][1].getSecret().toString(16));
 				System.out.println();
 			}
+		}
+		
+		// (SS2) Hülle für Bobs Geheimnisse
+		SecretWord[][] ssb = new SecretWord[ssn.intValue()][2];
+		for (int i = 0 ; i < ssn.intValue() ; i++) {
+			ssb[i][0] = new SecretWord(ZERO);
+			ssb[i][1] = new SecretWord(ZERO);
 		}
 
 		
@@ -150,7 +160,7 @@ public final class SecretSharing implements Protocol {
 		// (1)b Alice sendet m1 und m2 an Bob
 		Com.sendTo(1, m[0].toString(RADIX_SEND_)); // m1
 		Com.sendTo(1, m[1].toString(RADIX_SEND_)); // m2
-		if (DEBUG) {
+		if (DEBUG_OB) {
 			System.out.println("DDD| (1) A sendet an B:");
 			System.out.println("DDD| \t m1 = " + m[0]);
 			System.out.println("DDD| \t m2 = " + m[1]);
@@ -158,7 +168,7 @@ public final class SecretSharing implements Protocol {
 		// (2) Alice empfängt q von Bob
 		String getq = Com.receive();
 		BigInteger q = new BigInteger(getq, RADIX_SEND_);
-		if (DEBUG) {
+		if (DEBUG_OB) {
 			System.out.println("DDD| (2) A empfängt von B");
 			System.out.println("DDD| \t q = " + q);
 		}
@@ -182,7 +192,7 @@ public final class SecretSharing implements Protocol {
 			Sk[ii] = BigIntegerUtil.randomBetween(BigInteger.ONE,
 					myGamalP.subtract(zwei));
 		}
-		if (DEBUG) {
+		if (DEBUG_OB) {
 			boolean t0 = Grundlagen.elGamalVerify(k[0], Sk[0], myGamalP,
 					myGamalG, myY);
 			boolean t1 = Grundlagen.elGamalVerify(k[1], Sk[1], myGamalP,
@@ -194,7 +204,7 @@ public final class SecretSharing implements Protocol {
 		// (3)c Alice sendet beide Signaturen an Bob
 		Com.sendTo(1, Sk[0].toString(RADIX_SEND_));
 		Com.sendTo(1, Sk[1].toString(RADIX_SEND_));
-		if (DEBUG) {
+		if (DEBUG_OB) {
 			System.out.println("DDD| (3) A sendet an B:");
 			System.out.println("DDD| \t S(k0) = " + Sk[0]);
 			System.out.println("DDD| \t S(k1) = " + Sk[1]);
@@ -214,7 +224,7 @@ public final class SecretSharing implements Protocol {
 		Com.sendTo(1, send0.toString(RADIX_SEND_)); // send0
 		Com.sendTo(1, send1.toString(RADIX_SEND_)); // send1
 		Com.sendTo(1, sbig.toString(RADIX_SEND_)); // s
-		if (DEBUG) {
+		if (DEBUG_OB) {
 			System.out.println("DDD| (3)d-f Berechnete Werte");
 			System.out.println("DDD| \t s = " + sbig);
 			System.out.println("DDD| \t send0 = " + send0.toString(16));
@@ -232,19 +242,21 @@ public final class SecretSharing implements Protocol {
 		BigInteger partnerGamalG = new BigInteger(sReceive, RADIX_SEND_);
 		sReceive = Com.receive();
 		BigInteger partnerY = new BigInteger(sReceive, RADIX_SEND_);
-		if (DEBUG) {
+		if (DEBUG_OB) {
 			System.out.println("DDD| (0) B empfängt von A:");
 			System.out.println("DDD| \t p = " + partnerGamalP);
 			System.out.println("DDD| \t g = " + partnerGamalG);
 			System.out.println("DDD| \t y = " + partnerY);
 		}
+		
+		// TODO Bob braucht eigenen ElGamal Key!
 
 		// (SS1) Bob empfängt n und k
 		sReceive = Com.receive();
 		ssn = new BigInteger(sReceive, RADIX_SEND_);
 		sReceive = Com.receive();
 		ssk = new BigInteger(sReceive, RADIX_SEND_);
-		if (DEBUG) {
+		if (DEBUG_SS) {
 			System.out.println("DDD| (SS1) B empfängt von A:");
 			System.out.println("DDD| \t n = " + ssn.toString(16));
 			System.out.println("DDD| \t k = " + ssk.toString(16));
@@ -253,19 +265,27 @@ public final class SecretSharing implements Protocol {
 		setAdvantage(ssk);
 
 		// (SS2)a b_(i,j) mit i=1,...,n und j=1,2 erzeugen
-		BigInteger[][] ssb = new BigInteger[ssn.intValue()][2];
-		ssb = generateWords(ssn.intValue());
-		if (DEBUG) {
+		SecretWord[][] ssb = new SecretWord[ssn.intValue()][2];
+		ssb = generateSecrets(ssn.intValue());
+		if (DEBUG_SS) {
 			System.out.println("DDD| (SS2) Generierte Wortpaare:");
 			for (int i = 0; i < ssb.length; i++) {
 				System.out.print("DDD| \t ");
-				System.out.print(ssb[i][0].toString(16));
+				System.out.print(ssb[i][0].getSecret().toString(16));
 				System.out.print("\t und ");
-				System.out.print(ssb[i][1].toString(16));
+				System.out.print(ssb[i][1].getSecret().toString(16));
 				System.out.println();
 			}
 		}
 
+		// (SS2) Hülle für Alice Geheimnisse
+		SecretWord[][] ssa = new SecretWord[ssn.intValue()][2];
+		for (int i = 0 ; i < ssn.intValue() ; i++) {
+			ssa[i][0] = new SecretWord(ZERO);
+			ssa[i][1] = new SecretWord(ZERO);
+		}
+
+		
 		// HERE SS3 Bob
 		// (1)b Bob empfängt m1 und m2
 		String m1 = Com.receive();
@@ -273,7 +293,7 @@ public final class SecretSharing implements Protocol {
 		BigInteger[] m = new BigInteger[2];
 		m[0] = new BigInteger(m1, RADIX_SEND_);
 		m[1] = new BigInteger(m2, RADIX_SEND_);
-		if (DEBUG) {
+		if (DEBUG_OB) {
 			System.out.println("DDD| (0) B empfängt von A:");
 			System.out.println("DDD| \t m1 = " + m1);
 			System.out.println("DDD| \t m2 = " + m2);
@@ -293,7 +313,7 @@ public final class SecretSharing implements Protocol {
 				.multiply(partnerGamalP));
 		// (2)c Bob sendet q an Alice
 		Com.sendTo(0, q.toString(RADIX_SEND_));
-		if (DEBUG) {
+		if (DEBUG_OB) {
 			System.out.println("DDD| (2) B sendet an A:");
 			System.out.println("DDD| \t r = " + r);
 			System.out.println("DDD| \t q = " + q);
@@ -303,7 +323,7 @@ public final class SecretSharing implements Protocol {
 		BigInteger Sk0 = new BigInteger(sReceive, RADIX_SEND_);
 		sReceive = Com.receive();
 		BigInteger Sk1 = new BigInteger(sReceive, RADIX_SEND_);
-		if (DEBUG) {
+		if (DEBUG_OB) {
 			System.out.println("DDD| (3) B empfängt von A:");
 			System.out.println("DDD| \t Sk0 = " + Sk0);
 			System.out.println("DDD| \t Sk1 = " + Sk1);
@@ -315,7 +335,7 @@ public final class SecretSharing implements Protocol {
 		BigInteger rec1 = new BigInteger(sReceive, RADIX_SEND_);
 		sReceive = Com.receive();
 		BigInteger s = new BigInteger(sReceive, RADIX_SEND_);
-		if (DEBUG) {
+		if (DEBUG_OB) {
 			System.out.println("DDD| (3)d Bob hat empfangen");
 			System.out.println("DDD| \t rec0 (send0) = " + rec0.toString(16));
 			System.out.println("DDD| \t rec1 (send1) = " + rec1.toString(16));
@@ -355,7 +375,7 @@ public final class SecretSharing implements Protocol {
 		test = test.subtract(k);
 		test = test.mod(partnerGamalP);
 
-		if (DEBUG) {
+		if (DEBUG_OB) {
 			System.out.println("DDD| (4)a Bob berechnet M_(s xor r)");
 			System.out
 					.println("DDD| \t s xor r = " + s + " xor " + r + "=" + t);
@@ -376,13 +396,13 @@ public final class SecretSharing implements Protocol {
 				partnerGamalG, partnerY);
 		boolean sQ1OK = Grundlagen.elGamalVerify(kQuer, Sk1, partnerGamalP,
 				partnerGamalG, partnerY);
-		if (DEBUG) {
+		if (DEBUG_OB) {
 			System.out.println("DDD| (4)b Prüfe gültige Siganturen");
 			System.out.println("DDD| \t k  : " + s0OK + " \t " + s1OK);
 			System.out.println("DDD| \t kQ : " + sQ0OK + " \t " + sQ1OK);
 		}
 
-		if (DEBUG) {
+		if (DEBUG_OB) {
 			System.out.println("DDD| (4)b BETRUGSVERSUCHE:");
 		}
 		// (4)b Signatur auf k ist falsch
@@ -403,7 +423,7 @@ public final class SecretSharing implements Protocol {
 		qQuer = q.subtract(m[biR.xor(BigInteger.ONE).intValue()]).mod(
 				partnerGamalP);
 		cheat4 = eQuer.equals(qQuer);
-		if (DEBUG) {
+		if (DEBUG_OB) {
 			System.out.println("DDD| \t s(k) gilt nicht für k     : " + cheat1);
 			System.out.println("DDD| \t s(k) gilt für k und kQ    : " + cheat2);
 			System.out.println("DDD| \t s(k0)==s(k1)              : " + cheat3);
@@ -445,6 +465,27 @@ public final class SecretSharing implements Protocol {
 		return s;
 	}
 
+//	/**
+//	 * Generiert zufällige n Geheimnispaare
+//	 * 
+//	 * @param n
+//	 *            Anzahl der Geheimnispaare
+//	 * @return Gibt die Geheimnispaare zurück
+//	 * @deprecated
+//	 */
+//	private BigInteger[][] generateWords(int n) {
+//		BigInteger[][] words = new BigInteger[n][2];
+//		BigInteger biRand;
+//		for (int i = 0; i < n; i++) {
+//			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
+//			words[i][0] = biRand;
+//			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
+//			words[i][1] = biRand;
+//		}
+//
+//		return words;
+//	}
+
 	/**
 	 * Generiert zufällige n Geheimnispaare
 	 * 
@@ -452,19 +493,20 @@ public final class SecretSharing implements Protocol {
 	 *            Anzahl der Geheimnispaare
 	 * @return Gibt die Geheimnispaare zurück
 	 */
-	private BigInteger[][] generateWords(int n) {
-		BigInteger[][] words = new BigInteger[n][2];
+	private SecretWord[][] generateSecrets(int n) {
+		SecretWord[][] secrets = new SecretWord[n][2];
 		BigInteger biRand;
 		for (int i = 0; i < n; i++) {
 			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
-			words[i][0] = biRand;
+			secrets[i][0] = new SecretWord(biRand);
+			
 			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
-			words[i][1] = biRand;
+			secrets[i][1] = new SecretWord(biRand);
 		}
 
-		return words;
+		return secrets;
 	}
-
+	
 	/**
 	 * Setzt den Berechnungsvorteil anhand k
 	 */
