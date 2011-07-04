@@ -23,10 +23,11 @@ public final class SecretSharing implements Protocol {
 	static private String NameOfTheGame = "ObliviousTransfer";
 
 	// Secret Sharing
-	private final BigInteger WORD_MAX = new BigInteger("zzzzzzzzzz",36);
-	private BigInteger ssk = new BigInteger("7"); // 0...7
-	private BigInteger ssn = new BigInteger("10"); // Geheimnispaare, max 10
-	private BigInteger ssm = new BigInteger("10"); // Länge der Wörter, max 10
+	private final BigInteger WORD_MAX = new BigInteger("zzzzzzzzzz", 36);
+	private BigInteger ssk; // = new BigInteger("7"); // 0...7
+	private BigInteger ssn; // = new BigInteger("10"); // Geheimnispaare, max 10
+	private BigInteger ssm = new BigInteger("52"); // Wortlänge (binary), max 52
+													// bits
 	private BigInteger ssChanceA; // Berechnungsvorteil A:B
 	private BigInteger ssChanceB; // Berechnungsvorteil A:B
 
@@ -94,16 +95,17 @@ public final class SecretSharing implements Protocol {
 
 		if (messM0.equals(messM1)) {
 			betrug_ = true;
-			System.out
-					.println("DDD| Alice betrügt, indem sie zwei gleiche Nachrichten eingibt.");
+			System.out.print("DDD| Alice betrügt");
+			System.out.print(" indem sie zwei gleiche Nachrichten eingibt.");
+			System.out.println();
 		}
 
 		if (DEBUG) {
 			System.out.println("DDD| (0)c Alice Nachrichten");
-			System.out.println("DDD| \t Nachricht 1: " + M0);
+			// System.out.println("DDD| \t Nachricht 1: " + M0);
 			System.out.println("DDD| \t Nachricht 1: " + messM0);
 			System.out.println("DDD| \t Nachricht 1: " + messM0.toString(36));
-			System.out.println("DDD| \t Nachricht 2: " + M1);
+			// System.out.println("DDD| \t Nachricht 2: " + M1);
 			System.out.println("DDD| \t Nachricht 2: " + messM1);
 			System.out.println("DDD| \t Nachricht 2: " + messM1.toString(36));
 		}
@@ -112,7 +114,10 @@ public final class SecretSharing implements Protocol {
 		// k global: ssk; n global: ssn
 		ssn = BigIntegerUtil.randomSmallerThan((new BigInteger("10"))).add(ONE); // 1<=n<11
 		ssk = BigIntegerUtil.randomSmallerThan(new BigInteger("8")); // 0<=k<8
-		
+
+		// Berechnung der Berechnungsvorteile
+		setAdvantage(ssk);
+
 		// Bob n und k senden
 		Com.sendTo(1, ssn.toString(RADIX_SEND_));
 		Com.sendTo(1, ssk.toString(RADIX_SEND_));
@@ -121,28 +126,23 @@ public final class SecretSharing implements Protocol {
 			System.out.println("DDD| \t n = " + ssn.toString(16));
 			System.out.println("DDD| \t k = " + ssk.toString(16));
 		}
-		
-		// Berechnung der Berechnungsvorteile
-		setAdvantage(ssk);
 
 		// (SS2)a a_(i,j) mit i=1,...,n und j=1,2 erzeugen
 		BigInteger[][] ssa = new BigInteger[ssn.intValue()][2];
-		ssa = generateWords(ssn.intValue()); 
+		ssa = generateWords(ssn.intValue());
 		if (DEBUG) {
 			System.out.println("DDD| (SS2) Generierte Wortpaare:");
-			for (int i = 0; i < ssa.length ; i++) {
+			for (int i = 0; i < ssa.length; i++) {
 				System.out.print("DDD| \t ");
 				System.out.print(ssa[i][0].toString(16));
-				System.out.println("\t und ");
+				System.out.print("\t und ");
 				System.out.print(ssa[i][1].toString(16));
 				System.out.println();
 			}
 		}
-		// alle 2^(k+1) Binärwörter der Länge k+1 abgespeichern
-		// (SS2)b nach Größe ordnen
-//		// ssa = sortWords(ssa); // Nicht nötig
-		// TODO (SS3) Senden, muss an anderer Stelle eingebaut werden
 
+		
+		// HERE SS3 Alice
 		// (1)a Alice wählt zufällig zwei weitere Nachrichten m1 und m2;
 		BigInteger[] m = new BigInteger[2];
 		m[0] = BigIntegerUtil.randomBetween(BigInteger.ONE, help);
@@ -238,20 +238,35 @@ public final class SecretSharing implements Protocol {
 			System.out.println("DDD| \t g = " + partnerGamalG);
 			System.out.println("DDD| \t y = " + partnerY);
 		}
-		
+
 		// (SS1) Bob empfängt n und k
 		sReceive = Com.receive();
-		ssn = new BigInteger(sReceive,RADIX_SEND_);
+		ssn = new BigInteger(sReceive, RADIX_SEND_);
 		sReceive = Com.receive();
-		ssk = new BigInteger(sReceive,RADIX_SEND_);
+		ssk = new BigInteger(sReceive, RADIX_SEND_);
 		if (DEBUG) {
 			System.out.println("DDD| (SS1) B empfängt von A:");
 			System.out.println("DDD| \t n = " + ssn.toString(16));
 			System.out.println("DDD| \t k = " + ssk.toString(16));
 		}
-		
+
 		setAdvantage(ssk);
-		
+
+		// (SS2)a b_(i,j) mit i=1,...,n und j=1,2 erzeugen
+		BigInteger[][] ssb = new BigInteger[ssn.intValue()][2];
+		ssb = generateWords(ssn.intValue());
+		if (DEBUG) {
+			System.out.println("DDD| (SS2) Generierte Wortpaare:");
+			for (int i = 0; i < ssb.length; i++) {
+				System.out.print("DDD| \t ");
+				System.out.print(ssb[i][0].toString(16));
+				System.out.print("\t und ");
+				System.out.print(ssb[i][1].toString(16));
+				System.out.println();
+			}
+		}
+
+		// HERE SS3 Bob
 		// (1)b Bob empfängt m1 und m2
 		String m1 = Com.receive();
 		String m2 = Com.receive();
@@ -432,7 +447,9 @@ public final class SecretSharing implements Protocol {
 
 	/**
 	 * Generiert zufällige n Geheimnispaare
-	 * @param n Anzahl der Geheimnispaare
+	 * 
+	 * @param n
+	 *            Anzahl der Geheimnispaare
 	 * @return Gibt die Geheimnispaare zurück
 	 */
 	private BigInteger[][] generateWords(int n) {
@@ -440,10 +457,8 @@ public final class SecretSharing implements Protocol {
 		BigInteger biRand;
 		for (int i = 0; i < n; i++) {
 			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
-//			biRand.flipBit(biRand.bitLength()+1);
 			words[i][0] = biRand;
 			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
-//			biRand.flipBit(biRand.bitLength()+1);
 			words[i][1] = biRand;
 		}
 
@@ -451,21 +466,11 @@ public final class SecretSharing implements Protocol {
 	}
 
 	/**
-	 * @deprecated
-	 * @param ssa
-	 * @return
-	 */
-	private BigInteger[][] sortWords(BigInteger[][] ssa) {
-		BigInteger[][] words = ssa.clone();
-		
-		return words;
-	}
-
-	/**
-	 * Setzt dn Berechnungsvorteil anhand k
+	 * Setzt den Berechnungsvorteil anhand k
 	 */
 	private void setAdvantage(BigInteger k) {
 		ssChanceA = TWO.pow(k.intValue()).add(ONE);
 		ssChanceB = TWO.pow(k.intValue());
 	}
+
 }
