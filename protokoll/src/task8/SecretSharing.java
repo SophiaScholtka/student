@@ -133,7 +133,7 @@ public final class SecretSharing implements Protocol {
 			for (int i = 0; i < ssa.length ; i++) {
 				System.out.print("DDD| \t ");
 				System.out.print(ssa[i][0].toString(16));
-				System.out.print("\t und ");
+				System.out.println("\t und ");
 				System.out.print(ssa[i][1].toString(16));
 				System.out.println();
 			}
@@ -251,20 +251,6 @@ public final class SecretSharing implements Protocol {
 		}
 		
 		setAdvantage(ssk);
-		
-		// (SS2)a b_(i,j) mit i=1,...,n und j=1,2 erzeugen
-		BigInteger[][] ssb = new BigInteger[ssn.intValue()][2];
-		ssb = generateWords(ssn.intValue()); 
-		if (DEBUG) {
-			System.out.println("DDD| (SS2) Generierte Wortpaare:");
-			for (int i = 0; i < ssb.length ; i++) {
-				System.out.print("DDD| \t ");
-				System.out.print(ssb[i][0].toString(16));
-				System.out.print("\t und ");
-				System.out.print(ssb[i][1].toString(16));
-				System.out.println();
-			}
-		}
 		
 		// (1)b Bob empfängt m1 und m2
 		String m1 = Com.receive();
