@@ -122,18 +122,58 @@ public final class SecretSharing implements Protocol {
 				System.out.println();
 			}
 		}
+		// Eigene Geheimnisse vorbereiten
+		for (int i = 0 ; i < ssa.length ; i++) {
+			ssa[i][0].startBinary(2);
+			ssa[i][0].resetSend();
+			
+			ssa[i][1].startBinary(2);
+			ssa[i][1].resetSend();
+		}
 		
 		// (SS2) Hülle für Bobs Geheimnisse
 		SecretWord[][] ssb = new SecretWord[ssn.intValue()][2];
 		for (int i = 0 ; i < ssn.intValue() ; i++) {
 			ssb[i][0] = new SecretWord(ZERO);
+			ssb[i][0].startBinary(2);
+			ssb[i][0].resetSend();
 			ssb[i][1] = new SecretWord(ZERO);
+			ssb[i][1].startBinary(2);
+			ssb[i][1].resetSend();
 		}
 		
 		
 		// (SS3) Alice sendet Geheimnisse
-		for (int i = 0; i < ssa.length; i++) {
-			sendSecret(ssa[i][0].getSecret(), ssa[i][1].getSecret());
+		// Solange weniger als m bits gesendet
+		int sendM = 3;
+		while(sendM <= ssm.intValue()) {
+			
+			
+			// Alice sendet
+			// TODO Bobs Empfang anpassen!
+			for (int i = 0; i < ssa.length; i++) {
+				BigInteger send0 = ssa[i][0].useBinary();
+				BigInteger send1 = ssa[i][1].useBinary();
+				sendSecret(send0, send1);
+				
+				// Erweitere die Wortlisten, wenn ChanceB 2^k erreicht ist
+				if(ssa[i][0].getBinarySize() <= ssChanceB.intValue()) {
+					ssa[i][0].enhanceBinary(1);
+				}
+				if(ssa[i][1].getBinarySize() <= ssChanceB.intValue()) {
+					ssa[i][1].enhanceBinary(1);
+				}
+			}
+			
+//			// Alice empfängt
+//			for (int i = 0; i < ssb.length; i++) {
+//				BigInteger send0 = new BigInteger(Com.receive(),RADIX_SEND_);
+//				BigInteger send1 = new BigInteger(Com.receive(),RADIX_SEND_);
+//				receiveAndCheckSecret(); // TODO anpassen!
+//			}
+			
+			// Nächste Runde
+			sendM = sendM + 1;
 		}
 	}
 
@@ -184,7 +224,7 @@ public final class SecretSharing implements Protocol {
 		
 		// (SS3) Bob empfängt
 		for (int i = 0; i < ssa.length; i++) {
-			BigInteger rec = receiveAndCheckSecret();
+			BigInteger rec = receiveAndCheckSecret()[0];
 			if(rec!= null) {
 				System.out.println("Empfangene Nachricht: " + rec.toString(16));
 			} else {
@@ -423,7 +463,7 @@ public final class SecretSharing implements Protocol {
 	/**
 	 * 
 	 */
-	private BigInteger receiveAndCheckSecret() {
+	private BigInteger[] receiveAndCheckSecret() {
 		String sReceive;
 		// (1)b Bob empfängt m1 und m2
 		String m1 = Com.receive();
@@ -575,7 +615,10 @@ public final class SecretSharing implements Protocol {
 		} else {
 //			System.out.println("Kein Betrug von Alice festgestellt.");
 //			System.out.println("Nachricht: " + calc.toString(36));
-			return calc;
+			BigInteger[] back = new BigInteger[2];
+			back[0] = calc;
+			back[1] = ZERO; // TODO wie bekommt man die genaue Nummer der lesbaren Nachricht raus?
+			return back;
 		}
 	}
 
