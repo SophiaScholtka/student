@@ -134,10 +134,10 @@ public final class SecretSharing implements Protocol {
 		// (SS2) Hülle für Bobs Geheimnisse
 		SecretWord[][] ssb = new SecretWord[ssn.intValue()][2];
 		for (int i = 0 ; i < ssn.intValue() ; i++) {
-			ssb[i][0] = new SecretWord(ZERO);
+			ssb[i][0] = new SecretWord(ZERO,ssk.intValue());
 			ssb[i][0].startBinary(2);
 			ssb[i][0].resetSend();
-			ssb[i][1] = new SecretWord(ZERO);
+			ssb[i][1] = new SecretWord(ZERO,ssk.intValue());
 			ssb[i][1].startBinary(2);
 			ssb[i][1].resetSend();
 		}
@@ -155,6 +155,9 @@ public final class SecretSharing implements Protocol {
 				BigInteger send0 = ssa[i][0].useBinary();
 				BigInteger send1 = ssa[i][1].useBinary();
 				sendSecret(send0, send1);
+				
+				ssa[i][0].addSend(send0);
+				ssa[i][1].addSend(send1);
 				
 				// Erweitere die Wortlisten, wenn ChanceB 2^k erreicht ist
 				if(ssa[i][0].getBinarySize() <= ssChanceB.intValue()) {
@@ -217,16 +220,21 @@ public final class SecretSharing implements Protocol {
 		// (SS2) Hülle für Alice Geheimnisse
 		SecretWord[][] ssa = new SecretWord[ssn.intValue()][2];
 		for (int i = 0 ; i < ssn.intValue() ; i++) {
-			ssa[i][0] = new SecretWord(ZERO);
-			ssa[i][1] = new SecretWord(ZERO);
+			ssa[i][0] = new SecretWord(ZERO,ssk.intValue());
+			ssa[i][1] = new SecretWord(ZERO,ssk.intValue());
 		}
 
 		
 		// (SS3) Bob empfängt
 		for (int i = 0; i < ssa.length; i++) {
-			BigInteger rec = receiveAndCheckSecret()[0];
-			if(rec!= null) {
-				System.out.println("Empfangene Nachricht: " + rec.toString(16));
+			BigInteger[] recs = receiveAndCheckSecret();
+			BigInteger prefix = recs[0];
+			BigInteger k = recs[1];
+			ssa[i][k.intValue()].addSend(recs[0]);
+			ssa[i][k.intValue()].refreshSecrets();
+			
+			if(prefix!= null) {
+				System.out.println("Empfangene Nachricht: " + prefix.toString(16));
 			} else {
 				System.out.println("Betrüger!");
 				System.exit(1);
@@ -293,10 +301,10 @@ public final class SecretSharing implements Protocol {
 		BigInteger biRand;
 		for (int i = 0; i < n; i++) {
 			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
-			secrets[i][0] = new SecretWord(biRand);
+			secrets[i][0] = new SecretWord(biRand,ssk.intValue());
 			
 			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
-			secrets[i][1] = new SecretWord(biRand);
+			secrets[i][1] = new SecretWord(biRand,ssk.intValue());
 		}
 
 		return secrets;
@@ -617,7 +625,7 @@ public final class SecretSharing implements Protocol {
 //			System.out.println("Nachricht: " + calc.toString(36));
 			BigInteger[] back = new BigInteger[2];
 			back[0] = calc;
-			back[1] = ZERO; // TODO wie bekommt man die genaue Nummer der lesbaren Nachricht raus?
+			back[1] = biR.xor(s); // TODO wie bekommt man die genaue Nummer der lesbaren Nachricht raus?
 			return back;
 		}
 	}

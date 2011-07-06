@@ -2,23 +2,26 @@ package task8;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
 
 public class SecretWord {
+	
+	private final BigInteger TWO = new BigInteger("2");
 
 	private BigInteger secret; // Geheimnis
-	private ArrayList<BigInteger> possiblePrefix; // Mögliche Prefixe
+	private ArrayList<BigInteger> possiblePrefix; // Mögliche Präfixverwaltung
 	private ArrayList<BigInteger> sendPrefix; // Gesendete Prefixe
 	private BigInteger guessedSecret; // Geratenes Geheimnis
 	
-//	private ArrayList<BigInteger> allNumbers; // alle in Frage kommenden Zahlen
-
+	private ArrayList<BigInteger> allNumbers; // alle in Frage kommenden Zahlen
 	/**
 	 * Konstruktor
 	 * Erzeugt eine leere Liste gesendeter Elemente. 
 	 * Erzeugt eine leere Liste der möglichen Elemente. 
-	 * Das geratene Geheimnis ist 0
+	 * Das geratene Geheimnis ist 0.
+	 * Keine Liste möglicher Zahlen
 	 * @param secret Geheime Zahl
 	 */
 	public SecretWord(BigInteger secret) {
@@ -26,19 +29,29 @@ public class SecretWord {
 		this.sendPrefix = new ArrayList<BigInteger>();
 		this.possiblePrefix = new ArrayList<BigInteger>();
 		this.guessedSecret = BigInteger.ZERO;
+		
+		this.allNumbers = new ArrayList<BigInteger>();
 	}
-
-//	/**
-//	 * Konstruktur
-//	 * @param secret Geheimnis
-//	 * @param k 
-//	 */
-//	public SecretWord(BigInteger secret, int k) {
-//		this.secret = secret;
-//		this.sendPrefix = new ArrayList<BigInteger>();
-//		this.possiblePrefix = SecretWord.generateBinary(k);
-//		this.guessedSecret = BigInteger.ZERO;
-//	}
+	/**
+	 * Konstruktor
+	 * Erzeugt eine leere Liste gesendeter Elemente. 
+	 * Erzeugt eine leere Liste der möglichen Elemente. 
+	 * Das geratene Geheimnis ist 0.
+	 * Erzeugt eine Liste möglicher Zahlen
+	 * @param secret Geheime Zahl
+	 */
+	public SecretWord(BigInteger secret,int k) {
+		this.secret = secret;
+		this.sendPrefix = new ArrayList<BigInteger>();
+		this.possiblePrefix = new ArrayList<BigInteger>();
+		this.guessedSecret = BigInteger.ZERO;
+		
+		BigInteger maxK = TWO.pow(k+1);
+		this.allNumbers = new ArrayList<BigInteger>();
+		for(int i = 0 ; i < maxK.intValue();i++) {
+			allNumbers.add(new BigInteger("" + i));
+		}
+	}
 
 	/**
 	 * Das echte Geheimnis
@@ -64,13 +77,7 @@ public class SecretWord {
 		this.guessedSecret = guessedSecret;
 	}
 
-	// public void refreshGuessedSecret() {
-	// }
-
-	// public void setGuessedSecret(BigInteger secret) {
-	// this.guessedSecret = secret;
-	// }
-
+	
 	// Gesendete Prefixes
 	/**
 	 * Erzeugt eine neue, leere Liste für gesendete Präfixe
@@ -113,10 +120,7 @@ public class SecretWord {
 		return sendPrefix.size();
 	}
 
-	// public void resetWords() {
-	// this.possiblePrefix = new ArrayList<BigInteger>();
-	// }
-
+	// Liste der binären Worte
 	/**
 	 * Erzeuge die erste binäre Zahlenliste
 	 * Länge der Liste: 2^(k+1)-1
@@ -125,14 +129,6 @@ public class SecretWord {
 	public void startBinary(int k) {
 		this.possiblePrefix = SecretWord.generateBinary(k);
 	}
-
-//	/**
-//	 * @deprecated
-//	 * @param binaryWord
-//	 */
-//	private void removeBinary(BigInteger binaryWord) {
-//		this.possiblePrefix.remove(binaryWord);
-//	}
 	
 	/**
 	 * Wählt ein y aus der möglichen Liste aus
@@ -161,14 +157,14 @@ public class SecretWord {
 
 		BigInteger shifted;
 		for(int i = 0 ; i < amount ; i++) {
-			for (BigInteger bi : possiblePrefix) {
+			for (BigInteger bi : this.possiblePrefix) {
 				shifted = bi.shiftLeft(1);
 				newList.add(shifted);
 				newList.add(shifted.flipBit(0));
 			}
 		}
 
-		possiblePrefix = newList;
+		this.possiblePrefix = newList;
 	}
 
 	/**
@@ -176,7 +172,7 @@ public class SecretWord {
 	 * @return Anzahl der binären Worte, die als Präfix möglich sind
 	 */
 	public int getBinarySize() {
-		return possiblePrefix.size();
+		return this.possiblePrefix.size();
 	}
 	
 	/**
@@ -192,11 +188,63 @@ public class SecretWord {
 		
 		return b;
 	}
-
+	
+	// AllNumbers, die in Frage kommen für Secret
+	/** 
+	 * Anzahl der möglichen Geheimnisse
+	 */
+	public int getSecretsCount() {
+		return allNumbers.size();
+	}
+	
+	/**
+	 * Aktualisiert die in Frage kommenden Zahlen, indem alle Zahlen entfernt 
+	 * werden, die ein Präfix in den gesendeten Werten haben.
+	 * Ist nur noch ein Element vorhanden, so wird guessedSecret auf diesen Wert gesetzt.
+	 * @return Anzahl der verbleibenden Elemente
+	 */
+	public int refreshSecrets() {
+		for (Iterator<BigInteger> it = allNumbers.iterator(); it.hasNext();) {
+			BigInteger tPoss = (BigInteger) it.next();
+			for (Iterator<BigInteger> itSend = sendPrefix.iterator(); itSend.hasNext();) {
+				BigInteger tSend = (BigInteger) itSend.next();
+				int shift = 52 - tSend.bitLength();
+				if(tSend.equals(tPoss.shiftRight(shift))) {
+					allNumbers.remove(tPoss);
+					break;
+				}
+			}
+		}
+		
+		if(allNumbers.isEmpty()) {
+			return 0;
+		} else if(allNumbers.size() == 1) {
+			this.guessedSecret = allNumbers.get(0);
+			return allNumbers.size();
+		} else {
+			return allNumbers.size();
+		}
+	}
+	
+	/**
+	 * Gibt einen Array der möglichen Zahlen zurück
+	 * @return
+	 */
+	public BigInteger[] getSecrets() {
+		int i = 0;
+		BigInteger[] ret = new BigInteger[allNumbers.size()];
+		for (Iterator<BigInteger> iterator = allNumbers.iterator(); iterator.hasNext();) {
+			ret[i] = (BigInteger) iterator.next();
+		}
+		return ret;
+	}
+	
+	
 	// Static Methods
 	/**
 	 * Erzeugt eine Liste mit binären Wörtern der Länge k. 
-	 * Zahlenwerte reichen von 0 bis 2^(k+1)-1
+	 * Zahlenwerte reichen von 0 bis 2^(k+1)-1.
+	 * Anzahl der Elemente: 2^(k+1)
 	 * @param k Anzahl der Bits
 	 */
 	public static ArrayList<BigInteger> generateBinary(int k) {
