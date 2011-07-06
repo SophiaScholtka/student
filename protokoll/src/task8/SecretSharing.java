@@ -87,20 +87,22 @@ public final class SecretSharing implements Protocol {
 			}
 		}
 		
-		// (SS2) Hülle für Bobs Geheimnisse
-		SecretWord[][] ssb = generateSecretsPartner(ssn.intValue());
-		
 		// (SS3) Alice sendet Geheimnisse
+		sendSecrets(ssa);
+		// (SS3) Alice empfängt Geheimnisse
+		SecretWord[][] ssb = receiveSecrets(ssn.intValue());
+		
+		
 		// Solange weniger als m bits gesendet
 		int sendM = 3;
 //		while(sendM <= ssm.intValue()) {
-		while(sendM <= 3) {
+		while(sendM <= sendM+1) {
 			// Alice sendet
 			// TODO Bobs Empfang anpassen!
 			for (int i = 0; i < ssa.length; i++) {
 				BigInteger send0 = ssa[i][0].useBinary();
 				BigInteger send1 = ssa[i][1].useBinary();
-				sendSecret(send0, send1);
+				sendOblivious(ssa[i][0].getSecret(), ssa[i][1].getSecret());
 				
 				ssa[i][0].addSend(send0);
 				ssa[i][1].addSend(send1);
@@ -157,16 +159,18 @@ public final class SecretSharing implements Protocol {
 			}
 		}
 
-		// (SS2) Hülle für Alice Geheimnisse
-		SecretWord[][] ssa = generateSecretsPartner(ssn.intValue());
-
+		// (SS3) Bob empfängt Nachrichten
+		SecretWord[][] ssa = receiveSecrets(ssn.intValue());
+		// (SS3) Bob sendet Nachrichten
+		sendSecrets(ssb);
+		
 		// (SS3) Solange weniger als m bits gesendet
 		int sendM = 3;
 //		while(sendM <= ssm.intValue()) {
-		while(sendM <= 3) {
+		while(sendM <= sendM+1) {
 			// (SS3) Bob empfängt
 			for (int i = 0; i < ssa.length; i++) {
-				BigInteger[] recs = receiveAndCheckSecret();
+				BigInteger[] recs = receiveAndCheckOblivious();
 				BigInteger prefix = recs[0];
 				BigInteger k = recs[1];
 				ssa[i][k.intValue()].addSend(recs[0]);
@@ -339,7 +343,7 @@ public final class SecretSharing implements Protocol {
 	 * @param messM0
 	 * @param messM1
 	 */
-	private void sendSecret(BigInteger messM0, BigInteger messM1) {
+	private void sendOblivious(BigInteger messM0, BigInteger messM1) {
 		// (1)a Alice wählt zufällig zwei weitere Nachrichten m1 und m2;
 		BigInteger[] m = new BigInteger[2];
 		m[0] = BigIntegerUtil.randomBetween(BigInteger.ONE, help);
@@ -424,7 +428,7 @@ public final class SecretSharing implements Protocol {
 	/**
 	 * 
 	 */
-	private BigInteger[] receiveAndCheckSecret() {
+	private BigInteger[] receiveAndCheckOblivious() {
 		String sReceive;
 		// (1)b Bob empfängt m1 und m2
 		String m1 = Com.receive();
@@ -578,6 +582,31 @@ public final class SecretSharing implements Protocol {
 			back[1] = biR.xor(s);
 			return back;
 		}
+	}
+
+	/**
+	 * @param ssa
+	 */
+	private void sendSecrets(SecretWord[][] ssa) {
+		for (int i = 0; i < ssa.length; i++) {
+			BigInteger send0 = ssa[i][0].getSecret();
+			BigInteger send1 = ssa[i][1].getSecret();
+			sendOblivious(send0, send1);
+		}
+	}
+
+	/**
+	 * @param ssb
+	 * @return
+	 */
+	private SecretWord[][] receiveSecrets(int n) {
+		SecretWord[][] ssa = generateSecretsPartner(n);
+		for (int i = 0; i < n; i++) {
+			BigInteger[] rec = receiveAndCheckOblivious();
+			ssa[i][rec[1].intValue()] = new SecretWord(rec[0], ssk.intValue());
+			ssa[i][rec[1].xor(ONE).intValue()] = new SecretWord(ZERO, ssk.intValue());
+		}
+		return ssa;
 	}
 
 }
