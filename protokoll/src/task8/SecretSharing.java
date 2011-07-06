@@ -92,6 +92,10 @@ public final class SecretSharing implements Protocol {
 		sendSecrets(1,ssa);
 		// (SS3) Alice empfängt Geheimnisse
 		SecretWord[][] ssb = receiveSecrets(1,ssn.intValue());
+		if (DEBUG_SS) {
+			System.out.println("DDD| (SS3) empfangene Geheimnisse: ");
+			showSecrets("DDD| \t " , ssb, 36);
+		}
 		
 		// (SS3) Tausche y aus
 		// Solange weniger als m bits gesendet
@@ -651,12 +655,12 @@ public final class SecretSharing implements Protocol {
 		for (int i = 0 ; i < secrets.length ; i++) {
 			System.out.print(pre);
 			System.out.print(secrets[i][0].getSecret().toString(rad));
-			System.out.println("\t");
-			System.out.print("(" + secrets[i][0].getSecret().toString(rad) + ")");
-			System.out.println("\t\t");
+			System.out.print("\t");
+			System.out.print("(" + secrets[i][0].getGuessedSecret().toString(rad) + ")");
+			System.out.print("\t\t");
 			System.out.print(secrets[i][1].getSecret().toString(rad));
-			System.out.println("\t");
-			System.out.print("(" + secrets[i][1].getSecret().toString(rad) + ")");
+			System.out.print("\t");
+			System.out.print("(" + secrets[i][1].getGuessedSecret().toString(rad) + ")");
 			System.out.println();
 		}
 	}
