@@ -145,7 +145,7 @@ public class SecretWord {
 			BigInteger size = new BigInteger("" + possiblePrefix.size());
 			BigInteger r = BigIntegerUtil.randomSmallerThan(size);
 			prefix = possiblePrefix.get(r.intValue());
-		} while(isFreePrefix(prefix) && !isPrefix(prefix));
+		} while(!isFreePrefix(prefix) || !isPrefix(prefix));
 		
 		possiblePrefix.remove(prefix);
 		return prefix;
