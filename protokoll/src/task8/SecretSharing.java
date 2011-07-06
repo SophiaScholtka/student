@@ -93,18 +93,19 @@ public final class SecretSharing implements Protocol {
 		SecretWord[][] ssb = receiveSecrets(ssn.intValue());
 		
 		// (SS3) Tausche y aus
-		// TODO
 		// Solange weniger als m bits gesendet
-		int sendM = 3;
-//		while(sendM <= ssm.intValue()) {
-		while(sendM <= sendM+1) {
+		int sendM = ssk.intValue(); //Anzahl der in diesem Schrit versendeten Bits
+		int anzMes = (zwei.pow(ssk.intValue()-1)).intValue(); //es werden 2^{k-1} verschiedene y ausgetauscht
+		while(sendM <= ssm.intValue()) {
+			// Alice sagt ssa, dass sie Präfixe der Länge sendM haben will
+			
 			// Alice sendet
 			// TODO Bobs Empfang anpassen!
-			for (int i = 0; i < ssa.length; i++) {
+			for (int i = 0; i < anzMes; i++) {
+				//Alice wählt zwei y der Länge sendM
 				BigInteger send0 = ssa[i][0].useBinary();
 				BigInteger send1 = ssa[i][1].useBinary();
 				sendOblivious(ssa[i][0].getSecret(), ssa[i][1].getSecret());
-				
 				ssa[i][0].addSend(send0);
 				ssa[i][1].addSend(send1);
 				
@@ -166,7 +167,6 @@ public final class SecretSharing implements Protocol {
 		sendSecrets(ssb);
 		
 		// (SS3) Tausche y aus
-		// TODO
 		// (SS3) Solange weniger als m bits gesendet
 		int sendM = 3;
 //		while(sendM <= ssm.intValue()) {
