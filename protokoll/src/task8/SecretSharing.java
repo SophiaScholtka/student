@@ -15,7 +15,7 @@ public final class SecretSharing implements Protocol {
 	private final boolean DEBUG_SS = true;  // DEBUG für Task8 Elemente
 	private final boolean TEST = true; // für Testwerte
 
-	private static final int RADIX_SEND_ = 16;
+	private static final int RADIX_SEND_ = 2;
 	private static final int SCHLEIFE_  = 2;
 	private BigInteger zwei = new BigInteger("2", 10);
 	private final BigInteger ZERO = new BigInteger("0");
@@ -71,8 +71,8 @@ public final class SecretSharing implements Protocol {
 		Com.sendTo(1, ssk.toString(RADIX_SEND_));
 		if (DEBUG_SS) {
 			System.out.println("DDD| (SS1) Sende n und k an Bob");
-			System.out.println("DDD| \t n = " + ssn.toString(16));
-			System.out.println("DDD| \t k = " + ssk.toString(16));
+			System.out.println("DDD| \t n = " + ssn.toString(RADIX_SEND_));
+			System.out.println("DDD| \t k = " + ssk.toString(RADIX_SEND_));
 		}
 
 		// (SS2)a a_(i,j) mit i=1,...,n und j=1,2 erzeugen
@@ -81,9 +81,9 @@ public final class SecretSharing implements Protocol {
 			System.out.println("DDD| (SS2) Generierte Wortpaare:");
 			for (int i = 0; i < ssa.length; i++) {
 				System.out.print("DDD| \t ");
-				System.out.print(ssa[i][0].getSecret().toString(16));
+				System.out.print(ssa[i][0].getSecret().toString(RADIX_SEND_));
 				System.out.print("\t und ");
-				System.out.print(ssa[i][1].getSecret().toString(16));
+				System.out.print(ssa[i][1].getSecret().toString(RADIX_SEND_));
 				System.out.println();
 			}
 		}
@@ -111,9 +111,12 @@ public final class SecretSharing implements Protocol {
 			for (int i = 0; i < ssa.length; i++){
 				// Alice schickt für die Hälfte der möglichen Präfixe der Länge sendM die Nachricht
 				// "Dieses y ist nicht das Präfix!"
+				if (DEBUG_SS) {System.out.println("DDD| Alice sendet an Bob:");}				
 				for (int j = 0; j < anzMes; j++) {
 					BigInteger send0 = ssa[i][0].useBinary();
+					if (DEBUG_SS) {System.out.println("DDD| a["+i+"][0] beginnt nicht mit "+send0.toString(RADIX_SEND_));}
 					BigInteger send1 = ssa[i][1].useBinary();
+					if (DEBUG_SS) {System.out.println("DDD| a["+i+"][1] beginnt nicht mit "+send1.toString(RADIX_SEND_));}
 					Com.sendTo(1,send0.toString(RADIX_SEND_));
 					Com.sendTo(1,send1.toString(RADIX_SEND_));
 					ssa[i][0].addSend(send0);
@@ -121,13 +124,17 @@ public final class SecretSharing implements Protocol {
 				}
 				// Alice empfängt für die Hälfte der möglichen Präfixe der Länge sendM die Nachricht
 				// "Dieses y ist nicht das Präfix"
+				if (DEBUG_SS) {System.out.println("Alice empfängt von Bob:");}
 				for (int j = 0; j < anzMes; j++) {
 					//Alice wählt zwei y der Länge sendM
 					String rec = Com.receive();
 					BigInteger rec0 = new BigInteger(rec, RADIX_SEND_);
 					rec = Com.receive();
 					BigInteger rec1 = new BigInteger(rec, RADIX_SEND_);
-	
+					
+					if (DEBUG_SS) {System.out.println("DDD| b["+i+"][0] beginnt nicht mit "+rec0.toString(RADIX_SEND_));}
+					if (DEBUG_SS) {System.out.println("DDD| b["+i+"][1] beginnt nicht mit "+rec1.toString(RADIX_SEND_));}
+					
 					ssb[i][0].addSend(rec0);
 					ssb[i][1].addSend(rec1);
 				}
@@ -164,8 +171,8 @@ public final class SecretSharing implements Protocol {
 		setAdvantage(ssk);
 		if (DEBUG_SS) {
 			System.out.println("DDD| (SS1) Empfangen:");
-			System.out.println("DDD| \t n = " + ssn.toString(16));
-			System.out.println("DDD| \t k = " + ssk.toString(16));
+			System.out.println("DDD| \t n = " + ssn.toString(RADIX_SEND_));
+			System.out.println("DDD| \t k = " + ssk.toString(RADIX_SEND_));
 		}
 
 		// (SS2)a b_(i,j) mit i=1,...,n und j=1,2 erzeugen
@@ -174,9 +181,9 @@ public final class SecretSharing implements Protocol {
 			System.out.println("DDD| (SS2) Generierte Wortpaare:");
 			for (int i = 0; i < ssb.length; i++) {
 				System.out.print("DDD| \t ");
-				System.out.print(ssb[i][0].getSecret().toString(16));
+				System.out.print(ssb[i][0].getSecret().toString(RADIX_SEND_));
 				System.out.print("\t und ");
-				System.out.print(ssb[i][1].getSecret().toString(16));
+				System.out.print(ssb[i][1].getSecret().toString(RADIX_SEND_));
 				System.out.println();
 			}
 		}
@@ -452,8 +459,8 @@ public final class SecretSharing implements Protocol {
 		if (DEBUG_OB) {
 			System.out.println("DDD| (3)d-f Berechnete Werte");
 			System.out.println("DDD| \t s = " + sbig);
-			System.out.println("DDD| \t send0 = " + send0.toString(16));
-			System.out.println("DDD| \t send1 = " + send1.toString(16));
+			System.out.println("DDD| \t send0 = " + send0.toString(RADIX_SEND_));
+			System.out.println("DDD| \t send1 = " + send1.toString(RADIX_SEND_));
 		}
 	
 		// (4) nichts tun
@@ -514,9 +521,9 @@ public final class SecretSharing implements Protocol {
 		BigInteger s = new BigInteger(sReceive, RADIX_SEND_);
 		if (DEBUG_OB) {
 			System.out.println("DDD| (3)d Bob hat empfangen");
-			System.out.println("DDD| \t rec0 (send0) = " + rec0.toString(16));
-			System.out.println("DDD| \t rec1 (send1) = " + rec1.toString(16));
-			System.out.println("DDD| \t s = " + s.toString(16));
+			System.out.println("DDD| \t rec0 (send0) = " + rec0.toString(RADIX_SEND_));
+			System.out.println("DDD| \t rec1 (send1) = " + rec1.toString(RADIX_SEND_));
+			System.out.println("DDD| \t s = " + s.toString(RADIX_SEND_));
 		}
 	
 		// (4)a Bob berechnet M_(s xor r)
