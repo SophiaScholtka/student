@@ -204,16 +204,25 @@ public class SecretWord {
 	 * @return Anzahl der verbleibenden Elemente
 	 */
 	public int refreshSecrets() {
-		for (Iterator<BigInteger> it = allNumbers.iterator(); it.hasNext();) {
-			BigInteger tPoss = (BigInteger) it.next();
-			for (Iterator<BigInteger> itSend = sendPrefix.iterator(); itSend.hasNext();) {
-				BigInteger tSend = (BigInteger) itSend.next();
-				int shift = 52 - tSend.bitLength();
-				if(tSend.equals(tPoss.shiftRight(shift))) {
-					allNumbers.remove(tPoss);
-					break;
+		if(!allNumbers.isEmpty()) {
+			ArrayList<BigInteger> stored = new ArrayList<BigInteger>();
+			for (Iterator<BigInteger> it = allNumbers.iterator(); it.hasNext();) {
+				BigInteger tPoss = (BigInteger) it.next();
+				boolean store = true;
+				for (Iterator<BigInteger> itSend = sendPrefix.iterator(); itSend.hasNext();) {
+					BigInteger tSend = (BigInteger) itSend.next();
+					int shift = 52 - tSend.bitLength();
+					if(tSend.equals(tPoss.shiftRight(shift))) {
+						//allNumbers.remove(tPoss);
+						store = false;
+						break;
+					}
+				}
+				if(store) {
+					stored.add(tPoss);
 				}
 			}
+			this.allNumbers = stored;
 		}
 		
 		if(allNumbers.isEmpty()) {

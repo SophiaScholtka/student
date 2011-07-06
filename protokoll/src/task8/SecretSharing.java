@@ -93,9 +93,8 @@ public final class SecretSharing implements Protocol {
 		// (SS3) Alice sendet Geheimnisse
 		// Solange weniger als m bits gesendet
 		int sendM = 3;
-		while(sendM <= ssm.intValue()) {
-			
-			
+//		while(sendM <= ssm.intValue()) {
+		while(sendM <= 3) {
 			// Alice sendet
 			// TODO Bobs Empfang anpassen!
 			for (int i = 0; i < ssa.length; i++) {
@@ -163,7 +162,8 @@ public final class SecretSharing implements Protocol {
 
 		// (SS3) Solange weniger als m bits gesendet
 		int sendM = 3;
-		while(sendM <= ssm.intValue()) {
+//		while(sendM <= ssm.intValue()) {
+		while(sendM <= 3) {
 			// (SS3) Bob empfängt
 			for (int i = 0; i < ssa.length; i++) {
 				BigInteger[] recs = receiveAndCheckSecret();
@@ -173,11 +173,13 @@ public final class SecretSharing implements Protocol {
 				ssa[i][k.intValue()].refreshSecrets();
 				
 				if(prefix!= null) {
-					System.out.println("Empfangene Nachricht: " + prefix.toString(16));
+					System.out.print("Empfangene Nachricht: " + prefix.toString(16));
+					System.out.println(" \t für " + k);
 				} else {
 					System.out.println("Betrüger!");
 					System.exit(1);
 				}
+				System.out.println(">> blah");
 			}
 			
 			// (SS3) Bob sendet
