@@ -116,7 +116,7 @@ public final class SecretSharing implements Protocol {
 			}
 			
 //			// Alice empfängt
-			// TODO Klauen von Bob später
+			// TODO Empfang klauen von Bob später
 			
 			// Nächste Runde
 			sendM = sendM + 1;
@@ -181,7 +181,7 @@ public final class SecretSharing implements Protocol {
 			}
 			
 			// (SS3) Bob sendet
-			// TODO Klauen von Alice später
+			// TODO Senden klauen von Alice später
 			
 			// Nächste Runde
 			sendM = sendM + 1;
@@ -568,15 +568,12 @@ public final class SecretSharing implements Protocol {
 		}
 	
 		checkCheat = cheat1 || cheat2 || cheat3 || cheat4;
-		if (checkCheat) {
-//			System.out.println("Betrüger!");
+		if (checkCheat) { // Betrüger
 			return null;
-		} else {
-//			System.out.println("Kein Betrug von Alice festgestellt.");
-//			System.out.println("Nachricht: " + calc.toString(36));
+		} else { // Ehrlich
 			BigInteger[] back = new BigInteger[2];
 			back[0] = calc;
-			back[1] = biR.xor(s); // TODO wie bekommt man die genaue Nummer der lesbaren Nachricht raus?
+			back[1] = biR.xor(s);
 			return back;
 		}
 	}
