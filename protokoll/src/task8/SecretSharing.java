@@ -612,5 +612,27 @@ public final class SecretSharing implements Protocol {
 		}
 		return ssa;
 	}
+	
+	/**
+	 * Gibt die SecretWords als Text aus.
+	 * Format: 
+	 * Prefix SecretWord1 \t (SecretGuessedWord1) \t\t SecretWord2 \t (SecretGuessedWort2)
+	 * @param pre Zeilenbeginn
+	 * @param secrets Die Geheimnisse
+	 * @param rad Radix, in welcher die Geheimnisse angezeigt werden sollen
+	 */
+	private void showSecrets(String pre, SecretWord[][] secrets, int rad) {
+		for (int i = 0 ; i < secrets.length ; i++) {
+			System.out.print(pre);
+			System.out.print(secrets[i][0].getSecret().toString(rad));
+			System.out.println("\t");
+			System.out.print("(" + secrets[i][0].getSecret().toString(rad) + ")");
+			System.out.println("\t\t");
+			System.out.print(secrets[i][1].getSecret().toString(rad));
+			System.out.println("\t");
+			System.out.print("(" + secrets[i][1].getSecret().toString(rad) + ")");
+			System.out.println();
+		}
+	}
 
 }
