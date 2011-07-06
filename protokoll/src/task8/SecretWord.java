@@ -214,8 +214,6 @@ public class SecretWord {
 		if (shift <= 0) {
 			shift = 0;
 		}
-//		System.out.print(">>> " + binary.toString(2) + " vgl " + secret.toString(2));
-//		System.out.println(" \t" + shift);
 		b = binary.equals(secret.shiftRight(shift));
 
 		return b;
