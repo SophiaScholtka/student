@@ -16,6 +16,7 @@ public final class SecretSharing implements Protocol {
 	private final boolean TEST = true; // für Testwerte
 
 	private static final int RADIX_SEND_ = 16;
+	private static final int SCHLEIFE_  = 2;
 	private BigInteger zwei = new BigInteger("2", 10);
 	private final BigInteger ZERO = new BigInteger("0");
 	private final BigInteger ONE  = new BigInteger("1");
@@ -95,8 +96,10 @@ public final class SecretSharing implements Protocol {
 		// (SS3) Tausche y aus
 		// Solange weniger als m bits gesendet
 		int sendM = ssk.intValue(); //Anzahl der in diesem Schrit versendeten Bits
+		int whileEnde = ssm.intValue();
+		if ((SCHLEIFE_>0) && ((sendM+SCHLEIFE_)<whileEnde)) whileEnde = sendM+SCHLEIFE_;
 		int anzMes = (zwei.pow(ssk.intValue()-1)).intValue(); //es werden 2^{k-1} verschiedene y ausgetauscht
-		while(sendM <= ssm.intValue()) {
+		while(sendM < whileEnde) {
 			// Alice sagt ssa, dass sie Präfixe der Länge sendM haben will
 			
 			// Alice sendet
@@ -134,6 +137,9 @@ public final class SecretSharing implements Protocol {
 			// Nächste Runde
 			sendM = sendM + 1;
 		}
+		
+		
+		
 	}
 
 	public void receiveFirst() {
@@ -180,8 +186,10 @@ public final class SecretSharing implements Protocol {
 		// TODO
 		// (SS3) Solange weniger als m bits gesendet
 		int sendM = ssk.intValue(); //Anzahl der in diesem Schrit versendeten Bits
+		int whileEnde = ssm.intValue();
+		if ((SCHLEIFE_>0) && ((sendM+SCHLEIFE_)<whileEnde)) whileEnde = sendM+SCHLEIFE_;
 		int anzMes = (zwei.pow(ssk.intValue()-1)).intValue(); //es werden 2^{k-1} verschiedene y ausgetauscht
-		while(sendM <= ssm.intValue()) {
+		while(sendM < whileEnde) {
 			// Bob empfängt
 			for (int i = 0; i < ssa.length; i++){
 				// Bob empfängt für die Hälfte der möglichen Präfixe der Länge sendM die Nachricht
