@@ -101,27 +101,36 @@ public final class SecretSharing implements Protocol {
 			
 			// Alice sendet
 			// TODO Bobs Empfang anpassen!
-			for (int i = 0; i < anzMes; i++) {
-				//Alice wählt zwei y der Länge sendM
-				BigInteger send0 = ssa[i][0].useBinary();
-				BigInteger send1 = ssa[i][1].useBinary();
-				sendOblivious(1,ssa[i][0].getSecret(), ssa[i][1].getSecret());				ssa[i][0].addSend(send0);
-				
-				ssa[i][0].addSend(send0);
-				ssa[i][1].addSend(send1);
-				
-				// Erweitere die Wortlisten, wenn ChanceB 2^k erreicht ist
-				if(ssa[i][0].getBinarySize() <= ssChanceB.intValue()) {
-					ssa[i][0].enhanceBinary(1);
+			for (int i = 0; i < ssa.length; i++){
+				// Alice schickt für die Hälfte der möglichen Präfixe der Länge sendM die Nachricht
+				// "Dieses y ist nicht das Präfix!"
+				for (int j = 0; j < anzMes; j++) {
+					BigInteger send0 = ssa[i][0].useBinary();
+					BigInteger send1 = ssa[i][1].useBinary();
+					Com.sendTo(1,send0.toString(RADIX_SEND_));
+					Com.sendTo(1,send1.toString(RADIX_SEND_));
+					ssa[i][0].addSend(send0);
+					ssa[i][1].addSend(send1);	
 				}
-				if(ssa[i][1].getBinarySize() <= ssChanceB.intValue()) {
-					ssa[i][1].enhanceBinary(1);
+				// Alice empfängt für die Hälfte der möglichen Präfixe der Länge sendM die Nachricht
+				// "Dieses y ist nicht das Präfix"
+				for (int j = 0; j < anzMes; j++) {
+					//Alice wählt zwei y der Länge sendM
+					String rec = Com.receive();
+					BigInteger rec0 = new BigInteger(rec, RADIX_SEND_);
+					rec = Com.receive();
+					BigInteger rec1 = new BigInteger(rec, RADIX_SEND_);
+	
+					ssb[i][0].addSend(rec0);
+					ssb[i][1].addSend(rec1);
 				}
+			// Gucken, was noch da ist
+			ssb[i][0].refreshSecrets();
+			ssb[i][1].refreshSecrets();
+			// Erweitere die Wortlisten	
+			ssa[i][0].enhanceBinary(1);
+			ssa[i][1].enhanceBinary(1);
 			}
-			
-//			// Alice empfängt
-			// TODO Empfang klauen von Bob später
-			
 			// Nächste Runde
 			sendM = sendM + 1;
 		}
@@ -170,33 +179,43 @@ public final class SecretSharing implements Protocol {
 		// (SS3) Tausche y aus
 		// TODO
 		// (SS3) Solange weniger als m bits gesendet
-		int sendM = 3;
-//		while(sendM <= ssm.intValue()) {
-		while(sendM <= sendM+1) {
-			// (SS3) Bob empfängt
-			for (int i = 0; i < ssa.length; i++) {
-				BigInteger[] recs = receiveAndCheckOblivious(0);
-				BigInteger prefix = recs[0];
-				BigInteger k = recs[1];
-				ssa[i][k.intValue()].addSend(recs[0]);
-				ssa[i][k.intValue()].refreshSecrets();
-				
-				if(prefix!= null) {
-					System.out.print("Empfangene Nachricht: " + prefix.toString(16));
-					System.out.println(" \t für " + k);
-				} else {
-					System.out.println("Betrüger!");
-					System.exit(1);
+		int sendM = ssk.intValue(); //Anzahl der in diesem Schrit versendeten Bits
+		int anzMes = (zwei.pow(ssk.intValue()-1)).intValue(); //es werden 2^{k-1} verschiedene y ausgetauscht
+		while(sendM <= ssm.intValue()) {
+			// Bob empfängt
+			for (int i = 0; i < ssa.length; i++){
+				// Bob empfängt für die Hälfte der möglichen Präfixe der Länge sendM die Nachricht
+				// "Dieses y ist nicht das Präfix"
+				for (int j = 0; j < anzMes; j++) {
+					//Alice wählt zwei y der Länge sendM
+					String rec = Com.receive();
+					BigInteger rec0 = new BigInteger(rec, RADIX_SEND_);
+					rec = Com.receive();
+					BigInteger rec1 = new BigInteger(rec, RADIX_SEND_);
+	
+					ssa[i][0].addSend(rec0);
+					ssa[i][1].addSend(rec1);
 				}
+				// Bob schickt für die Hälfte der möglichen Präfixe der Länge sendM die Nachricht
+				// "Dieses y ist nicht das Präfix!"
+				for (int j = 0; j < anzMes; j++) {
+					BigInteger send0 = ssb[i][0].useBinary();
+					BigInteger send1 = ssb[i][1].useBinary();
+					Com.sendTo(0,send0.toString(RADIX_SEND_));
+					Com.sendTo(0,send1.toString(RADIX_SEND_));
+					ssb[i][0].addSend(send0);
+					ssb[i][1].addSend(send1);	
+				}
+			// Gucken, was noch da ist
+			ssa[i][0].refreshSecrets();
+			ssa[i][1].refreshSecrets();
+			// Erweitere die Wortlisten	
+			ssb[i][0].enhanceBinary(1);
+			ssb[i][1].enhanceBinary(1);
 			}
-			
-			// (SS3) Bob sendet
-			// TODO Senden klauen von Alice später
-			
 			// Nächste Runde
 			sendM = sendM + 1;
 		}
-
 	}
 
 	public String nameOfTheGame() {
@@ -233,19 +252,18 @@ public final class SecretSharing implements Protocol {
 	 * @return Gibt die Geheimnispaare zurück
 	 */
 	private SecretWord[][] generateSecrets(int n) {
-		int start = 2;
 
 		SecretWord[][] secrets = new SecretWord[n][2];
 		BigInteger biRand;
 		for (int i = 0; i < n; i++) {
 			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
 			secrets[i][0] = new SecretWord(biRand);
-			secrets[i][0].startBinary(start);
+			secrets[i][0].startBinary(ssk.intValue());
 			secrets[i][0].resetSend();
 			
 			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
 			secrets[i][1] = new SecretWord(biRand);
-			secrets[i][1].startBinary(start);
+			secrets[i][1].startBinary(ssk.intValue());
 			secrets[i][1].resetSend();
 		}
 
@@ -259,10 +277,10 @@ public final class SecretSharing implements Protocol {
 		SecretWord[][] secrets = new SecretWord[n][2];
 		for (int i = 0 ; i < n ; i++) {
 			secrets[i][0] = new SecretWord(ZERO,ssk.intValue());
-			secrets[i][0].startBinary(2);
+			secrets[i][0].startBinary(ssk.intValue());
 			secrets[i][0].resetSend();
 			secrets[i][1] = new SecretWord(ZERO,ssk.intValue());
-			secrets[i][1].startBinary(2);
+			secrets[i][1].startBinary(ssk.intValue());
 			secrets[i][1].resetSend();
 		}
 		
