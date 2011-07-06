@@ -149,13 +149,17 @@ public class SecretWord {
 	 */
 	public BigInteger useBinary() {
 		BigInteger prefix;
+		boolean whileB = true;
+		System.out.println("uB: " + possiblePrefix.size());
 		do {
 			BigInteger size = new BigInteger("" + possiblePrefix.size());
 			BigInteger r = BigIntegerUtil.randomSmallerThan(size);
 			prefix = possiblePrefix.get(r.intValue());
-		} while (!isFreePrefix(prefix) || !isPrefix(prefix));
+			whileB = !isFreePrefix(prefix) || isPrefix(prefix);
+		} while (whileB);
 
 		possiblePrefix.remove(prefix);
+		
 		return prefix;
 	}
 
@@ -200,7 +204,19 @@ public class SecretWord {
 		boolean b = false;
 
 		int size = binary.bitLength();
-		b = binary.equals(secret.shiftRight(52 - size));
+		int m = Math.max(binary.bitLength(),secret.bitLength());
+		int shift;
+		if (binary.bitLength() != 0) {
+			shift = m - binary.bitLength();
+		} else {
+			shift = m - 1;
+		}
+		if (shift <= 0) {
+			shift = 0;
+		}
+//		System.out.print(">>> " + binary.toString(2) + " vgl " + secret.toString(2));
+//		System.out.println(" \t" + shift);
+		b = binary.equals(secret.shiftRight(shift));
 
 		return b;
 	}
@@ -275,11 +291,12 @@ public class SecretWord {
 	
 	public String toString() {
 		int radix = 2;
+		int radixChar = 2;
 		String s = "";
 		
 		s = "Das Geheimnis: ";
-		s = s + secret.toString(36);
-		s = s + " (" + guessedSecret.toString(36) + ")\n";
+		s = s + secret.toString(radixChar);
+		s = s + " (" + guessedSecret.toString(radixChar) + ")\n";
 		s = s + "\t Mögliche Prefix (" + possiblePrefix.size() + "): \n\t";
 		for (Iterator<BigInteger> it = possiblePrefix.iterator(); it.hasNext();) {
 			BigInteger t = (BigInteger) it.next();
