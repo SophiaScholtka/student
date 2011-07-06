@@ -53,54 +53,19 @@ public final class SecretSharing implements Protocol {
 	}
 
 	public void sendFirst() {
-
 		// (0)a Alice erzeugt sich einen ElGamal Key
 		makeElGamal();
-
 		// (0)b Alice sendet ihren PublicKey an Bob
 		sendElGamal(1);
 		// (0) Alice empfängt Bobs Schlüssel
 		receiveElGamal();
 
-		// (0)c Alice gibt zwei Nachrichten M1 und M2 an, von denen Bob eine
-		// erhalten soll
-		System.out.print("Geben sie jetzt die beiden Nachrichten an, ");
-		System.out.println("von denen Bob eine erhalten soll.");
-		System.out.println("Nachricht 1: ");
-//		String M0 = askString();
-		String M0 = "hallo1";
-		BigInteger messM0 = new BigInteger(M0, 36);
-		System.out.println("Nachricht 2: ");
-//		String M1 = askString();
-		String M1 = "hallo2";
-		BigInteger messM1 = new BigInteger(M1, 36);
-
-		if (messM0.equals(messM1)) {
-			betrug_ = true;
-			System.out.print("DDD| Alice betrügt");
-			System.out.print(" indem sie zwei gleiche Nachrichten eingibt.");
-			System.out.println();
-		}
-
-		if (DEBUG_OB) {
-			System.out.println("DDD| (0)c Alice Nachrichten");
-			// System.out.println("DDD| \t Nachricht 1: " + M0);
-			System.out.println("DDD| \t Nachricht 1: " + messM0);
-			System.out.println("DDD| \t Nachricht 1: " + messM0.toString(36));
-			// System.out.println("DDD| \t Nachricht 2: " + M1);
-			System.out.println("DDD| \t Nachricht 2: " + messM1);
-			System.out.println("DDD| \t Nachricht 2: " + messM1.toString(36));
-		}
-
-		// (SS1) k für beide festlegen
-		// k global: ssk; n global: ssn
+		// (SS1) n und k für beide festlegen; k global: ssk; n global: ssn
 		ssn = BigIntegerUtil.randomSmallerThan((new BigInteger("10"))).add(ONE); // 1<=n<11
 		ssk = BigIntegerUtil.randomSmallerThan(new BigInteger("8")); // 0<=k<8
-
-		// Berechnung der Berechnungsvorteile
+		// (SS1) Berechnung der Berechnungsvorteile
 		setAdvantage(ssk);
-
-		// Bob n und k senden
+		// (SS1) Bob n und k senden
 		Com.sendTo(1, ssn.toString(RADIX_SEND_));
 		Com.sendTo(1, ssk.toString(RADIX_SEND_));
 		if (DEBUG_SS) {
@@ -110,8 +75,7 @@ public final class SecretSharing implements Protocol {
 		}
 
 		// (SS2)a a_(i,j) mit i=1,...,n und j=1,2 erzeugen
-		SecretWord[][] ssa = new SecretWord[ssn.intValue()][2];
-		ssa = generateSecrets(ssn.intValue());
+		SecretWord[][] ssa = generateSecrets(ssn.intValue());
 		if (DEBUG_SS) {
 			System.out.println("DDD| (SS2) Generierte Wortpaare:");
 			for (int i = 0; i < ssa.length; i++) {
@@ -122,26 +86,9 @@ public final class SecretSharing implements Protocol {
 				System.out.println();
 			}
 		}
-		// Eigene Geheimnisse vorbereiten
-		for (int i = 0 ; i < ssa.length ; i++) {
-			ssa[i][0].startBinary(2);
-			ssa[i][0].resetSend();
-			
-			ssa[i][1].startBinary(2);
-			ssa[i][1].resetSend();
-		}
 		
 		// (SS2) Hülle für Bobs Geheimnisse
-		SecretWord[][] ssb = new SecretWord[ssn.intValue()][2];
-		for (int i = 0 ; i < ssn.intValue() ; i++) {
-			ssb[i][0] = new SecretWord(ZERO,ssk.intValue());
-			ssb[i][0].startBinary(2);
-			ssb[i][0].resetSend();
-			ssb[i][1] = new SecretWord(ZERO,ssk.intValue());
-			ssb[i][1].startBinary(2);
-			ssb[i][1].resetSend();
-		}
-		
+		SecretWord[][] ssb = generateSecretsPartner(ssn.intValue());
 		
 		// (SS3) Alice sendet Geheimnisse
 		// Solange weniger als m bits gesendet
@@ -169,11 +116,7 @@ public final class SecretSharing implements Protocol {
 			}
 			
 //			// Alice empfängt
-//			for (int i = 0; i < ssb.length; i++) {
-//				BigInteger send0 = new BigInteger(Com.receive(),RADIX_SEND_);
-//				BigInteger send1 = new BigInteger(Com.receive(),RADIX_SEND_);
-//				receiveAndCheckSecret(); // TODO anpassen!
-//			}
+			// TODO Klauen von Bob später
 			
 			// Nächste Runde
 			sendM = sendM + 1;
@@ -181,10 +124,10 @@ public final class SecretSharing implements Protocol {
 	}
 
 	public void receiveFirst() {
-		// (0) Bob empfängt den Public-Key von Alice
 		String sReceive;
+		
+		// (0) Bob empfängt den Public-Key von Alice
 		receiveElGamal();
-
 		// (0) Bob macht sich eigenen ElGamal Key
 		makeElGamal();
 		// (0) Bob sendet public Key an Partner
@@ -195,17 +138,15 @@ public final class SecretSharing implements Protocol {
 		ssn = new BigInteger(sReceive, RADIX_SEND_);
 		sReceive = Com.receive();
 		ssk = new BigInteger(sReceive, RADIX_SEND_);
+		setAdvantage(ssk);
 		if (DEBUG_SS) {
 			System.out.println("DDD| (SS1) Empfangen:");
 			System.out.println("DDD| \t n = " + ssn.toString(16));
 			System.out.println("DDD| \t k = " + ssk.toString(16));
 		}
 
-		setAdvantage(ssk);
-
 		// (SS2)a b_(i,j) mit i=1,...,n und j=1,2 erzeugen
-		SecretWord[][] ssb = new SecretWord[ssn.intValue()][2];
-		ssb = generateSecrets(ssn.intValue());
+		SecretWord[][] ssb = generateSecrets(ssn.intValue());
 		if (DEBUG_SS) {
 			System.out.println("DDD| (SS2) Generierte Wortpaare:");
 			for (int i = 0; i < ssb.length; i++) {
@@ -218,27 +159,32 @@ public final class SecretSharing implements Protocol {
 		}
 
 		// (SS2) Hülle für Alice Geheimnisse
-		SecretWord[][] ssa = new SecretWord[ssn.intValue()][2];
-		for (int i = 0 ; i < ssn.intValue() ; i++) {
-			ssa[i][0] = new SecretWord(ZERO,ssk.intValue());
-			ssa[i][1] = new SecretWord(ZERO,ssk.intValue());
-		}
+		SecretWord[][] ssa = generateSecretsPartner(ssn.intValue());
 
-		
-		// (SS3) Bob empfängt
-		for (int i = 0; i < ssa.length; i++) {
-			BigInteger[] recs = receiveAndCheckSecret();
-			BigInteger prefix = recs[0];
-			BigInteger k = recs[1];
-			ssa[i][k.intValue()].addSend(recs[0]);
-			ssa[i][k.intValue()].refreshSecrets();
-			
-			if(prefix!= null) {
-				System.out.println("Empfangene Nachricht: " + prefix.toString(16));
-			} else {
-				System.out.println("Betrüger!");
-				System.exit(1);
+		// (SS3) Solange weniger als m bits gesendet
+		int sendM = 3;
+		while(sendM <= ssm.intValue()) {
+			// (SS3) Bob empfängt
+			for (int i = 0; i < ssa.length; i++) {
+				BigInteger[] recs = receiveAndCheckSecret();
+				BigInteger prefix = recs[0];
+				BigInteger k = recs[1];
+				ssa[i][k.intValue()].addSend(recs[0]);
+				ssa[i][k.intValue()].refreshSecrets();
+				
+				if(prefix!= null) {
+					System.out.println("Empfangene Nachricht: " + prefix.toString(16));
+				} else {
+					System.out.println("Betrüger!");
+					System.exit(1);
+				}
 			}
+			
+			// (SS3) Bob sendet
+			// TODO Klauen von Alice später
+			
+			// Nächste Runde
+			sendM = sendM + 1;
 		}
 
 	}
@@ -268,27 +214,7 @@ public final class SecretSharing implements Protocol {
 		return s;
 	}
 
-//	/**
-//	 * Generiert zufällige n Geheimnispaare
-//	 * 
-//	 * @param n
-//	 *            Anzahl der Geheimnispaare
-//	 * @return Gibt die Geheimnispaare zurück
-//	 * @deprecated
-//	 */
-//	private BigInteger[][] generateWords(int n) {
-//		BigInteger[][] words = new BigInteger[n][2];
-//		BigInteger biRand;
-//		for (int i = 0; i < n; i++) {
-//			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
-//			words[i][0] = biRand;
-//			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
-//			words[i][1] = biRand;
-//		}
-//
-//		return words;
-//	}
-
+	// Geheimnisaustausch mit Berechnungsvorteil
 	/**
 	 * Generiert zufällige n Geheimnispaare
 	 * 
@@ -297,19 +223,42 @@ public final class SecretSharing implements Protocol {
 	 * @return Gibt die Geheimnispaare zurück
 	 */
 	private SecretWord[][] generateSecrets(int n) {
+		int start = 2;
+
 		SecretWord[][] secrets = new SecretWord[n][2];
 		BigInteger biRand;
 		for (int i = 0; i < n; i++) {
 			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
-			secrets[i][0] = new SecretWord(biRand,ssk.intValue());
+			secrets[i][0] = new SecretWord(biRand);
+			secrets[i][0].startBinary(start);
+			secrets[i][0].resetSend();
 			
 			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
-			secrets[i][1] = new SecretWord(biRand,ssk.intValue());
+			secrets[i][1] = new SecretWord(biRand);
+			secrets[i][1].startBinary(start);
+			secrets[i][1].resetSend();
 		}
 
 		return secrets;
 	}
 	
+	/**
+	 * 
+	 */
+	private SecretWord[][] generateSecretsPartner(int n) {
+		SecretWord[][] secrets = new SecretWord[n][2];
+		for (int i = 0 ; i < n ; i++) {
+			secrets[i][0] = new SecretWord(ZERO,ssk.intValue());
+			secrets[i][0].startBinary(2);
+			secrets[i][0].resetSend();
+			secrets[i][1] = new SecretWord(ZERO,ssk.intValue());
+			secrets[i][1].startBinary(2);
+			secrets[i][1].resetSend();
+		}
+		
+		return secrets;
+	}
+
 	/**
 	 * Setzt den Berechnungsvorteil anhand k
 	 */
@@ -318,6 +267,7 @@ public final class SecretSharing implements Protocol {
 		ssChanceB = TWO.pow(k.intValue());
 	}
 
+	// ElGamal
 	/**
 	 * 
 	 */
@@ -382,6 +332,7 @@ public final class SecretSharing implements Protocol {
 		}
 	}
 
+	// Senden und Empfangen nach Oblivious Transfer
 	/**
 	 * @param messM0
 	 * @param messM1

@@ -217,6 +217,7 @@ public class SecretWord {
 		}
 		
 		if(allNumbers.isEmpty()) {
+			//this.guessedSecret = null;
 			return 0;
 		} else if(allNumbers.size() == 1) {
 			this.guessedSecret = allNumbers.get(0);
