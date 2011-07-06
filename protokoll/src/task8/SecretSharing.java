@@ -92,7 +92,8 @@ public final class SecretSharing implements Protocol {
 		// (SS3) Alice empfängt Geheimnisse
 		SecretWord[][] ssb = receiveSecrets(ssn.intValue());
 		
-		
+		// (SS3) Tausche y aus
+		// TODO
 		// Solange weniger als m bits gesendet
 		int sendM = 3;
 //		while(sendM <= ssm.intValue()) {
@@ -164,6 +165,8 @@ public final class SecretSharing implements Protocol {
 		// (SS3) Bob sendet Nachrichten
 		sendSecrets(ssb);
 		
+		// (SS3) Tausche y aus
+		// TODO
 		// (SS3) Solange weniger als m bits gesendet
 		int sendM = 3;
 //		while(sendM <= ssm.intValue()) {
