@@ -92,6 +92,7 @@ public final class SecretSharing implements Protocol {
 		// (SS3) Alice empfängt Geheimnisse
 		SecretWord[][] ssb = receiveSecrets(1,ssn.intValue());
 		if (DEBUG_SS) {
+			System.out.println("DDD| (SS3) empfangene Geheimnisse: ");
 			showSecrets("DDD| \t " , ssb, 36);
 		}
 		
