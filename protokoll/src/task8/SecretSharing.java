@@ -10,22 +10,23 @@ import de.tubs.cs.iti.krypto.protokoll.*;
 
 public final class SecretSharing implements Protocol {
 	// Schalter
-	private final boolean DEBUG    = true;  // DEBUG, Allgemein
+	private final boolean DEBUG = true; // DEBUG, Allgemein
 	private final boolean DEBUG_OB = false; // DEBUG für Task7 Elemente
-	private final boolean DEBUG_SS = true;  // DEBUG für Task8 Elemente
+	private final boolean DEBUG_SS = true; // DEBUG für Task8 Elemente
 	private final boolean TEST = true; // für Testwerte
 
-	private static final int RADIX_SEND_ = 2;
-	private static final int SCHLEIFE_  = 2;
+	private static final int RADIX_SEND_ = 16;
+	private static final int SCHLEIFE_ = 2;
+
 	private BigInteger zwei = new BigInteger("2", 10);
 	private final BigInteger ZERO = new BigInteger("0");
-	private final BigInteger ONE  = new BigInteger("1");
-	private final BigInteger TWO  = new BigInteger("2");
+	private final BigInteger ONE = new BigInteger("1");
+	private final BigInteger TWO = new BigInteger("2");
 
 	static private int MinPlayer = 2;
 	static private int MaxPlayer = 2;
 	static private String NameOfTheGame = "ObliviousTransfer";
-	
+
 	// ElGamal Eigene
 	private BigInteger myGamalP;
 	private BigInteger myGamalG;
@@ -87,82 +88,90 @@ public final class SecretSharing implements Protocol {
 				System.out.println();
 			}
 		}
-		
+
 		// (SS3) Alice sendet Geheimnisse
-		sendSecrets(1,ssa);
+		sendSecrets(1, ssa);
 		// (SS3) Alice empfängt Geheimnisse
-		SecretWord[][] ssb = receiveSecrets(1,ssn.intValue());
+		SecretWord[][] ssb = receiveSecrets(1, ssn.intValue());
 		if (DEBUG_SS) {
 			System.out.println("DDD| (SS3) empfangene Geheimnisse: ");
-			showSecrets("DDD| \t " , ssb, 36);
+			showSecrets("DDD| \t ", ssb, 36);
 		}
-		
+
 		// (SS3) Tausche y aus
 		// Solange weniger als m bits gesendet
-		int sendM = ssk.intValue(); //Anzahl der in diesem Schrit versendeten Bits
+		int sendM = ssk.intValue(); // Anzahl der in diesem Schrit versendeten
+									// Bits
 		int whileEnde = ssm.intValue();
-		if ((SCHLEIFE_>0) && ((sendM+SCHLEIFE_)<whileEnde)) whileEnde = sendM+SCHLEIFE_;
-		int anzMes = (zwei.pow(ssk.intValue()-1)).intValue(); //es werden 2^{k-1} verschiedene y ausgetauscht
-		while(sendM < whileEnde) {
+		if ((SCHLEIFE_ > 0) && ((sendM + SCHLEIFE_) < whileEnde))
+			whileEnde = sendM + SCHLEIFE_;
+		int anzMes = (zwei.pow(ssk.intValue() - 1)).intValue(); // es werden
+																// 2^{k-1}
+																// verschiedene
+																// y
+																// ausgetauscht
+		while (sendM < whileEnde) {
 			// Alice sagt ssa, dass sie Präfixe der Länge sendM haben will
-			
+
 			// Alice sendet
 			// TODO Bobs Empfang anpassen!
-			for (int i = 0; i < ssa.length; i++){
-				// Alice schickt für die Hälfte der möglichen Präfixe der Länge sendM die Nachricht
+			for (int i = 0; i < ssa.length; i++) {
+				// Alice schickt für die Hälfte der möglichen Präfixe der Länge
+				// sendM die Nachricht
 				// "Dieses y ist nicht das Präfix!"
 				if (DEBUG_SS) {System.out.println("DDD| Alice sendet an Bob:");}				
 				for (int j = 0; j < anzMes; j++) {
 					BigInteger send0 = ssa[i][0].useBinary();
 					if (DEBUG_SS) {System.out.println("DDD| a["+i+"][0] beginnt nicht mit "+send0.toString(RADIX_SEND_));}
 					BigInteger send1 = ssa[i][1].useBinary();
+					
 					if (DEBUG_SS) {System.out.println("DDD| a["+i+"][1] beginnt nicht mit "+send1.toString(RADIX_SEND_));}
 					Com.sendTo(1,send0.toString(RADIX_SEND_));
 					Com.sendTo(1,send1.toString(RADIX_SEND_));
+
 					ssa[i][0].addSend(send0);
-					ssa[i][1].addSend(send1);	
+					ssa[i][1].addSend(send1);
 				}
-				// Alice empfängt für die Hälfte der möglichen Präfixe der Länge sendM die Nachricht
+				// Alice empfängt für die Hälfte der möglichen Präfixe der Länge
+				// sendM die Nachricht
 				// "Dieses y ist nicht das Präfix"
 				if (DEBUG_SS) {System.out.println("Alice empfängt von Bob:");}
 				for (int j = 0; j < anzMes; j++) {
-					//Alice wählt zwei y der Länge sendM
+					// Alice wählt zwei y der Länge sendM
 					String rec = Com.receive();
 					BigInteger rec0 = new BigInteger(rec, RADIX_SEND_);
 					rec = Com.receive();
 					BigInteger rec1 = new BigInteger(rec, RADIX_SEND_);
-					
+
 					if (DEBUG_SS) {System.out.println("DDD| b["+i+"][0] beginnt nicht mit "+rec0.toString(RADIX_SEND_));}
 					if (DEBUG_SS) {System.out.println("DDD| b["+i+"][1] beginnt nicht mit "+rec1.toString(RADIX_SEND_));}
 					
 					ssb[i][0].addSend(rec0);
 					ssb[i][1].addSend(rec1);
 				}
-			// Gucken, was noch da ist
-			ssb[i][0].refreshSecrets();
-			ssb[i][1].refreshSecrets();
-			// Erweitere die Wortlisten	
-			ssa[i][0].enhanceBinary(1);
-			ssa[i][1].enhanceBinary(1);
+				// Gucken, was noch da ist
+				ssb[i][0].refreshSecrets();
+				ssb[i][1].refreshSecrets();
+				// Erweitere die Wortlisten
+				ssa[i][0].enhanceBinary(1);
+				ssa[i][1].enhanceBinary(1);
 			}
 			// Nächste Runde
 			sendM = sendM + 1;
 		}
-		
-		
-		
+
 	}
 
 	public void receiveFirst() {
 		String sReceive;
-		
+
 		// (0) Bob empfängt den Public-Key von Alice
 		receiveElGamal();
 		// (0) Bob macht sich eigenen ElGamal Key
 		makeElGamal();
 		// (0) Bob sendet public Key an Partner
 		sendElGamal(0);
-		
+
 		// (SS1) Bob empfängt n und k
 		sReceive = Com.receive();
 		ssn = new BigInteger(sReceive, RADIX_SEND_);
@@ -189,48 +198,57 @@ public final class SecretSharing implements Protocol {
 		}
 
 		// (SS3) Bob empfängt Nachrichten
-		SecretWord[][] ssa = receiveSecrets(0,ssn.intValue());
+		SecretWord[][] ssa = receiveSecrets(0, ssn.intValue());
 		// (SS3) Bob sendet Nachrichten
-		sendSecrets(0,ssb);
-		
+		sendSecrets(0, ssb);
+
 		// (SS3) Tausche y aus
 		// TODO
 		// (SS3) Solange weniger als m bits gesendet
-		int sendM = ssk.intValue(); //Anzahl der in diesem Schrit versendeten Bits
+		int sendM = ssk.intValue(); // Anzahl der in diesem Schrit versendeten
+									// Bits
 		int whileEnde = ssm.intValue();
-		if ((SCHLEIFE_>0) && ((sendM+SCHLEIFE_)<whileEnde)) whileEnde = sendM+SCHLEIFE_;
-		int anzMes = (zwei.pow(ssk.intValue()-1)).intValue(); //es werden 2^{k-1} verschiedene y ausgetauscht
-		while(sendM < whileEnde) {
+		if ((SCHLEIFE_ > 0) && ((sendM + SCHLEIFE_) < whileEnde))
+			whileEnde = sendM + SCHLEIFE_;
+		int anzMes = (zwei.pow(ssk.intValue() - 1)).intValue(); // es werden
+																// 2^{k-1}
+																// verschiedene
+																// y
+																// ausgetauscht
+		while (sendM < whileEnde) {
 			// Bob empfängt
-			for (int i = 0; i < ssa.length; i++){
-				// Bob empfängt für die Hälfte der möglichen Präfixe der Länge sendM die Nachricht
+			for (int i = 0; i < ssa.length; i++) {
+				// Bob empfängt für die Hälfte der möglichen Präfixe der Länge
+				// sendM die Nachricht
 				// "Dieses y ist nicht das Präfix"
 				for (int j = 0; j < anzMes; j++) {
-					//Alice wählt zwei y der Länge sendM
+					// Alice wählt zwei y der Länge sendM
 					String rec = Com.receive();
 					BigInteger rec0 = new BigInteger(rec, RADIX_SEND_);
 					rec = Com.receive();
 					BigInteger rec1 = new BigInteger(rec, RADIX_SEND_);
-	
+
 					ssa[i][0].addSend(rec0);
 					ssa[i][1].addSend(rec1);
 				}
-				// Bob schickt für die Hälfte der möglichen Präfixe der Länge sendM die Nachricht
+
+				// Bob schickt für die Hälfte der möglichen Präfixe der Länge
+				// sendM die Nachricht
 				// "Dieses y ist nicht das Präfix!"
 				for (int j = 0; j < anzMes; j++) {
 					BigInteger send0 = ssb[i][0].useBinary();
 					BigInteger send1 = ssb[i][1].useBinary();
-					Com.sendTo(0,send0.toString(RADIX_SEND_));
-					Com.sendTo(0,send1.toString(RADIX_SEND_));
+					Com.sendTo(0, send0.toString(RADIX_SEND_));
+					Com.sendTo(0, send1.toString(RADIX_SEND_));
 					ssb[i][0].addSend(send0);
-					ssb[i][1].addSend(send1);	
+					ssb[i][1].addSend(send1);
 				}
-			// Gucken, was noch da ist
-			ssa[i][0].refreshSecrets();
-			ssa[i][1].refreshSecrets();
-			// Erweitere die Wortlisten	
-			ssb[i][0].enhanceBinary(1);
-			ssb[i][1].enhanceBinary(1);
+				// Gucken, was noch da ist
+				ssa[i][0].refreshSecrets();
+				ssa[i][1].refreshSecrets();
+				// Erweitere die Wortlisten
+				ssb[i][0].enhanceBinary(1);
+				ssb[i][1].enhanceBinary(1);
 			}
 			// Nächste Runde
 			sendM = sendM + 1;
@@ -279,7 +297,7 @@ public final class SecretSharing implements Protocol {
 			secrets[i][0] = new SecretWord(biRand);
 			secrets[i][0].startBinary(ssk.intValue());
 			secrets[i][0].resetSend();
-			
+
 			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
 			secrets[i][1] = new SecretWord(biRand);
 			secrets[i][1].startBinary(ssk.intValue());
@@ -288,21 +306,21 @@ public final class SecretSharing implements Protocol {
 
 		return secrets;
 	}
-	
+
 	/**
 	 * 
 	 */
 	private SecretWord[][] generateSecretsPartner(int n) {
 		SecretWord[][] secrets = new SecretWord[n][2];
-		for (int i = 0 ; i < n ; i++) {
-			secrets[i][0] = new SecretWord(ZERO,ssk.intValue());
+		for (int i = 0; i < n; i++) {
+			secrets[i][0] = new SecretWord(ZERO, ssk.intValue());
 			secrets[i][0].startBinary(ssk.intValue());
 			secrets[i][0].resetSend();
-			secrets[i][1] = new SecretWord(ZERO,ssk.intValue());
+			secrets[i][1] = new SecretWord(ZERO, ssk.intValue());
 			secrets[i][1].startBinary(ssk.intValue());
 			secrets[i][1].resetSend();
 		}
-		
+
 		return secrets;
 	}
 
@@ -462,7 +480,7 @@ public final class SecretSharing implements Protocol {
 			System.out.println("DDD| \t send0 = " + send0.toString(RADIX_SEND_));
 			System.out.println("DDD| \t send1 = " + send1.toString(RADIX_SEND_));
 		}
-	
+
 		// (4) nichts tun
 	}
 
@@ -525,7 +543,7 @@ public final class SecretSharing implements Protocol {
 			System.out.println("DDD| \t rec1 (send1) = " + rec1.toString(RADIX_SEND_));
 			System.out.println("DDD| \t s = " + s.toString(RADIX_SEND_));
 		}
-	
+
 		// (4)a Bob berechnet M_(s xor r)
 		BigInteger biR = new BigInteger("" + r, 10);
 		BigInteger calc;
@@ -548,17 +566,17 @@ public final class SecretSharing implements Protocol {
 		calc = calc.mod(partnerGamalP);
 		calc = calc.subtract(k); // sendT - k
 		calc = calc.mod(partnerGamalP); // sendT - k mod p
-	
+
 		// kQuer_(r xor 1) = (calcQuer mod p - calc) mod p
 		BigInteger kQuer;
 		kQuer = calcQuer.mod(partnerGamalP);
 		kQuer = kQuer.subtract(calc);
 		kQuer = kQuer.mod(partnerGamalP);
-	
+
 		BigInteger test = calcQuer.mod(partnerGamalP);
 		test = test.subtract(k);
 		test = test.mod(partnerGamalP);
-	
+
 		if (DEBUG_OB) {
 			System.out.println("DDD| (4)a Bob berechnet M_(s xor r)");
 			System.out
@@ -568,7 +586,7 @@ public final class SecretSharing implements Protocol {
 			System.out.println("DDD| \t Test = " + test);
 			System.out.println("DDD| \t Test = " + test.toString(36));
 		}
-	
+
 		// (4)b Bob prüft, ob Alice betrogen hat
 		boolean checkCheat = false;
 		// (4)b Prüfe, ob Signaturen für k und/oder kQuer gelten
@@ -585,7 +603,7 @@ public final class SecretSharing implements Protocol {
 			System.out.println("DDD| \t k  : " + s0OK + " \t " + s1OK);
 			System.out.println("DDD| \t kQ : " + sQ0OK + " \t " + sQ1OK);
 		}
-	
+
 		if (DEBUG_OB) {
 			System.out.println("DDD| (4)b BETRUGSVERSUCHE:");
 		}
@@ -613,7 +631,7 @@ public final class SecretSharing implements Protocol {
 			System.out.println("DDD| \t s(k0)==s(k1)              : " + cheat3);
 			System.out.println("DDD| \t EA(kQ)==(q-m)mod n        : " + cheat4);
 		}
-	
+
 		checkCheat = cheat1 || cheat2 || cheat3 || cheat4;
 		if (checkCheat) { // Betrüger
 			return null;
@@ -645,29 +663,35 @@ public final class SecretSharing implements Protocol {
 		for (int i = 0; i < n; i++) {
 			BigInteger[] rec = receiveAndCheckOblivious(target);
 			ssa[i][rec[1].intValue()] = new SecretWord(rec[0], ssk.intValue());
-			ssa[i][rec[1].xor(ONE).intValue()] = new SecretWord(ZERO, ssk.intValue());
+			ssa[i][rec[1].xor(ONE).intValue()] = new SecretWord(ZERO,
+					ssk.intValue());
 		}
 		return ssa;
 	}
-	
+
 	/**
-	 * Gibt die SecretWords als Text aus.
-	 * Format: 
-	 * Prefix SecretWord1 \t (SecretGuessedWord1) \t\t SecretWord2 \t (SecretGuessedWort2)
-	 * @param pre Zeilenbeginn
-	 * @param secrets Die Geheimnisse
-	 * @param rad Radix, in welcher die Geheimnisse angezeigt werden sollen
+	 * Gibt die SecretWords als Text aus. Format: Prefix SecretWord1 \t
+	 * (SecretGuessedWord1) \t\t SecretWord2 \t (SecretGuessedWort2)
+	 * 
+	 * @param pre
+	 *            Zeilenbeginn
+	 * @param secrets
+	 *            Die Geheimnisse
+	 * @param rad
+	 *            Radix, in welcher die Geheimnisse angezeigt werden sollen
 	 */
 	private void showSecrets(String pre, SecretWord[][] secrets, int rad) {
-		for (int i = 0 ; i < secrets.length ; i++) {
+		for (int i = 0; i < secrets.length; i++) {
 			System.out.print(pre);
 			System.out.print(secrets[i][0].getSecret().toString(rad));
 			System.out.print("\t");
-			System.out.print("(" + secrets[i][0].getGuessedSecret().toString(rad) + ")");
+			System.out.print("("
+					+ secrets[i][0].getGuessedSecret().toString(rad) + ")");
 			System.out.print("\t\t");
 			System.out.print(secrets[i][1].getSecret().toString(rad));
 			System.out.print("\t");
-			System.out.print("(" + secrets[i][1].getGuessedSecret().toString(rad) + ")");
+			System.out.print("("
+					+ secrets[i][1].getGuessedSecret().toString(rad) + ")");
 			System.out.println();
 		}
 	}
