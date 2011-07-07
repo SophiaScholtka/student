@@ -150,7 +150,7 @@ public class SecretWord {
 	public BigInteger useBinary() {
 		BigInteger prefix;
 		boolean whileB = true;
-		System.out.println("uB: " + possiblePrefix.size());
+		//System.out.println("uB: " + possiblePrefix.size());
 		do {
 			BigInteger size = new BigInteger("" + possiblePrefix.size());
 			BigInteger r = BigIntegerUtil.randomSmallerThan(size);
