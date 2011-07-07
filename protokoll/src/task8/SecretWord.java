@@ -14,6 +14,7 @@ public class SecretWord {
 	private ArrayList<BigInteger> possiblePrefix; // Mögliche Präfixverwaltung
 	private ArrayList<BigInteger> sendPrefix; // Gesendete Prefixe
 	private BigInteger guessedSecret; // Geratenes Geheimnis
+	private boolean isGuessed;
 
 	private ArrayList<BigInteger> allNumbers; // alle in Frage kommenden Zahlen
 
@@ -30,6 +31,7 @@ public class SecretWord {
 		this.sendPrefix = new ArrayList<BigInteger>();
 		this.possiblePrefix = new ArrayList<BigInteger>();
 		this.guessedSecret = BigInteger.ZERO;
+		this.isGuessed = false;
 
 		this.allNumbers = new ArrayList<BigInteger>();
 	}
@@ -80,6 +82,15 @@ public class SecretWord {
 	 */
 	public void setGuessedSecret(BigInteger guessedSecret) {
 		this.guessedSecret = guessedSecret;
+		this.isGuessed = true;
+	}
+	
+	public boolean hasGuessed() {
+		return this.isGuessed;
+	}
+	
+	public void resetGuessed() {
+		this.isGuessed = false;
 	}
 
 	// Gesendete Prefixes
@@ -218,7 +229,7 @@ public class SecretWord {
 
 		return b;
 	}
-
+	
 	// AllNumbers, die in Frage kommen für Secret
 	/**
 	 * Anzahl der möglichen Geheimnisse
@@ -261,13 +272,39 @@ public class SecretWord {
 			this.allNumbers = stored;
 		}
 
+		// Prüfe, ob nur noch Präfixe des größten Wertes vorhanden sind
+		boolean onlyPrefixes = false;
+		if(allNumbers!=null && allNumbers.size()>1) {
+			onlyPrefixes = true;
+			int lastIndex = allNumbers.size()-1;
+			if(lastIndex < 0) {
+				lastIndex = 0;
+			}
+			BigInteger maxValue = allNumbers.get(lastIndex);
+			for (Iterator<BigInteger> it = allNumbers.iterator(); it.hasNext();) {
+				BigInteger t = (BigInteger) it.next();
+				if (!SecretWord.isPrefix(maxValue, t)) {
+					onlyPrefixes = false;
+					break;
+				}
+			}
+		}
+		
+		// Organisiere guessedSecret und Rückgabe
 		if (allNumbers.isEmpty()) {
 			// this.guessedSecret = null;
 			return 0;
-		} else if (allNumbers.size() == 1) {
+		} 
+		else if (allNumbers.size() == 1) {
 			this.guessedSecret = allNumbers.get(0);
 			return allNumbers.size();
-		} else {
+		} 
+		else if (onlyPrefixes) {
+			this.isGuessed = true;
+			this.guessedSecret = allNumbers.get(allNumbers.size()-1);
+			return allNumbers.size();
+		}
+		else {
 			return allNumbers.size();
 		}
 	}
@@ -354,5 +391,29 @@ public class SecretWord {
 		secret.resetSend();
 
 		return secret;
+	}
+
+	/**
+	 * Ist binary2 ein Präfix von binary1?
+	 * @param binary1
+	 * @param prefix
+	 * @return
+	 */
+	public static boolean isPrefix(BigInteger binary1, BigInteger prefix) {
+		boolean b = false;
+	
+		int m = Math.max(prefix.bitLength(),binary1.bitLength());
+		int shift;
+		if (prefix.bitLength() != 0) {
+			shift = m - prefix.bitLength();
+		} else {
+			shift = m - 1;
+		}
+		if (shift <= 0) {
+			shift = 0;
+		}
+		b = prefix.equals(binary1.shiftRight(shift));
+	
+		return b;
 	}
 }

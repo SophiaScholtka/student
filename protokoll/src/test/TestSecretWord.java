@@ -73,6 +73,18 @@ public class TestSecretWord {
 		sw2.addSend(new BigInteger("0",2));
 		sw2.refreshSecrets();
 		System.out.println("refreshSecrets:\n" + sw2);
+		
+		System.out.println();System.out.println();
+		SecretWord sw3 = new SecretWord(new BigInteger("11",2),K.intValue());
+		System.err.println("======> Wort 3");
+		System.out.println(sw3);
+		sw3.addSend(new BigInteger("0",2));
+		sw3.addSend(new BigInteger("10",2));
+		sw3.addSend(new BigInteger("111",2));
+		sw3.addSend(new BigInteger("110",2));
+//		sw3.addSend(new BigInteger("1",2)); // FIXME 11 muss drinbleiben! 
+		sw3.refreshSecrets();
+		System.out.println(sw3);
 	}
 
 	private static void showSecret(String pre, SecretWord[] secrets, int rad) {
