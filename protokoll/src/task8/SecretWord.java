@@ -15,6 +15,10 @@ public class SecretWord {
 	private ArrayList<BigInteger> sendPrefix; // Gesendete Prefixe
 	private BigInteger guessedSecret; // Geratenes Geheimnis
 	private boolean isGuessed;
+	
+	private BigIntegerList[] received;
+	
+	private BigInteger maxSecret;
 
 	private ArrayList<BigInteger> allNumbers; // alle in Frage kommenden Zahlen
 
@@ -34,6 +38,7 @@ public class SecretWord {
 		this.isGuessed = false;
 
 		this.allNumbers = new ArrayList<BigInteger>();
+		this.received = null;
 	}
 
 	/**
@@ -49,16 +54,16 @@ public class SecretWord {
 		this.sendPrefix = new ArrayList<BigInteger>();
 		this.possiblePrefix = new ArrayList<BigInteger>();
 		this.guessedSecret = BigInteger.ZERO;
-
-		BigInteger maxM = TWO.pow(m + 1);
-		BigInteger c = BigInteger.ZERO;
-		ArrayList<BigInteger> allNumbers = new ArrayList<BigInteger>();
-		while(c.compareTo(maxM) < 0) {
-			allNumbers.add(c);
-			c = c.add(BigInteger.ONE);
+		
+		received = new BigIntegerList[m];
+		for (int i = 0; i < m; i++) {
+			received[i] = new BigIntegerList();
 		}
-		System.out.println(c);
-		this.allNumbers = allNumbers;
+
+		BigInteger maxSecret = TWO.pow(m + 1);
+		this.maxSecret = maxSecret;
+		
+		this.allNumbers = new ArrayList<BigInteger>();
 	}
 
 	/**
@@ -102,9 +107,10 @@ public class SecretWord {
 	 * Erzeugt eine neue, leere Liste für gesendete Präfixe
 	 */
 	public void resetSend() {
+		secureSend();
 		sendPrefix = new ArrayList<BigInteger>();
 	}
-
+	
 	/**
 	 * Füge gesendeten Prefix der Liste hinzu
 	 * 
@@ -242,14 +248,93 @@ public class SecretWord {
 		return allNumbers.size();
 	}
 
+	
+	public int refreshSecrets() {
+		// Aktualisie die empfangenen falschen Präfixe
+		secureSend();
+		
+		// Organisiere falsche Präfixe als Liste
+		ArrayList<BigInteger> falsePrefixes = new ArrayList<BigInteger>();
+		for (int i = 0 ; i < received.length ; i++) {
+			ArrayList<BigInteger> list = received[i].getList();
+			for (Iterator<BigInteger> it = list.iterator(); it.hasNext();) {
+				BigInteger bigInteger = (BigInteger) it.next();
+				falsePrefixes.add(bigInteger);
+			}
+		}
+		
+		// Prüfe die in Frage kommenden Zahlen
+		if (allNumbers == null) {
+		}
+		else {
+			
+		}
+		this.allNumbers = new ArrayList<BigInteger>();
+		BigInteger i = maxSecret;
+		while (i.compareTo(BigInteger.ZERO) >= 0) {
+			boolean isPrefix = false;
+			for (Iterator<BigInteger> it = falsePrefixes.iterator(); it.hasNext();) {
+				BigInteger big = (BigInteger) it.next();
+				if (SecretWord.isPrefix(i, big)) {
+					isPrefix = true;
+					break;
+				}
+			}
+			if(isPrefix == false) {
+				allNumbers.add(i);
+			}
+			
+			i = i.subtract(BigInteger.ONE); // Next Value
+		}
+		
+
+		// Prüfe, ob nur noch Präfixe des größten Wertes vorhanden sind
+		boolean onlyPrefixes = false;
+		if(allNumbers!=null && allNumbers.size()>1) {
+			onlyPrefixes = true;
+			int lastIndex = allNumbers.size()-1;
+			if(lastIndex < 0) {
+				lastIndex = 0;
+			}
+			BigInteger maxValue = allNumbers.get(lastIndex);
+			for (Iterator<BigInteger> it = allNumbers.iterator(); it.hasNext();) {
+				BigInteger t = (BigInteger) it.next();
+				if (!SecretWord.isPrefix(maxValue, t)) {
+					onlyPrefixes = false;
+					break;
+				}
+			}
+		}
+		
+		// Organisiere guessedSecret und Rückgabe
+		if (allNumbers.isEmpty()) {
+			// this.guessedSecret = null;
+			return 0;
+		} 
+		else if (allNumbers.size() == 1) {
+			this.isGuessed = true;
+			this.guessedSecret = allNumbers.get(0);
+			return allNumbers.size();
+		} 
+		else if (onlyPrefixes) {
+			this.isGuessed = true;
+			this.guessedSecret = allNumbers.get(allNumbers.size()-1);
+			return allNumbers.size();
+		}
+		else {
+			return allNumbers.size();
+		}
+	}
+	
 	/**
 	 * Aktualisiert die in Frage kommenden Zahlen, indem alle Zahlen entfernt
 	 * werden, die ein Präfix in den gesendeten Werten haben. Ist nur noch ein
 	 * Element vorhanden, so wird guessedSecret auf diesen Wert gesetzt.
 	 * 
 	 * @return Anzahl der verbleibenden Elemente
+	 * @deprecated
 	 */
-	public int refreshSecrets() {
+	public int refreshSecretsOld() {
 		if (!allNumbers.isEmpty()) {
 			ArrayList<BigInteger> stored = new ArrayList<BigInteger>();
 			for (Iterator<BigInteger> it = allNumbers.iterator(); it.hasNext();) {
@@ -278,7 +363,7 @@ public class SecretWord {
 
 		// Prüfe, ob nur noch Präfixe des größten Wertes vorhanden sind
 		boolean onlyPrefixes = false;
-		if(allNumbers!=null && allNumbers.size()>1) {
+		if(allNumbers!=null && allNumbers.size()>0) {
 			onlyPrefixes = true;
 			int lastIndex = allNumbers.size()-1;
 			if(lastIndex < 0) {
@@ -421,5 +506,18 @@ public class SecretWord {
 		b = prefix.equals(binary1.shiftRight(shift));
 	
 		return b;
+	}
+
+	private void secureSend() {
+		if (sendPrefix.size()>0) {
+			for (Iterator<BigInteger> it = sendPrefix.iterator(); it.hasNext();) {
+				BigInteger element = (BigInteger) it.next();
+				int index = element.bitLength()-1;
+				received[index].addElementOnce(element);
+			}
+		}
+		else {
+			received = null;
+		}
 	}
 }
