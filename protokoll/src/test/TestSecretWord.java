@@ -3,6 +3,7 @@ package test;
 import java.math.BigInteger;
 
 import task8.SecretWord;
+import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
 
 public class TestSecretWord {
 
@@ -75,7 +76,7 @@ public class TestSecretWord {
 		System.out.println("refreshSecrets:\n" + sw2);
 		
 		System.out.println();System.out.println();
-		SecretWord sw3 = new SecretWord(new BigInteger("11",2),K.intValue());
+		SecretWord sw3 = new SecretWord(new BigInteger("11",2),3);
 		System.err.println("======> Wort 3");
 		System.out.println(sw3);
 		sw3.addSend(new BigInteger("0",2));
@@ -85,6 +86,11 @@ public class TestSecretWord {
 //		sw3.addSend(new BigInteger("1",2)); // FIXME 11 muss drinbleiben! 
 		sw3.refreshSecrets();
 		System.out.println(sw3);
+		
+		System.out.println();System.out.println();
+		SecretWord sw4 = new SecretWord(new BigInteger("11",2),52);
+		System.err.println("======> Wort 4");
+		System.out.println(sw4);
 	}
 
 	private static void showSecret(String pre, SecretWord[] secrets, int rad) {

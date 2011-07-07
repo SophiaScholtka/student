@@ -44,17 +44,21 @@ public class SecretWord {
 	 * @param secret
 	 *            Geheime Zahl
 	 */
-	public SecretWord(BigInteger secret, int k) {
+	public SecretWord(BigInteger secret, int m) {
 		this.secret = secret;
 		this.sendPrefix = new ArrayList<BigInteger>();
 		this.possiblePrefix = new ArrayList<BigInteger>();
 		this.guessedSecret = BigInteger.ZERO;
 
-		BigInteger maxK = TWO.pow(k + 1);
-		this.allNumbers = new ArrayList<BigInteger>();
-		for (int i = 0; i < maxK.intValue(); i++) {
-			allNumbers.add(new BigInteger("" + i));
+		BigInteger maxM = TWO.pow(m + 1);
+		BigInteger c = BigInteger.ZERO;
+		ArrayList<BigInteger> allNumbers = new ArrayList<BigInteger>();
+		while(c.compareTo(maxM) < 0) {
+			allNumbers.add(c);
+			c = c.add(BigInteger.ONE);
 		}
+		System.out.println(c);
+		this.allNumbers = allNumbers;
 	}
 
 	/**
@@ -296,6 +300,7 @@ public class SecretWord {
 			return 0;
 		} 
 		else if (allNumbers.size() == 1) {
+			this.isGuessed = true;
 			this.guessedSecret = allNumbers.get(0);
 			return allNumbers.size();
 		} 
@@ -331,7 +336,8 @@ public class SecretWord {
 		
 		s = "Das Geheimnis: ";
 		s = s + secret.toString(radixChar);
-		s = s + " (" + guessedSecret.toString(radixChar) + ")\n";
+		s = s + " (" + guessedSecret.toString(radixChar) + ")";
+		s = s + " hasGuessed=" + isGuessed + "\n";
 		s = s + "\t Mögliche Prefix (" + possiblePrefix.size() + "): \n\t";
 		for (Iterator<BigInteger> it = possiblePrefix.iterator(); it.hasNext();) {
 			BigInteger t = (BigInteger) it.next();

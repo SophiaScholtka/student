@@ -350,12 +350,12 @@ public final class SecretSharing implements Protocol {
 		BigInteger biRand;
 		for (int i = 0; i < n; i++) {
 			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
-			secrets[i][0] = new SecretWord(biRand,ssk.intValue());
+			secrets[i][0] = new SecretWord(biRand);
 			secrets[i][0].startBinary(ssk.intValue());
 			secrets[i][0].resetSend();
 
 			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
-			secrets[i][1] = new SecretWord(biRand,ssk.intValue());
+			secrets[i][1] = new SecretWord(biRand);
 			secrets[i][1].startBinary(ssk.intValue());
 			secrets[i][1].resetSend();
 		}
@@ -366,13 +366,13 @@ public final class SecretSharing implements Protocol {
 	/**
 	 * 
 	 */
-	private SecretWord[][] generateSecretsPartner(int n) {
+	private SecretWord[][] generateSecretsPartner(int n, int m) {
 		SecretWord[][] secrets = new SecretWord[n][2];
 		for (int i = 0; i < n; i++) {
-			secrets[i][0] = new SecretWord(ZERO, ssk.intValue());
+			secrets[i][0] = new SecretWord(ZERO, m);
 			secrets[i][0].startBinary(ssk.intValue());
 			secrets[i][0].resetSend();
-			secrets[i][1] = new SecretWord(ZERO, ssk.intValue());
+			secrets[i][1] = new SecretWord(ZERO, m);
 			secrets[i][1].startBinary(ssk.intValue());
 			secrets[i][1].resetSend();
 		}
@@ -715,7 +715,7 @@ public final class SecretSharing implements Protocol {
 	 * @return
 	 */
 	private SecretWord[][] receiveSecrets(int target, int n) {
-		SecretWord[][] ssa = generateSecretsPartner(n);
+		SecretWord[][] ssa = generateSecretsPartner(n,ssm.intValue());
 		for (int i = 0; i < n; i++) {
 			BigInteger[] rec = receiveAndCheckOblivious(target);
 			ssa[i][rec[1].intValue()] = new SecretWord(rec[0], ssk.intValue());
