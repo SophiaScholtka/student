@@ -15,7 +15,7 @@ public final class SecretSharing implements Protocol {
 	private final boolean DEBUG_SS = true; // DEBUG für Task8 Elemente
 	private final boolean TEST = true; // für Testwerte
 
-	private static final int RADIX_SEND_ = 16;
+	private static final int RADIX_SEND_ = 2;
 	private static final int SCHLEIFE_ = 2;
 
 	private BigInteger zwei = new BigInteger("2", 10);
