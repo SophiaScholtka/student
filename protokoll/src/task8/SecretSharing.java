@@ -12,9 +12,9 @@ import de.tubs.cs.iti.krypto.protokoll.Protocol;
 
 public final class SecretSharing implements Protocol {
 	// Schalter
-	private final boolean DEBUG = true; // DEBUG, Allgemein
+	private final boolean DEBUG = false; // DEBUG, Allgemein
 	private final boolean DEBUG_OB = false; // DEBUG für Task7 Elemente
-	private final boolean DEBUG_SS = true; // DEBUG für Task8 Elemente
+	private final boolean DEBUG_SS = false; // DEBUG für Task8 Elemente
 	private final boolean TEST = true; // für Testwerte
 
 	private static final int RADIX_SEND_ = 2;
@@ -85,7 +85,7 @@ public final class SecretSharing implements Protocol {
 
 		// (SS2)a a_(i,j) mit i=1,...,n und j=1,2 erzeugen
 		SecretWordSend[][] ssa = generateSecrets(ssn.intValue());
-		if (DEBUG_SS) {
+		//if (DEBUG_SS) {
 			System.out.println("DDD| (SS2) Generierte Wortpaare:");
 			for (int i = 0; i < ssa.length; i++) {
 				System.out.print("DDD| \t ");
@@ -94,7 +94,7 @@ public final class SecretSharing implements Protocol {
 				System.out.print(ssa[i][1].getSecret().toString(RADIX_SEND_));
 				System.out.println();
 			}
-		}
+		//}
 
 		// (SS3) Alice sendet Geheimnisse
 		sendSecrets(1, ssa);
@@ -192,13 +192,10 @@ public final class SecretSharing implements Protocol {
 		}
 		//Ermittelte Geheimnisse ausgeben
 		for (int i = 0; i < ssb.length; i++){
-			if(ssb[i][0].getSecretsCount() != 1){
-				System.err.println("Fehler: Es wurden noch nicht alle Geheimnisse ausgetauscht!");
-			}
-			else{
-				System.out.println("Das Geheimnis ssb["+i+"][0] ist "+ssb[i][0].getGuessedSecret());
-				System.out.println("Das Geheimnis ssb["+i+"][1] ist "+ssb[i][1].getGuessedSecret());
-			}
+			ssb[i][0].refreshSecrets();
+			ssb[i][1].refreshSecrets();
+				System.out.println("Das Geheimnis ssb["+i+"][0] ist "+ssb[i][0].getGuessedSecret().toString(RADIX_SEND_)+ "\n" + ssb[i][0].toString());
+				System.out.println("Das Geheimnis ssb["+i+"][1] ist "+ssb[i][1].getGuessedSecret().toString(RADIX_SEND_)+ "\n" + ssb[i][1].toString());
 		}
 
 	}
@@ -227,7 +224,7 @@ public final class SecretSharing implements Protocol {
 
 		// (SS2)a b_(i,j) mit i=1,...,n und j=1,2 erzeugen
 		SecretWordSend[][] ssb = generateSecrets(ssn.intValue());
-		if (DEBUG_SS) {
+		//if (DEBUG_SS) {
 			System.out.println("DDD| (SS2) Generierte Wortpaare:");
 			for (int i = 0; i < ssb.length; i++) {
 				System.out.print("DDD| \t ");
@@ -236,7 +233,7 @@ public final class SecretSharing implements Protocol {
 				System.out.print(ssb[i][1].getSecret().toString(RADIX_SEND_));
 				System.out.println();
 			}
-		}
+		//}
 
 		// (SS3) Bob empfängt Nachrichten
 		SecretWordGuess[][] ssa = receiveSecrets(0, ssn.intValue());
@@ -317,16 +314,12 @@ public final class SecretSharing implements Protocol {
 			// Nächste Runde
 			sendM = sendM + 1;
 		}
-		//Alle Geheimnisse sollten ausgetauscht sein.
-		//Check das nochmal
-		for (int i = 0; i < ssa.length; i++){
-			if(ssa[i][0].getSecretsCount() != 1){
-				System.err.println("Fehler: Es wurden noch nicht alle Geheimnisse ausgetauscht!");
-			}
-			else{
-				System.out.println("Das Geheimnis ssa["+i+"][0] ist "+ssa[i][0].getGuessedSecret());
-				System.out.println("Das Geheimnis ssa["+i+"][1] ist "+ssa[i][1].getGuessedSecret());
-			}
+		//Ermittelte Geheimnisse ausgeben
+		for (int i = 0; i < ssb.length; i++){
+			ssa[i][0].refreshSecrets();
+			ssa[i][1].refreshSecrets();
+				System.out.println("Das Geheimnis ssa["+i+"][0] ist "+ssa[i][0].getGuessedSecret().toString(RADIX_SEND_)+ "\n" + ssb[i][0].toString());
+				System.out.println("Das Geheimnis ssa["+i+"][1] ist "+ssa[i][1].getGuessedSecret().toString(RADIX_SEND_)+ "\n" + ssb[i][1].toString());
 		}
 	}
 
