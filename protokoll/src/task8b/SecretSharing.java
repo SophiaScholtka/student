@@ -110,9 +110,13 @@ public final class SecretSharing implements Protocol {
 			System.out.println("DDD| (SS3) empfangene Geheimnisse: ");
 			for (int i = 0; i < ssa.length; i++) {
 				System.out.print("DDD| \t ");
+				if(ssb[i][0] != null){
 				System.out.print(ssb[i][0].toString(RADIX_SEND_));
+				} else{System.out.println("null");}
 				System.out.print("\t und ");
+				if(ssb[i][1] != null){
 				System.out.print(ssb[i][1].toString(RADIX_SEND_));
+				} else{System.out.println("null");}
 				System.out.println();
 			} 
 		}
@@ -135,7 +139,7 @@ public final class SecretSharing implements Protocol {
 		// es werden 2^{k} verschiedene y ausgetauscht
 		int anzMes = (zwei.pow(ssk.intValue())).intValue(); 
 		
-		while (sendM < whileEnde) {
+		while (sendM <= whileEnde) {
 			int target = 1;
 			//Sende an Bob Indizes y, die aus den yListen entfernt werden können
 			sendPrefixIndizes(ssa, my_yListen, sendM, anzMes, target);
@@ -143,13 +147,18 @@ public final class SecretSharing implements Protocol {
 			//Empfange von Bob Indizes y die aus den yListen entfernt werden können
 			receivePrefixIndizes(ssb,their_yListen, sendM, anzMes);
 			
-			if(sendM != whileEnde-1){//im letzten Durchlauf nix mehr anhängen
+			if(sendM != whileEnde){//im letzten Durchlauf nix mehr anhängen
 				//my_yListen aufräumen und mit 0 und 1 ergänzen
 				clean_yListen(my_yListen, sendM, anzMes);
 				
 				//their_yListen aufräumen und mit 0 und 1 ergänzen
 				clean_yListen(their_yListen, sendM, anzMes);	
 			}
+			
+			System.out.println("Ich habe übrig: ");
+			show_yListen(my_yListen);
+			System.out.println("In Bobs Geheimnissen ist übrig: ");
+			show_yListen(their_yListen);
 		
 			// Nächste Runde
 			sendM = sendM + 1;
@@ -234,21 +243,26 @@ public final class SecretSharing implements Protocol {
 		// es werden 2^{k} verschiedene y ausgetauscht
 		int anzMes = (zwei.pow(ssk.intValue())).intValue(); 
 		
-		while (sendM < whileEnde) {
-			int target = 1;
-			//Sende an Bob Indizes y, die aus den yListen entfernt werden können
-			sendPrefixIndizes(ssa, my_yListen, sendM, anzMes, target);
+		while (sendM <= whileEnde) {
 			
-			//Empfange von Bob Indizes y die aus den yListen entfernt werden können
+			//Empfange von Alice Indizes y die aus den yListen entfernt werden können
 			receivePrefixIndizes(ssb,their_yListen, sendM, anzMes);
 			
-			if(sendM != whileEnde-1){//im letzten Durchlauf nix mehr anhängen
+			int target = 0;
+			//Sende an Alice Indizes y, die aus den yListen entfernt werden können
+			sendPrefixIndizes(ssb, my_yListen, sendM, anzMes, target);
+			
+			if(sendM != whileEnde){//im letzten Durchlauf nix mehr anhängen
 				//my_yListen aufräumen und mit 0 und 1 ergänzen
 				clean_yListen(my_yListen, sendM, anzMes);
 				
 				//their_yListen aufräumen und mit 0 und 1 ergänzen
 				clean_yListen(their_yListen, sendM, anzMes);	
 			}
+			System.out.println("Ich habe übrig: ");
+			show_yListen(my_yListen);
+			System.out.println("In Alices Geheimnissen ist übrig: ");
+			show_yListen(their_yListen);
 		
 			// Nächste Runde
 			sendM = sendM + 1;
@@ -256,12 +270,12 @@ public final class SecretSharing implements Protocol {
 		//nun sind nock anzMes nachrichten der Länge ssm übrig, von denen anzMes-1 ausgeschlossen werden müssen
 		sendM = ssm.intValue();
 		anzMes--;;
-		int target = 1;
-		//Sende an Bob Indizes y, die aus den yListen entfernt werden können
-		sendPrefixIndizes(ssa, my_yListen, sendM, anzMes, target);
+		//Empfange von Alice Indizes y die aus den yListen entfernt werden können
+		receivePrefixIndizes(ssa,their_yListen, sendM, anzMes);
 		
-		//Empfange von Bob Indizes y die aus den yListen entfernt werden können
-		receivePrefixIndizes(ssb,their_yListen, sendM, anzMes);
+		int target = 0;
+		//Sende an Alice Indizes y, die aus den yListen entfernt werden können
+		sendPrefixIndizes(ssb, my_yListen, sendM, anzMes, target);
 		
 		//jetzt sollte noch genau 1 Wort pro yListe übrig sein, mal gucken
 		System.out.println("Ich habe übrig: ");
@@ -285,6 +299,7 @@ public final class SecretSharing implements Protocol {
 
 	private void sendPrefixIndizes(BigInteger[][] ssa,
 			BigInteger[][][] my_yListen, int sendM, int anzMes, int target) {
+		System.err.println(">>>entered sendPrefixIndizes");
 		//für jedes Geheimnispaar
 		for (int i = 0; i < my_yListen.length; i++){
 			for (int j = 0; j < my_yListen[i].length;j++){
@@ -313,6 +328,7 @@ public final class SecretSharing implements Protocol {
 
 	private void receivePrefixIndizes(BigInteger[][] ssb,
 			BigInteger[][][] their_yListen, int sendM, int anzMes) {
+		System.err.println(">>>entered receivePrefixIndizes");
 		//für jedes Geheimnispaar
 		for (int i = 0; i < their_yListen.length; i++){
 			for (int j = 0; j < their_yListen[i].length;j++){
@@ -356,9 +372,8 @@ public final class SecretSharing implements Protocol {
 	private void fillyListen(BigInteger[][][] my_yListen) {
 		for (int i = 0; i < my_yListen.length; i++){
 			for (int j = 0; j < my_yListen[i].length; j++){
-				int countup = 0;
 				for (int k = 0; k < my_yListen[i][j].length; k++){
-					my_yListen[i][j][k] = new BigInteger(""+countup, 10);
+					my_yListen[i][j][k] = new BigInteger(""+k, 10);
 				}
 			}
 		}
