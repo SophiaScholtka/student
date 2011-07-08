@@ -17,6 +17,12 @@ public final class SecretSharing implements Protocol {
 	private final boolean DEBUG_OB = false; // DEBUG für Task7 Elemente
 	private final boolean DEBUG_SS = true; // DEBUG für Task8 Elemente
 	private final boolean TEST = true; // für Testwerte
+	
+	//hier true setzen, wenn Alice beim secretsharing betrügen soll, d.h. Bits manipulieren
+	private final boolean BETRUG_ = false;
+	//hier true setzen, wenn Alice beim oblivious cheaten soll d.h. 2 gleiche Geheimnisse
+	private boolean betrug_ = false; 
+
 
 	private static final int RADIX_SEND_ = 36;
 	private static final int SCHLEIFE_ = 0;
@@ -51,8 +57,6 @@ public final class SecretSharing implements Protocol {
 	private BigInteger ssChanceB; // Berechnungsvorteil A:B
 
 	private Communicator Com;
-	private boolean betrug_ = false;
-
 	public void setCommunicator(Communicator com) {
 		Com = com;
 	}
@@ -86,6 +90,12 @@ public final class SecretSharing implements Protocol {
 			ssa[i][0] = new BigInteger(ssm.intValue(), new Random());
 			ssa[i][1] = new BigInteger(ssm.intValue(), new Random());
 		}
+		
+		if(betrug_){
+			int randpair = ((int)(Math.random()*ssn.intValue()))%ssn.intValue();
+			ssa[randpair][1] = ssa[randpair][0];
+		}
+		
 		//if (DEBUG_SS) {
 			System.out.println("DDD| (SS2) Generierte Wortpaare:");
 			for (int i = 0; i < ssa.length; i++) {
@@ -115,6 +125,16 @@ public final class SecretSharing implements Protocol {
 				System.out.println();
 			} 
 		}
+		
+		//Falls Alice cheatet, flipt sie in jedem Paar ein random bit
+		if (BETRUG_){
+			for (int i = 0; i< ssa.length;i++){
+				int randindex = ((int)(Math.random()*100))%2;
+				int randbit = ((int)(Math.random()*ssm.intValue()))%ssm.intValue();
+				ssa[i][randindex] = ssa[i][randindex].flipBit(randbit);
+			}
+		}
+		
 
 		//y-Listen generieren
 		BigInteger anzY = zwei.pow(ssk.intValue()+1);
@@ -140,7 +160,7 @@ public final class SecretSharing implements Protocol {
 			sendPrefixIndizes(ssa, my_yListen, sendM, anzMes, target);
 			
 			//Empfange von Bob Indizes y die aus den yListen entfernt werden können
-			receivePrefixIndizes(ssb,their_yListen, sendM, anzMes);
+			receivePrefixIndizes(their_yListen,sendM, anzMes);
 			
 			if(sendM != whileEnde){//im letzten Durchlauf nix mehr anhängen
 				//my_yListen aufräumen und mit 0 und 1 ergänzen
@@ -166,7 +186,7 @@ public final class SecretSharing implements Protocol {
 		sendPrefixIndizes(ssa, my_yListen, sendM, anzMes, target);
 		
 		//Empfange von Bob Indizes y die aus den yListen entfernt werden können
-		receivePrefixIndizes(ssb,their_yListen, sendM, anzMes);
+		receivePrefixIndizes(their_yListen,sendM, anzMes);
 		
 		//Jetzt sollte noch genau 1 Wort pro Liste übrig sein, mal gucken
 		//System.out.println("Ich habe übrig: ");
@@ -253,11 +273,11 @@ public final class SecretSharing implements Protocol {
 		
 		// es werden 2^{k} verschiedene y ausgetauscht
 		int anzMes = (zwei.pow(ssk.intValue())).intValue(); 
-		
-		while (sendM <= whileEnde) {
+		boolean cheater = false;
+		while (sendM <= whileEnde  && !cheater) {
 			
 			//Empfange von Alice Indizes y die aus den yListen entfernt werden können
-			receivePrefixIndizes(ssb,their_yListen, sendM, anzMes);
+			receivePrefixIndizes(their_yListen,sendM, anzMes);
 			
 			int target = 0;
 			//Sende an Alice Indizes y, die aus den yListen entfernt werden können
@@ -270,6 +290,36 @@ public final class SecretSharing implements Protocol {
 				//their_yListen aufräumen und mit 0 und 1 ergänzen
 				clean_yListen(their_yListen, sendM, anzMes);	
 			}
+			
+			//checken, ob Alice manipuliert
+			for(int i = 0; i<their_yListen.length; i++){
+				//für jedes Paar
+				boolean manipulate = true;
+				BigInteger known = ssa[i][0];
+				if (known == null) known = ssa[i][1];
+				//bilde das entsprechende Präfix von known
+				BigInteger modo = zwei.pow(sendM+1);
+				known = known.mod(modo);
+				for(int j = 0; j<their_yListen[i].length;j++){
+					for(int k =0; k<their_yListen[i][j].length;k++){
+						if(their_yListen[i][j][k] != null){
+							BigInteger temp = their_yListen[i][j][k].mod(modo);
+							if(temp.equals(known)) {
+								manipulate = false;
+								j=their_yListen[i].length;
+								break;
+							}
+						}
+					}
+				}
+				if (manipulate){
+					System.err.println("Alice manipuliert bits!");
+					cheater = true;
+					break;
+				}
+				
+			}
+			
 			//System.out.println("Ich habe übrig: ");
 			//show_yListen(my_yListen);
 			//System.out.println("In Alices Geheimnissen ist übrig: ");
@@ -278,22 +328,24 @@ public final class SecretSharing implements Protocol {
 			// Nächste Runde
 			sendM = sendM + 1;
 		}
-		//nun sind nock anzMes nachrichten der Länge ssm übrig, von denen anzMes-1 ausgeschlossen werden müssen
-		sendM = ssm.intValue();
-		anzMes--;;
-		//Empfange von Alice Indizes y die aus den yListen entfernt werden können
-		receivePrefixIndizes(ssa,their_yListen, sendM, anzMes);
-		
-		int target = 0;
-		//Sende an Alice Indizes y, die aus den yListen entfernt werden können
-		sendPrefixIndizes(ssb, my_yListen, sendM, anzMes, target);
-		
-		//jetzt sollte noch genau 1 Wort pro yListe übrig sein, mal gucken
-		//System.out.println("Ich habe übrig: ");
-		//show_yListen(my_yListen);
-		System.out.println("Alices Geheimnisse sind: ");
-		show_yListen(their_yListen);
-		
+		//nur weitermachen, falls Alice nicht cheatet
+		if(!cheater){
+			//nun sind nock anzMes nachrichten der Länge ssm übrig, von denen anzMes-1 ausgeschlossen werden müssen
+			sendM = ssm.intValue();
+			anzMes--;;
+			//Empfange von Alice Indizes y die aus den yListen entfernt werden können
+			receivePrefixIndizes(their_yListen,sendM, anzMes);
+			
+			int target = 0;
+			//Sende an Alice Indizes y, die aus den yListen entfernt werden können
+			sendPrefixIndizes(ssb, my_yListen, sendM, anzMes, target);
+			
+			//jetzt sollte noch genau 1 Wort pro yListe übrig sein, mal gucken
+			//System.out.println("Ich habe übrig: ");
+			//show_yListen(my_yListen);
+			System.out.println("Alices Geheimnisse sind: ");
+			show_yListen(their_yListen);
+		}
 	}
 
 	private void show_yListen(BigInteger[][][] my_yListen) {
@@ -337,8 +389,8 @@ public final class SecretSharing implements Protocol {
 		}
 	}
 
-	private void receivePrefixIndizes(BigInteger[][] ssb,
-			BigInteger[][][] their_yListen, int sendM, int anzMes) {
+	private void receivePrefixIndizes(BigInteger[][][] their_yListen,
+			int sendM, int anzMes) {
 		//System.err.println(">>>entered receivePrefixIndizes");
 		//für jedes Geheimnispaar
 		for (int i = 0; i < their_yListen.length; i++){
@@ -753,6 +805,10 @@ public final class SecretSharing implements Protocol {
 		BigInteger[][] ssa = new BigInteger[n][2];
 		for (int i = 0; i < n; i++) {
 			BigInteger[] rec = receiveAndCheckOblivious(target);
+			if(rec == null){
+				System.err.println("Alice betrügt!");
+				return null;
+			}
 			ssa[i][rec[1].intValue()] = rec[0];
 			ssa[i][rec[1].xor(ONE).intValue()] = null;
 		}
