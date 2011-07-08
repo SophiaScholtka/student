@@ -328,14 +328,31 @@ public final class SecretSharing implements Protocol {
 			// Nächste Runde
 			sendM = sendM + 1;
 		}
+		
+		//nun sind nock anzMes nachrichten der Länge ssm übrig, von denen anzMes-1 ausgeschlossen werden müssen
+		sendM = ssm.intValue();
+		anzMes--;;
+		//Empfange von Alice Indizes y die aus den yListen entfernt werden können
+		receivePrefixIndizes(their_yListen,sendM, anzMes);
+		
+		//gucke, ob Alice nicht doch betrogen hat
+		for(int i=0; i<their_yListen.length && !cheater; i++){
+			for(int j=0; j<their_yListen[i][0].length && !cheater;j++){
+				for(int k=0; k<their_yListen[i][1].length && !cheater;k++){
+					if(their_yListen[i][0][j] != null){
+						if(their_yListen[i][1][k] != null){
+							if(their_yListen[i][0][j].equals(their_yListen[i][1][k])){
+								System.err.println("Alice hat zwei gleiche Geheimnisse eingegeben. Betrug!");
+								cheater = true;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
 		//nur weitermachen, falls Alice nicht cheatet
-		if(!cheater){
-			//nun sind nock anzMes nachrichten der Länge ssm übrig, von denen anzMes-1 ausgeschlossen werden müssen
-			sendM = ssm.intValue();
-			anzMes--;;
-			//Empfange von Alice Indizes y die aus den yListen entfernt werden können
-			receivePrefixIndizes(their_yListen,sendM, anzMes);
-			
+		if(!cheater){		
 			int target = 0;
 			//Sende an Alice Indizes y, die aus den yListen entfernt werden können
 			sendPrefixIndizes(ssb, my_yListen, sendM, anzMes, target);
@@ -343,6 +360,8 @@ public final class SecretSharing implements Protocol {
 			//jetzt sollte noch genau 1 Wort pro yListe übrig sein, mal gucken
 			//System.out.println("Ich habe übrig: ");
 			//show_yListen(my_yListen);
+		
+			
 			System.out.println("Alices Geheimnisse sind: ");
 			show_yListen(their_yListen);
 		}
