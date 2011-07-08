@@ -176,7 +176,9 @@ public class SecretWordGuess extends SecretWord {
 		}
 		this.allNumbers = new ArrayList<BigInteger>();
 		BigInteger i = BigInteger.ZERO;
-		while (i.compareTo(maxSecret) < 0) {
+		BigInteger counter = BigInteger.ZERO;
+		boolean checkWhile1 = true;
+		while (checkWhile1 && i.compareTo(maxSecret) < 0) {
 			boolean isPrefix = false;
 			for (Iterator<BigInteger> it = falsePrefixes.iterator(); it.hasNext();) {
 				BigInteger big = (BigInteger) it.next();
@@ -190,6 +192,11 @@ public class SecretWordGuess extends SecretWord {
 			}
 			
 			i = i.add(BigInteger.ONE); // Next Value
+			counter = counter.add(BigInteger.ONE);
+			checkWhile1 = (counter.compareTo(new BigInteger("10000")) < 0);
+			if(checkWhile1) {
+//				System.err.println("Berechnung wird wegen zu vieler Zahlen abgebrochen.");
+			}
 		}
 		
 

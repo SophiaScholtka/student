@@ -118,6 +118,7 @@ public final class SecretSharing implements Protocol {
 																// y
 																// ausgetauscht
 		while (sendM < whileEnde) {
+			System.err.println(">>> Nächste Runde");
 			// Alice sagt ssa, dass sie Präfixe der Länge sendM haben will
 
 			// Alice sendet
@@ -156,9 +157,9 @@ public final class SecretSharing implements Protocol {
 					ssb[i][1].addReceived(rec1);
 				}
 				// Gucken, was noch da ist
-				ssb[i][0].refreshSecrets();
-				ssb[i][1].refreshSecrets();
-				if(DEBUG_SS) System.out.println(">>>Alice benutzt refresh auf ssb.");
+//				ssb[i][0].refreshSecrets();
+//				ssb[i][1].refreshSecrets();
+//				if(DEBUG_SS) System.out.println(">>>Alice benutzt refresh auf ssb.");
 				
 				// Erweitere die Wortlisten
 				ssa[i][0].enhanceBinary(1);
@@ -179,8 +180,8 @@ public final class SecretSharing implements Protocol {
 				System.err.println("Fehler: Es wurden noch nicht alle Geheimnisse ausgetauscht!");
 			}
 			else{
-				System.out.println("Das Geheimnis ssb["+i+"][0] ist "+ssb[i][0].getSecrets());
-				System.out.println("Das Geheimnis ssb["+i+"][1] ist "+ssb[i][1].getSecrets());
+				System.out.println("Das Geheimnis ssb["+i+"][0] ist "+ssb[i][0].getGuessedSecret());
+				System.out.println("Das Geheimnis ssb["+i+"][1] ist "+ssb[i][1].getGuessedSecret());
 			}
 		}
 
@@ -239,6 +240,7 @@ public final class SecretSharing implements Protocol {
 																// y
 																// ausgetauscht
 		while (sendM < whileEnde) {
+			System.err.println(">>> Nächste Runde");
 			// Bob empfängt
 			for (int i = 0; i < ssa.length; i++) {
 				// Bob empfängt für die Hälfte der möglichen Präfixe der Länge
@@ -275,10 +277,10 @@ public final class SecretSharing implements Protocol {
 					ssb[i][0].addSend(send0);
 					ssb[i][1].addSend(send1);
 				}
-				// Gucken, was noch da ist
-				ssa[i][0].refreshSecrets();
-				ssa[i][1].refreshSecrets();
-				if(DEBUG_SS) System.out.println(">>>Bob benutzt refresh auf ssa.");
+//				// Gucken, was noch da ist
+//				ssa[i][0].refreshSecrets();
+//				ssa[i][1].refreshSecrets();
+//				if(DEBUG_SS) System.out.println(">>>Bob benutzt refresh auf ssa.");
 				
 				// Erweitere die Wortlisten
 				ssb[i][0].enhanceBinary(1);
@@ -299,8 +301,8 @@ public final class SecretSharing implements Protocol {
 				System.err.println("Fehler: Es wurden noch nicht alle Geheimnisse ausgetauscht!");
 			}
 			else{
-				System.out.println("Das Geheimnis ssa["+i+"][0] ist "+ssa[i][0].getSecrets());
-				System.out.println("Das Geheimnis ssa["+i+"][1] ist "+ssa[i][1].getSecrets());
+				System.out.println("Das Geheimnis ssa["+i+"][0] ist "+ssa[i][0].getGuessedSecret());
+				System.out.println("Das Geheimnis ssa["+i+"][1] ist "+ssa[i][1].getGuessedSecret());
 			}
 		}
 	}
@@ -710,9 +712,8 @@ public final class SecretSharing implements Protocol {
 		SecretWordGuess[][] ssa = generateSecretsPartner(n,ssm.intValue());
 		for (int i = 0; i < n; i++) {
 			BigInteger[] rec = receiveAndCheckOblivious(target);
-			ssa[i][rec[1].intValue()] = new SecretWordGuess(rec[0], ssk.intValue());
-			ssa[i][rec[1].xor(ONE).intValue()] = new SecretWordGuess(ZERO,
-					ssk.intValue());
+			ssa[i][rec[1].intValue()] = new SecretWordGuess(rec[0], ssm.intValue());
+			ssa[i][rec[1].xor(ONE).intValue()] = new SecretWordGuess(ZERO,ssm.intValue());
 		}
 		return ssa;
 	}
