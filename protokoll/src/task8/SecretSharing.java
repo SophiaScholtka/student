@@ -4,9 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
+
 import chiffre.Grundlagen;
 import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
-import de.tubs.cs.iti.krypto.protokoll.*;
+import de.tubs.cs.iti.krypto.protokoll.Communicator;
+import de.tubs.cs.iti.krypto.protokoll.Protocol;
 
 public final class SecretSharing implements Protocol {
 	// Schalter
@@ -82,7 +84,7 @@ public final class SecretSharing implements Protocol {
 		}
 
 		// (SS2)a a_(i,j) mit i=1,...,n und j=1,2 erzeugen
-		SecretWord[][] ssa = generateSecrets(ssn.intValue());
+		SecretWordSend[][] ssa = generateSecrets(ssn.intValue());
 		if (DEBUG_SS) {
 			System.out.println("DDD| (SS2) Generierte Wortpaare:");
 			for (int i = 0; i < ssa.length; i++) {
@@ -97,7 +99,7 @@ public final class SecretSharing implements Protocol {
 		// (SS3) Alice sendet Geheimnisse
 		sendSecrets(1, ssa);
 		// (SS3) Alice empfängt Geheimnisse
-		SecretWord[][] ssb = receiveSecrets(1, ssn.intValue());
+		SecretWordGuess[][] ssb = receiveSecrets(1, ssn.intValue());
 		if (DEBUG_SS) {
 			System.out.println("DDD| (SS3) empfangene Geheimnisse: ");
 			showSecrets("DDD| \t ", ssb, RADIX_SEND_);
@@ -150,17 +152,13 @@ public final class SecretSharing implements Protocol {
 					if (DEBUG_SS) {System.out.println("DDD| b["+i+"][0] beginnt nicht mit "+rec0.toString(RADIX_SEND_));}
 					if (DEBUG_SS) {System.out.println("DDD| b["+i+"][1] beginnt nicht mit "+rec1.toString(RADIX_SEND_));}
 					
-					ssb[i][0].addSend(rec0);
-					ssb[i][1].addSend(rec1);
+					ssb[i][0].addReceived(rec0);
+					ssb[i][1].addReceived(rec1);
 				}
 				// Gucken, was noch da ist
 				ssb[i][0].refreshSecrets();
 				ssb[i][1].refreshSecrets();
 				if(DEBUG_SS) System.out.println(">>>Alice benutzt refresh auf ssb.");
-				// Erweitere die Wortlisten
-				ssb[i][0].enhanceBinary(1);
-				ssb[i][1].enhanceBinary(1);
-				if(DEBUG_SS) System.out.println(">>>Alice benutzt enhance auf ssb.");
 				
 				// Erweitere die Wortlisten
 				ssa[i][0].enhanceBinary(1);
@@ -211,7 +209,7 @@ public final class SecretSharing implements Protocol {
 		}
 
 		// (SS2)a b_(i,j) mit i=1,...,n und j=1,2 erzeugen
-		SecretWord[][] ssb = generateSecrets(ssn.intValue());
+		SecretWordSend[][] ssb = generateSecrets(ssn.intValue());
 		if (DEBUG_SS) {
 			System.out.println("DDD| (SS2) Generierte Wortpaare:");
 			for (int i = 0; i < ssb.length; i++) {
@@ -224,7 +222,7 @@ public final class SecretSharing implements Protocol {
 		}
 
 		// (SS3) Bob empfängt Nachrichten
-		SecretWord[][] ssa = receiveSecrets(0, ssn.intValue());
+		SecretWordGuess[][] ssa = receiveSecrets(0, ssn.intValue());
 		// (SS3) Bob sendet Nachrichten
 		sendSecrets(0, ssb);
 
@@ -257,8 +255,8 @@ public final class SecretSharing implements Protocol {
 					if (DEBUG_SS) {System.out.println("DDD| a["+i+"][0] beginnt nicht mit "+rec0.toString(RADIX_SEND_));}
 					if (DEBUG_SS) {System.out.println("DDD| a["+i+"][1] beginnt nicht mit "+rec1.toString(RADIX_SEND_));}
 
-					ssa[i][0].addSend(rec0);
-					ssa[i][1].addSend(rec1);
+					ssa[i][0].addReceived(rec0);
+					ssa[i][1].addReceived(rec1);
 				}
 
 				// Bob schickt für die Hälfte der möglichen Präfixe der Länge
@@ -281,10 +279,6 @@ public final class SecretSharing implements Protocol {
 				ssa[i][0].refreshSecrets();
 				ssa[i][1].refreshSecrets();
 				if(DEBUG_SS) System.out.println(">>>Bob benutzt refresh auf ssa.");
-				// Erweitere die Wortlisten
-				ssa[i][0].enhanceBinary(1);
-				ssa[i][1].enhanceBinary(1);
-				if(DEBUG_SS) System.out.println(">>>Bob benutzt enhance auf ssa.");
 				
 				// Erweitere die Wortlisten
 				ssb[i][0].enhanceBinary(1);
@@ -344,18 +338,18 @@ public final class SecretSharing implements Protocol {
 	 *            Anzahl der Geheimnispaare
 	 * @return Gibt die Geheimnispaare zurück
 	 */
-	private SecretWord[][] generateSecrets(int n) {
+	private SecretWordSend[][] generateSecrets(int n) {
 
-		SecretWord[][] secrets = new SecretWord[n][2];
+		SecretWordSend[][] secrets = new SecretWordSend[n][2];
 		BigInteger biRand;
 		for (int i = 0; i < n; i++) {
 			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
-			secrets[i][0] = new SecretWord(biRand);
+			secrets[i][0] = new SecretWordSend(biRand);
 			secrets[i][0].startBinary(ssk.intValue());
 			secrets[i][0].resetSend();
 
 			biRand = BigIntegerUtil.randomBetween(ZERO, WORD_MAX);
-			secrets[i][1] = new SecretWord(biRand);
+			secrets[i][1] = new SecretWordSend(biRand);
 			secrets[i][1].startBinary(ssk.intValue());
 			secrets[i][1].resetSend();
 		}
@@ -366,15 +360,13 @@ public final class SecretSharing implements Protocol {
 	/**
 	 * 
 	 */
-	private SecretWord[][] generateSecretsPartner(int n, int m) {
-		SecretWord[][] secrets = new SecretWord[n][2];
+	private SecretWordGuess[][] generateSecretsPartner(int n, int m) {
+		SecretWordGuess[][] secrets = new SecretWordGuess[n][2];
 		for (int i = 0; i < n; i++) {
-			secrets[i][0] = new SecretWord(ZERO, m);
-			secrets[i][0].startBinary(ssk.intValue());
-			secrets[i][0].resetSend();
-			secrets[i][1] = new SecretWord(ZERO, m);
-			secrets[i][1].startBinary(ssk.intValue());
-			secrets[i][1].resetSend();
+			secrets[i][0] = new SecretWordGuess(ZERO, m);
+			secrets[i][0].resetReceived();
+			secrets[i][1] = new SecretWordGuess(ZERO, m);
+			secrets[i][1].resetReceived();
 		}
 
 		return secrets;
@@ -702,7 +694,7 @@ public final class SecretSharing implements Protocol {
 	/**
 	 * @param secrets
 	 */
-	private void sendSecrets(int target, SecretWord[][] secrets) {
+	private void sendSecrets(int target, SecretWordSend[][] secrets) {
 		for (int i = 0; i < secrets.length; i++) {
 			BigInteger send0 = secrets[i][0].getSecret();
 			BigInteger send1 = secrets[i][1].getSecret();
@@ -714,15 +706,13 @@ public final class SecretSharing implements Protocol {
 	 * @param ssb
 	 * @return
 	 */
-	private SecretWord[][] receiveSecrets(int target, int n) {
-		SecretWord[][] ssa = generateSecretsPartner(n,ssm.intValue());
+	private SecretWordGuess[][] receiveSecrets(int target, int n) {
+		SecretWordGuess[][] ssa = generateSecretsPartner(n,ssm.intValue());
 		for (int i = 0; i < n; i++) {
 			BigInteger[] rec = receiveAndCheckOblivious(target);
-			ssa[i][rec[1].intValue()] = new SecretWord(rec[0], ssk.intValue());
-			ssa[i][rec[1].intValue()].startBinary(ssk.intValue());
-			ssa[i][rec[1].xor(ONE).intValue()] = new SecretWord(ZERO,
+			ssa[i][rec[1].intValue()] = new SecretWordGuess(rec[0], ssk.intValue());
+			ssa[i][rec[1].xor(ONE).intValue()] = new SecretWordGuess(ZERO,
 					ssk.intValue());
-			ssa[i][rec[1].xor(ONE).intValue()].startBinary(ssk.intValue());
 		}
 		return ssa;
 	}
