@@ -8,7 +8,6 @@ import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
 
 public class SecretWordSend extends SecretWord {
 	
-	private final BigInteger TWO = new BigInteger("2");
 
 	private BigInteger secret; // Geheimnis
 	private ArrayList<BigInteger> possiblePrefix; // Mögliche Präfixverwaltung
