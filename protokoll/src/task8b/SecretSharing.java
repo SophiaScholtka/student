@@ -18,7 +18,7 @@ public final class SecretSharing implements Protocol {
 	private final boolean DEBUG_SS = true; // DEBUG für Task8 Elemente
 	private final boolean TEST = true; // für Testwerte
 
-	private static final int RADIX_SEND_ = 2;
+	private static final int RADIX_SEND_ = 36;
 	private static final int SCHLEIFE_ = 0;
 
 	private BigInteger zwei = new BigInteger("2", 10);
@@ -45,7 +45,7 @@ public final class SecretSharing implements Protocol {
 	private final BigInteger WORD_MAX = new BigInteger("zzzzzzzzzz", 36);
 	private BigInteger ssk; // = new BigInteger("7"); // 0...7
 	private BigInteger ssn; // = new BigInteger("10"); // Geheimnispaare, max 10
-	private BigInteger ssm = new BigInteger("5"); // Wortlänge (binary), max 52
+	private BigInteger ssm = new BigInteger("52"); // Wortlänge (binary), max 52
 													// bits
 	private BigInteger ssChanceA; // Berechnungsvorteil A:B
 	private BigInteger ssChanceB; // Berechnungsvorteil A:B
@@ -68,11 +68,6 @@ public final class SecretSharing implements Protocol {
 		// (SS1) n und k für beide festlegen; k global: ssk; n global: ssn
 		ssn = BigIntegerUtil.randomSmallerThan((new BigInteger("10"))).add(ONE); // 1<=n<11
 		ssk = BigIntegerUtil.randomSmallerThan(new BigInteger("8")); // 0<=k<8
-		if(DEBUG) {
-			System.err.println("Achtung, n=1, k=2 erzwungen. Entferne diese Option.");
-			ssn = BigInteger.ONE;
-			ssk = (BigInteger.ONE).add(BigInteger.ONE);
-		}
 		// (SS1) Berechnung der Berechnungsvorteile
 		setAdvantage(ssk);
 		// (SS1) Bob n und k senden
@@ -112,11 +107,11 @@ public final class SecretSharing implements Protocol {
 				System.out.print("DDD| \t ");
 				if(ssb[i][0] != null){
 				System.out.print(ssb[i][0].toString(RADIX_SEND_));
-				} else{System.out.println("null");}
+				} else{System.out.print("null");}
 				System.out.print("\t und ");
 				if(ssb[i][1] != null){
 				System.out.print(ssb[i][1].toString(RADIX_SEND_));
-				} else{System.out.println("null");}
+				} else{System.out.print("null");}
 				System.out.println();
 			} 
 		}
@@ -155,10 +150,10 @@ public final class SecretSharing implements Protocol {
 				clean_yListen(their_yListen, sendM, anzMes);	
 			}
 			
-			System.out.println("Ich habe übrig: ");
-			show_yListen(my_yListen);
-			System.out.println("In Bobs Geheimnissen ist übrig: ");
-			show_yListen(their_yListen);
+			//System.out.println("Ich habe übrig: ");
+			//show_yListen(my_yListen);
+			//System.out.println("In Bobs Geheimnissen ist übrig: ");
+			//show_yListen(their_yListen);
 		
 			// Nächste Runde
 			sendM = sendM + 1;
@@ -174,8 +169,8 @@ public final class SecretSharing implements Protocol {
 		receivePrefixIndizes(ssb,their_yListen, sendM, anzMes);
 		
 		//Jetzt sollte noch genau 1 Wort pro Liste übrig sein, mal gucken
-		System.out.println("Ich habe übrig: ");
-		show_yListen(my_yListen);
+		//System.out.println("Ich habe übrig: ");
+		//show_yListen(my_yListen);
 		System.out.println("Bobs Geheimnisse sind: ");
 		show_yListen(their_yListen);
 	}
@@ -222,6 +217,22 @@ public final class SecretSharing implements Protocol {
 
 		// (SS3) Bob empfängt Nachrichten
 		BigInteger[][] ssa = receiveSecrets(0, ssn.intValue());
+		if (DEBUG_SS) {
+			System.out.println("DDD| (SS3) empfangene Geheimnisse: ");
+			for (int i = 0; i < ssa.length; i++) {
+				System.out.print("DDD| \t ");
+				if(ssa[i][0] != null){
+				System.out.print(ssa[i][0].toString(RADIX_SEND_));
+				} else{System.out.print("null");}
+				System.out.print("\t und ");
+				if(ssa[i][1] != null){
+				System.out.print(ssa[i][1].toString(RADIX_SEND_));
+				} else{System.out.print("null");}
+				System.out.println();
+			} 
+		}
+		
+		
 		// (SS3) Bob sendet Nachrichten
 		sendSecrets(0, ssb);
 		
@@ -259,10 +270,10 @@ public final class SecretSharing implements Protocol {
 				//their_yListen aufräumen und mit 0 und 1 ergänzen
 				clean_yListen(their_yListen, sendM, anzMes);	
 			}
-			System.out.println("Ich habe übrig: ");
-			show_yListen(my_yListen);
-			System.out.println("In Alices Geheimnissen ist übrig: ");
-			show_yListen(their_yListen);
+			//System.out.println("Ich habe übrig: ");
+			//show_yListen(my_yListen);
+			//System.out.println("In Alices Geheimnissen ist übrig: ");
+			//show_yListen(their_yListen);
 		
 			// Nächste Runde
 			sendM = sendM + 1;
@@ -278,8 +289,8 @@ public final class SecretSharing implements Protocol {
 		sendPrefixIndizes(ssb, my_yListen, sendM, anzMes, target);
 		
 		//jetzt sollte noch genau 1 Wort pro yListe übrig sein, mal gucken
-		System.out.println("Ich habe übrig: ");
-		show_yListen(my_yListen);
+		//System.out.println("Ich habe übrig: ");
+		//show_yListen(my_yListen);
 		System.out.println("Alices Geheimnisse sind: ");
 		show_yListen(their_yListen);
 		
@@ -299,7 +310,7 @@ public final class SecretSharing implements Protocol {
 
 	private void sendPrefixIndizes(BigInteger[][] ssa,
 			BigInteger[][][] my_yListen, int sendM, int anzMes, int target) {
-		System.err.println(">>>entered sendPrefixIndizes");
+		//System.err.println(">>>entered sendPrefixIndizes");
 		//für jedes Geheimnispaar
 		for (int i = 0; i < my_yListen.length; i++){
 			for (int j = 0; j < my_yListen[i].length;j++){
@@ -328,7 +339,7 @@ public final class SecretSharing implements Protocol {
 
 	private void receivePrefixIndizes(BigInteger[][] ssb,
 			BigInteger[][][] their_yListen, int sendM, int anzMes) {
-		System.err.println(">>>entered receivePrefixIndizes");
+		//System.err.println(">>>entered receivePrefixIndizes");
 		//für jedes Geheimnispaar
 		for (int i = 0; i < their_yListen.length; i++){
 			for (int j = 0; j < their_yListen[i].length;j++){
