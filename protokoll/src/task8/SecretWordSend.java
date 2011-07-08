@@ -7,6 +7,8 @@ import java.util.Iterator;
 import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
 
 public class SecretWordSend extends SecretWord {
+	
+	private final BigInteger TWO = new BigInteger("2");
 
 	private BigInteger secret; // Geheimnis
 	private ArrayList<BigInteger> possiblePrefix; // Mögliche Präfixverwaltung
@@ -122,17 +124,29 @@ public class SecretWordSend extends SecretWord {
 	 * Wählt ein y aus der möglichen Liste aus y kein Präfix des Geheimnisses,
 	 * noch nicht genutzt
 	 * 
-	 * @return y
+	 * @return y wenn was nutzbares gefunden wurde; null wenn nichts findbar war
 	 */
 	public BigInteger useBinary() {
 		BigInteger prefix;
 		boolean whileB = true;
-		//System.out.println("uB: " + possiblePrefix.size());
+		
+		// Verbesser die Auswahl der Indize durch kleine Liste
+		ArrayList<BigInteger> possibleIndexes = new ArrayList<BigInteger>();
+		for (int i = 0 ; i < possiblePrefix.size() ; i++) {
+			possibleIndexes.add(new BigInteger("" + i));
+		}
+		// Suche nächsten nutzbaren Wert
 		do {
-			BigInteger size = new BigInteger("" + possiblePrefix.size());
-			BigInteger r = BigIntegerUtil.randomSmallerThan(size);
+			BigInteger possSize = new BigInteger("" + possibleIndexes.size());
+			BigInteger r = BigIntegerUtil.randomSmallerThan(possSize);
 			prefix = possiblePrefix.get(r.intValue());
+			
 			whileB = !isFreePrefix(prefix) || isPrefix(prefix);
+			possibleIndexes.remove(r);
+			
+			if(possibleIndexes == null || possibleIndexes.size() < 1) {
+				return null;
+			}
 		} while (whileB);
 
 		possiblePrefix.remove(prefix);

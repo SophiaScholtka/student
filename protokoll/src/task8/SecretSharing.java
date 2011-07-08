@@ -118,7 +118,7 @@ public final class SecretSharing implements Protocol {
 																// y
 																// ausgetauscht
 		while (sendM < whileEnde) {
-			System.err.println(">>> Nächste Runde");
+			if(DEBUG_SS) {System.err.println(">>> Nächste Runde");}
 			// Alice sagt ssa, dass sie Präfixe der Länge sendM haben will
 
 			// Alice sendet
@@ -240,7 +240,7 @@ public final class SecretSharing implements Protocol {
 																// y
 																// ausgetauscht
 		while (sendM < whileEnde) {
-			System.err.println(">>> Nächste Runde");
+			if(DEBUG_SS) {System.err.println(">>> Nächste Runde");}
 			// Bob empfängt
 			for (int i = 0; i < ssa.length; i++) {
 				// Bob empfängt für die Hälfte der möglichen Präfixe der Länge
