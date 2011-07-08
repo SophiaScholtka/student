@@ -4,8 +4,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
-
 public class SecretWordGuess extends SecretWord {
 
 	private final BigInteger TWO = new BigInteger("2");
@@ -129,7 +127,6 @@ public class SecretWordGuess extends SecretWord {
 	public boolean isPrefix(BigInteger binary) {
 		boolean b = false;
 
-		int size = binary.bitLength();
 		int m = Math.max(binary.bitLength(),secret.bitLength());
 		int shift;
 		if (binary.bitLength() != 0) {

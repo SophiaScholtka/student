@@ -8,8 +8,6 @@ import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
 
 public class SecretWordSend extends SecretWord {
 
-	private final BigInteger TWO = new BigInteger("2");
-
 	private BigInteger secret; // Geheimnis
 	private ArrayList<BigInteger> possiblePrefix; // Mögliche Präfixverwaltung
 	private ArrayList<BigInteger> sendPrefix; // Gesendete falsche Präfixe
@@ -248,7 +246,6 @@ public class SecretWordSend extends SecretWord {
 	private boolean isPrefix(BigInteger binary) {
 		boolean b = false;
 	
-		int size = binary.bitLength();
 		int m = Math.max(binary.bitLength(),secret.bitLength());
 		int shift;
 		if (binary.bitLength() != 0) {

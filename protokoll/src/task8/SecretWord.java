@@ -2,13 +2,7 @@ package task8;
 
 import java.math.BigInteger;
 
-public abstract class SecretWord {
-
-	private final BigInteger TWO = new BigInteger("2");
-
-	private BigInteger secret;        // Echtes Geheimnis
-	private BigInteger guessedSecret; // Geratenes Geheimnis
-	
+public abstract class SecretWord {	
 
 	/**
 	 * Das echte Geheimnis
