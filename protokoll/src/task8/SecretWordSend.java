@@ -8,6 +8,8 @@ import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
 
 public class SecretWordSend extends SecretWord {
 	
+	private final boolean DEBUG_SS = false;
+	
 
 	private BigInteger secret; // Geheimnis
 	private ArrayList<BigInteger> possiblePrefix; // Mögliche Präfixverwaltung
@@ -130,20 +132,29 @@ public class SecretWordSend extends SecretWord {
 		boolean whileB = true;
 		
 		// Verbesser die Auswahl der Indize durch kleine Liste
-		ArrayList<BigInteger> possibleIndexes = new ArrayList<BigInteger>();
+		ArrayList<Integer> possibleIndexes = new ArrayList<Integer>();
 		for (int i = 0 ; i < possiblePrefix.size() ; i++) {
-			possibleIndexes.add(new BigInteger("" + i));
+			possibleIndexes.add(i);
 		}
+		if(DEBUG_SS) {
+			System.err.println(possiblePrefix);
+			System.err.println(possibleIndexes);
+		}
+			
 		// Suche nächsten nutzbaren Wert
 		do {
 			BigInteger possSize = new BigInteger("" + possibleIndexes.size());
 			BigInteger r = BigIntegerUtil.randomSmallerThan(possSize);
-			prefix = possiblePrefix.get(r.intValue());
+			int index = possibleIndexes.get(r.intValue());
+			prefix = possiblePrefix.get(index);
 			
 			whileB = !isFreePrefix(prefix) || isPrefix(prefix);
-			possibleIndexes.remove(r);
+			possibleIndexes.remove(r.intValue());
 			
-			if(possibleIndexes == null || possibleIndexes.size() < 1) {
+			if(DEBUG_SS) {System.err.println(prefix.toString(2) + ": " + whileB + "  " + !isFreePrefix(prefix) + "  " + isPrefix(prefix));}
+			if(whileB && (possibleIndexes == null || possibleIndexes.size() < 1)) {
+				if(DEBUG_SS){System.err.println("Raus: " + possiblePrefix);
+				System.err.println("Raus: " + possibleIndexes);}
 				return null;
 			}
 		} while (whileB);

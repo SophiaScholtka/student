@@ -118,20 +118,36 @@ public final class SecretSharing implements Protocol {
 																// y
 																// ausgetauscht
 		while (sendM < whileEnde) {
-			if(DEBUG_SS) {System.err.println(">>> Nächste Runde");}
+//			if(DEBUG_SS) {System.err.println(">>> Nächste Runde");}
 			// Alice sagt ssa, dass sie Präfixe der Länge sendM haben will
 
 			// Alice sendet
+			// Setze die gesenderten für alle ssa zurück
+			for (int i = 0; i < ssa.length; i++) {
+				ssa[i][0].resetSend();
+				ssa[i][1].resetSend();
+			}
+			// Sende nächste Runde
 			for (int i = 0; i < ssa.length; i++) {
 				// Alice schickt für die Hälfte der möglichen Präfixe der Länge
 				// sendM die Nachricht
 				// "Dieses y ist nicht das Präfix!"
 				if (DEBUG_SS) {System.out.println("DDD| Alice sendet an Bob:");}				
 				for (int j = 0; j < anzMes; j++) {
+//					if(DEBUG_SS) {
+//						System.out.println("[0]" + ssa[i][0]);
+//						System.out.println("[1]" + ssa[i][1]);
+//					}
 					BigInteger send0 = ssa[i][0].useBinary();
+					if(DEBUG_SS && send0 == null) {
+						System.out.println("ssa[][0]\n" + ssa[i][0]);
+					}
 					if (DEBUG_SS) {System.out.println("DDD| a["+i+"][0] beginnt nicht mit "+send0.toString(RADIX_SEND_));}
 					BigInteger send1 = ssa[i][1].useBinary();
 					
+					if(DEBUG_SS && send1 == null) {
+						System.out.println("ssa[][1]\n" + ssa[i][1]);
+					}
 					if (DEBUG_SS) {System.out.println("DDD| a["+i+"][1] beginnt nicht mit "+send1.toString(RADIX_SEND_));}
 					Com.sendTo(1,send0.toString(RADIX_SEND_));
 					Com.sendTo(1,send1.toString(RADIX_SEND_));
@@ -240,7 +256,7 @@ public final class SecretSharing implements Protocol {
 																// y
 																// ausgetauscht
 		while (sendM < whileEnde) {
-			if(DEBUG_SS) {System.err.println(">>> Nächste Runde");}
+//			if(DEBUG_SS) {System.err.println(">>> Nächste Runde");}
 			// Bob empfängt
 			for (int i = 0; i < ssa.length; i++) {
 				// Bob empfängt für die Hälfte der möglichen Präfixe der Länge
@@ -262,6 +278,13 @@ public final class SecretSharing implements Protocol {
 				}
 
 				// Bob schickt für die Hälfte der möglichen Präfixe der Länge
+				// Setze die gesenderten für alle ssa zurück
+				// FIXME ist es hier richtig mit dem Resetten?
+				for (int j = 0; j < ssa.length; j++) {
+					ssb[j][0].resetSend();
+					ssb[j][1].resetSend();
+				}
+				// Sende nächste Runde
 				// sendM die Nachricht
 				// "Dieses y ist nicht das Präfix!"
 				if(DEBUG_SS){System.out.println("DDD| Bob sendet an Alice:");}
