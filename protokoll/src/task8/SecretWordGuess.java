@@ -66,12 +66,13 @@ public class SecretWordGuess extends SecretWord {
 	}
 
 	/**
-	 * Setzt das geratene Geheimnis
+	 * Setzt das geratene Geheimnis als echtes Geheimnis
 	 * 
 	 * @param guessedSecret
 	 */
 	public void setGuessedSecret(BigInteger guessedSecret) {
 		this.guessedSecret = guessedSecret;
+		this.secret = guessedSecret;
 		this.isGuessed = false;
 	}
 	
