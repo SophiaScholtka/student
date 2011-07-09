@@ -276,7 +276,6 @@ public final class SecretSharing implements Protocol {
 
 				// Bob schickt für die Hälfte der möglichen Präfixe der Länge
 				// Setze die gesenderten für alle ssa zurück
-				// FIXME ist es hier richtig mit dem Resetten?
 				for (int j = 0; j < ssa.length; j++) {
 					ssb[j][0].resetSend();
 					ssb[j][1].resetSend();
