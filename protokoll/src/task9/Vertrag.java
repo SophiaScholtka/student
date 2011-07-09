@@ -83,8 +83,13 @@ public final class Vertrag implements Protocol {
 			System.out.println("DDD| \t n = " + ssn.toString(RADIX_SEND_));
 			System.out.println("DDD| \t k = " + ssk.toString(RADIX_SEND_));
 		}
-
+		
+		//TODO Vertragstext-Datei einlesen
+		//TODO p_A  Primzahl < 2^52 und M << p_A zufällig bestimmen
+		//TODO p_A und M an Bob senden
+		
 		// (SS2)a a_(i,j) mit i=1,...,n und j=1,2 erzeugen
+		//TODO dieses so anpassen, dass die Aij Pohlig-Hellmann-Schlüssel sind
 		BigInteger[][] ssa = new BigInteger[ssn.intValue()][2];
 		// würfle ssn Paare von Nachrichten der Länge ssm Bit aus
 		for (int i = 0; i< ssa.length;i++){
@@ -218,6 +223,10 @@ public final class Vertrag implements Protocol {
 			System.out.println("DDD| \t k = " + ssk.toString(RADIX_SEND_));
 		}
 
+		//TODO Vertragstext-Datei einlesen
+		//TODO p_B Primzahl zufällig bestimmen, mit M << p_B < 2^52
+		//TODO p_B an Alice senden
+		
 		// (SS2)a b_(i,j) mit i=1,...,n und j=1,2 erzeugen
 		BigInteger[][] ssb = new BigInteger[ssn.intValue()][2];
 		// würfle ssn Paare von Nachrichten der Länge ssm Bit aus
