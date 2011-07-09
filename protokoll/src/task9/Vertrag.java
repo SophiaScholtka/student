@@ -1,9 +1,13 @@
 package task9;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 
 import chiffre.Grundlagen;
@@ -84,10 +88,19 @@ public final class Vertrag implements Protocol {
 			System.out.println("DDD| \t k = " + ssk.toString(RADIX_SEND_));
 		}
 		
-		//TODO Vertragstext-Datei einlesen
-		//TODO p_A  Primzahl < 2^52 und M << p_A zufällig bestimmen
-		//TODO p_A und M an Bob senden
-		//TODO p_B und M_B von Bob empfangen
+		// Vertragstext-Datei einlesen
+		int symbolCount = 2; // Anzahl der einzulesenden Zeichen
+		String path = "../protokoll/vertrag.txt"; // Pfad zu Vertrag
+		BigInteger[] vertrag = Grundlagen.readFile(path, symbolCount);
+		// p_A  Primzahl < 2^52 und M << p_A zufällig bestimmen
+		BigInteger myP = PohligHellmann.generatePrime(51); // Primzahl < 2^52
+		// TODO wie prüfe ich, ob M << p_a ist?
+		BigInteger myM = BigIntegerUtil.randomBetween(ZERO, myP); 
+		// p_A und M an Bob senden
+		Com.sendTo(1,myP.toString(RADIX_SEND_));
+		Com.sendTo(1,myM.toString(RADIX_SEND_));
+		// p_B und M_B von Bob empfangen
+		BigInteger partnerP = new BigInteger(Com.receive(),RADIX_SEND_);
 		
 		// (SS2)a a_(i,j) mit i=1,...,n und j=1,2 erzeugen
 		//TODO dieses so anpassen, dass die Aij Pohlig-Hellmann-Schlüssel sind
@@ -224,10 +237,18 @@ public final class Vertrag implements Protocol {
 			System.out.println("DDD| \t k = " + ssk.toString(RADIX_SEND_));
 		}
 
-		//TODO Vertragstext-Datei einlesen
-		//TODO p_A und M_A von Alice empfangen
-		//TODO p_B Primzahl zufällig bestimmen, mit M << p_B < 2^52
-		//TODO p_B an Alice senden
+		// Vertragstext-Datei einlesen
+		int symbolCount = 2; // Anzahl der einzulesenden Zeichen
+		String path = "../protokoll/vertrag.txt"; // Pfad zu Vertrag
+		BigInteger[] vertrag = Grundlagen.readFile(path, symbolCount);
+		// p_A und M_A von Alice empfangen
+		BigInteger partnerP = new BigInteger(Com.receive(),RADIX_SEND_);
+		BigInteger partnerM = new BigInteger(Com.receive(),RADIX_SEND_);
+		// p_B Primzahl zufällig bestimmen, mit M << p_B < 2^52
+		BigInteger myP = PohligHellmann.generatePrime(51); // Primzahl < 2^52
+		// TODO prüfe, ob M << partnerP
+		// p_B an Alice senden
+		Com.sendTo(1,myP.toString(RADIX_SEND_));
 		
 		// (SS2)a b_(i,j) mit i=1,...,n und j=1,2 erzeugen
 		BigInteger[][] ssb = new BigInteger[ssn.intValue()][2];
@@ -846,4 +867,5 @@ public final class Vertrag implements Protocol {
 		return ssa;
 	}
 
+	
 }

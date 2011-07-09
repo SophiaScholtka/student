@@ -1,8 +1,14 @@
 package chiffre;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 
 import de.tubs.cs.iti.jcrypt.chiffre.BigIntegerUtil;
@@ -319,4 +325,55 @@ public class Grundlagen {
 		// (2d) Akzeptiere, wenn v1==v2
 		return foeV2.equals(foeV1);
 	}
+	
+	/**
+	 * Liest gegebene Datei ein
+	 * @param path Pfad zur Datei
+	 * @return Inhalt des Vertrages, pro BigInteger zwei Zeichen des Vertrages
+	 */
+	public static BigInteger[] readFile(String path, int amount) {
+		if(amount < 1) { 
+			amount = 1;
+		}
+		try {
+			ArrayList<BigInteger> readChars = new ArrayList<BigInteger>();
+			
+			BufferedReader file = new BufferedReader(new FileReader(path));
+			int read;
+			while (file.ready()) {
+				read = file.read();
+				
+				BigInteger big;
+				big = new BigInteger("" + read);
+				for(int i = 1 ; i < amount; i++ ) {
+					read = file.read();
+					
+					big = big.shiftLeft(8);
+					
+					BigInteger big2;
+					big2 = new BigInteger("" + read);
+					big = big.add(big2);
+				}
+				
+				readChars.add(big);
+			}
+			
+			BigInteger[] back = new BigInteger[readChars.size()];
+			int index = 0;
+			for (Iterator<BigInteger> it = readChars.iterator(); it.hasNext();) {
+				BigInteger bigInteger = (BigInteger) it.next();
+				back[index] = bigInteger;
+				index = index + 1;
+			}
+			
+			return back;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
 }
