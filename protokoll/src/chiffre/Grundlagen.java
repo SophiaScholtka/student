@@ -329,6 +329,7 @@ public class Grundlagen {
 	/**
 	 * Liest gegebene Datei ein
 	 * @param path Pfad zur Datei
+	 * @param amount Anzahl der Zeichen pro BigInteger
 	 * @return Inhalt des Vertrages, pro BigInteger zwei Zeichen des Vertrages
 	 */
 	public static BigInteger[] readFile(String path, int amount) {

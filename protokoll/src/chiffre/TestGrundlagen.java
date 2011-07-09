@@ -9,7 +9,7 @@ public class TestGrundlagen {
 	 */
 	public static void main(String[] args) {
 		String path = "../protokoll/vertrag.txt";
-		BigInteger[] bigs = Grundlagen.readFile(path, 2);
+		BigInteger[] bigs = Grundlagen.readFile(path, 3);
 		for (int i = 0; i < bigs.length; i++) {
 			System.out.print(enhance(bigs[i].toString(2),8));
 			System.out.print("\t Länge=" + bigs[i].bitLength());
