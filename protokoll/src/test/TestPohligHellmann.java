@@ -14,7 +14,7 @@ public class TestPohligHellmann {
 		BigInteger m = new BigInteger("hallo",36);
 		System.out.println("Nachricht: " + m);
 		
-		polly1.makeKey();
+		polly1.makeKey(512);
 		BigInteger[] key = polly1.getChipherKey();
 		
 		BigInteger c = PohligHellmann.encipher(m, key);

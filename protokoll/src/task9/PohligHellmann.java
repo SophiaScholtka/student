@@ -23,10 +23,19 @@ public class PohligHellmann {
 	}
 
 	/**
-	 * Schlüsselerzeugung für das Pohlig-Hellman-Verfahren; Algorithmus 5.1
+	 * Generiert eine Primzahl mit angegebener Bitlänge
+	 * @param bitLength Bitlänge der Primzahl
+	 * @return eine Primzahl
 	 */
-	public void makeKey() {
-		int bitLength = 512;
+	public static BigInteger generatePrime(int bitLength) {
+		return BigInteger.probablePrime(bitLength, new Random());
+	}
+	
+	/**
+	 * Schlüsselerzeugung für das Pohlig-Hellman-Verfahren; Algorithmus 5.1
+	 * @param bitLength Bitlänge der Primzahl p
+	 */
+	public void makeKey(int bitLength) {
 		// (1) Erzeuge große Primzahl p
 		this.p_ = BigInteger.probablePrime(bitLength, new Random());
 		this.PHI_P_ = p_.subtract(ONE_);
