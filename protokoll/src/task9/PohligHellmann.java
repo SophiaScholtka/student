@@ -69,6 +69,10 @@ public class PohligHellmann {
 		// (4)b Dechiffrierschlüssel ist (p,d) (public)
 	}
 	
+	
+	public BigInteger getPrime() {
+		return this.p_;
+	}
 	/**
 	 * Ausgabe des Chiffrierschlüssels (p,e)
 	 * @return (p,e) Chiffrierschlüssel
