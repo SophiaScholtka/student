@@ -102,30 +102,47 @@ public final class Vertrag implements Protocol {
 		// p_B von Bob empfangen
 		BigInteger partnerP = new BigInteger(Com.receive(),RADIX_SEND_);
 		
-		// (SS2)a a_(i,j) mit i=1,...,n und j=1,2 erzeugen
-		//TODO dieses so anpassen, dass die Aij Pohlig-Hellmann-Schlüssel sind
-		BigInteger[][] ssa = new BigInteger[ssn.intValue()][2];
-		// würfle ssn Paare von Nachrichten der Länge ssm Bit aus
+		// (SS2) aij mit i=1,...,n und j=1,2 erzeugen
+		// so dass ggT(aij,myP-1)=1 ist, d.h. die aij können als
+		// PohligHellmann Schlüssel verwendet werden
+		BigInteger[][] ssa = new BigInteger[ssn.intValue()][2]; 
 		for (int i = 0; i< ssa.length;i++){
-			ssa[i][0] = new BigInteger(ssm.intValue(), new Random());
-			ssa[i][1] = new BigInteger(ssm.intValue(), new Random());
+			boolean isold = false;
+			do{
+				ssa[i][0] = genKey(myP);
+				ssa[i][1] = genKey(myP);
+				for(int j=0; j<i; j++){
+					if(ssa[i][0].equals(ssa[j][0])) isold = true;
+					if(ssa[i][1].equals(ssa[j][1])) isold = true;
+				}
+			} while (isold);
 		}
 		
+		//Für jedes aij berechne cij = myM ^ aij mod myP
+		BigInteger[][] ssc = new BigInteger[ssn.intValue()][2];
+		for (int i = 0; i<ssc.length;i++){
+			ssc[i][0] = myM.modPow(ssa[i][0],myP);
+			ssc[i][1] = myM.modPow(ssa[i][1],myP);
+		}
+		
+		/*//Dieser Betrug ist jetzt sinnlos -> auskommentiert
 		if(betrug_){
 			int randpair = ((int)(Math.random()*ssn.intValue()))%ssn.intValue();
-			ssa[randpair][1] = ssa[randpair][0];
-		}
+			ssc[randpair][1] = ssc[randpair][0];
+		}*/
 		
 		//if (DEBUG_SS) {
-			System.out.println("DDD| (SS2) Generierte Wortpaare:");
-			for (int i = 0; i < ssa.length; i++) {
+			System.out.println("DDD| Generierte Cij:");
+			for (int i = 0; i < ssc.length; i++) {
 				System.out.print("DDD| \t ");
-				System.out.print(ssa[i][0].toString(RADIX_SEND_));
+				System.out.print(ssc[i][0].toString(RADIX_SEND_));
 				System.out.print("\t und ");
-				System.out.print(ssa[i][1].toString(RADIX_SEND_));
+				System.out.print(ssc[i][1].toString(RADIX_SEND_));
 				System.out.println();
 			}
 		//}
+			
+		//TODO Alice und Bob senden sich gegenseitig ihre kompletten ssc
 
 		// (SS3) Alice sendet Geheimnisse
 		sendSecrets(1, ssa);
@@ -215,6 +232,17 @@ public final class Vertrag implements Protocol {
 		show_yListen(their_yListen);
 	}
 
+	private BigInteger genKey(BigInteger myP) {
+		BigInteger e;
+		boolean isGGT1 = false;
+		do {
+			// e \in setN mit 1<e<phi(p) = p-1 = 2<=e<phi(p)
+			e = BigIntegerUtil.randomBetween(zwei, myP.subtract(zwei), new Random());
+			isGGT1 = (e.gcd(myP.subtract(ONE)).equals(ONE)); // ggT(e,p-1)=1
+		} while (!isGGT1);
+		return e;
+	}
+
 	public void receiveFirst() {
 		String sReceive;
 
@@ -250,23 +278,42 @@ public final class Vertrag implements Protocol {
 		// p_B an Alice senden
 		Com.sendTo(1,myP.toString(RADIX_SEND_));
 		
-		// (SS2)a b_(i,j) mit i=1,...,n und j=1,2 erzeugen
-		BigInteger[][] ssb = new BigInteger[ssn.intValue()][2];
-		// würfle ssn Paare von Nachrichten der Länge ssm Bit aus
+		// (SS2) bij mit i=1,...,n und j=1,2 erzeugen
+		// so dass ggT(bij,myP-1)=1 ist, d.h. die bij können als
+		// PohligHellmann Schlüssel verwendet werden
+		BigInteger[][] ssb = new BigInteger[ssn.intValue()][2]; 
 		for (int i = 0; i< ssb.length;i++){
-			ssb[i][0] = new BigInteger(ssm.intValue(), new Random());
-			ssb[i][1] = new BigInteger(ssm.intValue(), new Random());
+			boolean isold = false;
+			do{
+				ssb[i][0] = genKey(myP);
+				ssb[i][1] = genKey(myP);
+				for(int j=0; j<i; j++){
+					if(ssb[i][0].equals(ssb[j][0])) isold = true;
+					if(ssb[i][1].equals(ssb[j][1])) isold = true;
+				}
+			} while (isold);
 		}
+		
+		//Für jedes bij berechne cij = M ^ bij mod myP
+		BigInteger[][] ssc = new BigInteger[ssn.intValue()][2];
+		for (int i = 0; i<ssc.length;i++){
+			ssc[i][0] = partnerM.modPow(ssb[i][0],myP);
+			ssc[i][1] = partnerM.modPow(ssb[i][1],myP);
+		}
+		
 		//if (DEBUG_SS) {
-			System.out.println("DDD| (SS2) Generierte Wortpaare:");
-			for (int i = 0; i < ssb.length; i++) {
+			System.out.println("DDD| Generierte Cij:");
+			for (int i = 0; i < ssc.length; i++) {
 				System.out.print("DDD| \t ");
-				System.out.print(ssb[i][0].toString(RADIX_SEND_));
+				System.out.print(ssc[i][0].toString(RADIX_SEND_));
 				System.out.print("\t und ");
-				System.out.print(ssb[i][1].toString(RADIX_SEND_));
+				System.out.print(ssc[i][1].toString(RADIX_SEND_));
 				System.out.println();
 			}
 		//}
+			
+		//TODO Alice und Bob senden sich gegenseitig ihre kompletten ssc
+		
 
 		// (SS3) Bob empfängt Nachrichten
 		BigInteger[][] ssa = receiveSecrets(0, ssn.intValue());
