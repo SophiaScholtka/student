@@ -94,12 +94,12 @@ public final class Vertrag implements Protocol {
 		BigInteger[] vertrag = Grundlagen.readFile(path, symbolCount);
 		// p_A  Primzahl < 2^52 und M << p_A zufällig bestimmen
 		BigInteger myP = PohligHellmann.generatePrime(51); // Primzahl < 2^52
-		// TODO wie prüfe ich, ob M << p_a ist?
-		BigInteger myM = BigIntegerUtil.randomBetween(ZERO, myP); 
+		//M << p_a jetzt als M <= p_a/16 umgesetzt
+		BigInteger myM = BigIntegerUtil.randomBetween(ZERO, myP.divide(zwei.pow(4)));
 		// p_A und M an Bob senden
 		Com.sendTo(1,myP.toString(RADIX_SEND_));
 		Com.sendTo(1,myM.toString(RADIX_SEND_));
-		// p_B und M_B von Bob empfangen
+		// p_B von Bob empfangen
 		BigInteger partnerP = new BigInteger(Com.receive(),RADIX_SEND_);
 		
 		// (SS2)a a_(i,j) mit i=1,...,n und j=1,2 erzeugen
@@ -246,7 +246,7 @@ public final class Vertrag implements Protocol {
 		BigInteger partnerM = new BigInteger(Com.receive(),RADIX_SEND_);
 		// p_B Primzahl zufällig bestimmen, mit M << p_B < 2^52
 		BigInteger myP = PohligHellmann.generatePrime(51); // Primzahl < 2^52
-		// TODO prüfe, ob M << partnerP
+		// es gilt automatisch M << partnerP, da M höchstens 48 bit hat
 		// p_B an Alice senden
 		Com.sendTo(1,myP.toString(RADIX_SEND_));
 		
