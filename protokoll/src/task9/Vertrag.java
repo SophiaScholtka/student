@@ -99,8 +99,12 @@ public final class Vertrag implements Protocol {
 		// p_A und M an Bob senden
 		Com.sendTo(1,myP.toString(RADIX_SEND_));
 		Com.sendTo(1,myM.toString(RADIX_SEND_));
+		if (DEBUG_V) System.out.println("DDD| myP = "+myP.toString(RADIX_SEND_));
+		if (DEBUG_V) System.out.println("DDD| myM = "+myM.toString(RADIX_SEND_));
+		
 		// p_B von Bob empfangen
 		BigInteger partnerP = new BigInteger(Com.receive(),RADIX_SEND_);
+		if (DEBUG_V) System.out.println("DDD| partnerP = "+partnerP.toString(RADIX_SEND_));
 		
 		// (SS2) aij mit i=1,...,n und j=1,2 erzeugen
 		// so dass ggT(aij,myP-1)=1 ist, d.h. die aij können als
@@ -131,16 +135,16 @@ public final class Vertrag implements Protocol {
 			ssc[randpair][1] = ssc[randpair][0];
 		}*/
 		
-		//if (DEBUG_SS) {
-			System.out.println("DDD| Generierte Cij:");
-			for (int i = 0; i < myC.length; i++) {
+		if (DEBUG_SS) {
+			System.out.println("DDD| Generierte aij:");
+			for (int i = 0; i < ssa.length; i++) {
 				System.out.print("DDD| \t ");
-				System.out.print(myC[i][0].toString(RADIX_SEND_));
+				System.out.print(ssa[i][0].toString(RADIX_SEND_));
 				System.out.print("\t und ");
-				System.out.print(myC[i][1].toString(RADIX_SEND_));
+				System.out.print(ssa[i][1].toString(RADIX_SEND_));
 				System.out.println();
 			}
-		//}
+		}
 			
 		//Alice und Bob senden sich gegenseitig ihre kompletten ssc
 		BigInteger[][] partnerC = new BigInteger[myC.length][2];
@@ -149,6 +153,17 @@ public final class Vertrag implements Protocol {
 			partnerC[i][0] = new BigInteger(Com.receive(),RADIX_SEND_);
 			Com.sendTo(1,myC[i][1].toString(RADIX_SEND_));
 			partnerC[i][1] = new BigInteger(Com.receive(),RADIX_SEND_);
+		}
+		
+		if (DEBUG_SS) {
+			System.out.println("DDD| Empfangene Cij:");
+			for (int i = 0; i < myC.length; i++) {
+				System.out.print("DDD| \t ");
+				System.out.print(partnerC[i][0].toString(RADIX_SEND_));
+				System.out.print("\t und ");
+				System.out.print(partnerC[i][1].toString(RADIX_SEND_));
+				System.out.println();
+			}
 		}
 		
 		//TODO Erklärung zusammenstellen, hashen, hash signieren (elGamal) und senden
@@ -173,9 +188,29 @@ public final class Vertrag implements Protocol {
 				System.out.println();
 			} 
 		}
-		//TODO überprüfe, ob die bij die Lösungen der entsprechenden M-Puzzles sind
+		//Überprüfe, ob die bij die Lösungen der entsprechenden M-Puzzles sind
 		//d.h. gilt partnerC[i][j] = yM ^ ssb[i][j] mod partnerP für die bekannten ssb[i][j]?
-		
+		if(DEBUG_V) System.out.println("Prüfe bisher empfangene Schlüssel: ");
+		boolean keysOk = true;
+		for (int i = 0; i < ssb.length; i++) {
+			if(ssb[i][0] != null){
+				if(!partnerC[i][0].equals(PohligHellmann.encipher(myM,partnerP,ssb[i][0]))){
+					System.err.println("Fehlerhafter Schlüssel!");
+					keysOk = false;
+				} else {
+					if(DEBUG_V) System.out.println("DDD| ssb["+i+"][0]="+ssb[i][0]+" als Key für C["+i+"][0]="+partnerC[i][0].toString(RADIX_SEND_)+" bestätigt.");
+				}
+			}
+			if(ssb[i][1] != null){
+				if(!partnerC[i][1].equals(PohligHellmann.encipher(myM,partnerP,ssb[i][1]))){
+					System.err.println("Fehlerhafter Schlüssel!");
+					keysOk = false;
+				} else {
+					if(DEBUG_V) System.out.println("DDD| ssb["+i+"][1]="+ssb[i][1]+" als Key für C["+i+"][1]="+partnerC[i][1].toString(RADIX_SEND_)+" bestätigt.");
+				}
+			}
+		}
+		//TODO Abbruch falls keysOk = false
 		
 		//Falls Alice cheatet, flipt sie in jedem Paar ein random bit
 		if (BETRUG_){
@@ -278,11 +313,14 @@ public final class Vertrag implements Protocol {
 		// p_A und M_A von Alice empfangen
 		BigInteger partnerP = new BigInteger(Com.receive(),RADIX_SEND_);
 		BigInteger partnerM = new BigInteger(Com.receive(),RADIX_SEND_);
+		if (DEBUG_V) System.out.println("DDD| parterP = "+partnerP.toString(RADIX_SEND_));
+		if (DEBUG_V) System.out.println("DDD| parterM = "+partnerM.toString(RADIX_SEND_));
 		// p_B Primzahl zufällig bestimmen, mit M << p_B < 2^52
 		BigInteger myP = PohligHellmann.generatePrime(51); // Primzahl < 2^52
 		// es gilt automatisch M << partnerP, da M höchstens 48 bit hat
 		// p_B an Alice senden
-		Com.sendTo(1,myP.toString(RADIX_SEND_));
+		Com.sendTo(0,myP.toString(RADIX_SEND_));
+		if (DEBUG_V) System.out.println("DDD| myP = "+myP.toString(RADIX_SEND_));
 		
 		// (SS2) bij mit i=1,...,n und j=1,2 erzeugen
 		// so dass ggT(bij,myP-1)=1 ist, d.h. die bij können als
@@ -308,12 +346,12 @@ public final class Vertrag implements Protocol {
 		}
 		
 		//if (DEBUG_SS) {
-			System.out.println("DDD| Generierte Cij:");
-			for (int i = 0; i < myC.length; i++) {
+			System.out.println("DDD| Generierte bij:");
+			for (int i = 0; i < ssb.length; i++) {
 				System.out.print("DDD| \t ");
-				System.out.print(myC[i][0].toString(RADIX_SEND_));
+				System.out.print(ssb[i][0].toString(RADIX_SEND_));
 				System.out.print("\t und ");
-				System.out.print(myC[i][1].toString(RADIX_SEND_));
+				System.out.print(ssb[i][1].toString(RADIX_SEND_));
 				System.out.println();
 			}
 		//}
@@ -322,9 +360,20 @@ public final class Vertrag implements Protocol {
 		BigInteger[][] partnerC = new BigInteger[myC.length][2];
 		for (int i = 0; i<myC.length;i++){
 			partnerC[i][0] = new BigInteger(Com.receive(),RADIX_SEND_);
-			Com.sendTo(1,myC[i][0].toString(RADIX_SEND_));
+			Com.sendTo(0,myC[i][0].toString(RADIX_SEND_));
 			partnerC[i][1] = new BigInteger(Com.receive(),RADIX_SEND_);
-			Com.sendTo(1,myC[i][1].toString(RADIX_SEND_));
+			Com.sendTo(0,myC[i][1].toString(RADIX_SEND_));
+		}
+		
+		if (DEBUG_SS) {
+			System.out.println("DDD| Empfangene Cij:");
+			for (int i = 0; i < myC.length; i++) {
+				System.out.print("DDD| \t ");
+				System.out.print(partnerC[i][0].toString(RADIX_SEND_));
+				System.out.print("\t und ");
+				System.out.print(partnerC[i][1].toString(RADIX_SEND_));
+				System.out.println();
+			}
 		}
 
 		//TODO Alices Erklärung empfangen und prüfen
@@ -347,8 +396,29 @@ public final class Vertrag implements Protocol {
 				System.out.println();
 			} 
 		}
-		//TODO überprüfe, ob die aij die Lösungen der entsprechenden M-Puzzles sind
+		//Überprüfe, ob die aij die Lösungen der entsprechenden M-Puzzles sind
 		//d.h. gilt partnerC[i][j] = partnerM ^ ssa[i][j] mod partnerP für die bekannten ssa[i][j]?
+		if(DEBUG_V) System.out.println("Prüfe bisher empfangene Schlüssel: ");
+		boolean keysOk = true;
+		for (int i = 0; i < ssa.length; i++) {
+			if(ssa[i][0] != null){
+				if(!partnerC[i][0].equals(PohligHellmann.encipher(partnerM,partnerP,ssa[i][0]))){
+					System.err.println("Fehlerhafter Schlüssel!");
+					keysOk = false;
+				} else {
+					if(DEBUG_V) System.out.println("DDD| ssa["+i+"][0]="+ssa[i][0]+" als Key für C["+i+"][0]="+partnerC[i][0].toString(RADIX_SEND_)+" bestätigt.");
+				}
+			}
+			if(ssa[i][1] != null){
+				if(!partnerC[i][1].equals(PohligHellmann.encipher(partnerM,partnerP,ssa[i][1]))){
+					System.err.println("Fehlerhafter Schlüssel!");
+					keysOk = false;
+				} else {
+					if(DEBUG_V) System.out.println("DDD| ssa["+i+"][1]="+ssa[i][1]+" als Key für C["+i+"][1]="+partnerC[i][1].toString(RADIX_SEND_)+" bestätigt.");
+				}
+			}
+		}
+		//TODO Abbruch falls keysOk = false
 		
 		
 		// Bob sendet oblivious die Hälfte der bij
