@@ -347,9 +347,14 @@ public class Grundlagen {
 				BigInteger big;
 				big = new BigInteger("" + read);
 				for(int i = 1 ; i < amount; i++ ) {
-					read = file.read();
-					
 					big = big.shiftLeft(8);
+					
+					if (file.ready()) {
+						read = file.read();
+					} else { 
+						// Fülle mit Leerzeichen auf
+						read = 32;
+					}
 					
 					BigInteger big2;
 					big2 = new BigInteger("" + read);
@@ -376,5 +381,4 @@ public class Grundlagen {
 		
 		return null;
 	}
-	
 }

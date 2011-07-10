@@ -1,13 +1,12 @@
 package task9;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.util.Random;
 
 import chiffre.Grundlagen;
@@ -60,6 +59,10 @@ public final class Vertrag implements Protocol {
 													// bits
 	private BigInteger ssChanceA; // Berechnungsvorteil A:B
 	private BigInteger ssChanceB; // Berechnungsvorteil A:B
+	
+	// Task9 Konstanten
+	private final int symbolCount = 1;
+	private final String digestType = "SHA";
 
 	private Communicator Com;
 	public void setCommunicator(Communicator com) {
@@ -89,7 +92,7 @@ public final class Vertrag implements Protocol {
 		}
 		
 		// Vertragstext-Datei einlesen
-		int symbolCount = 2; // Anzahl der einzulesenden Zeichen
+//		int symbolCount = 2; // Anzahl der einzulesenden Zeichen
 		String path = "../protokoll/vertrag.txt"; // Pfad zu Vertrag
 		BigInteger[] vertrag = Grundlagen.readFile(path, symbolCount);
 		// p_A  Primzahl < 2^52 und M << p_A zufällig bestimmen
@@ -166,9 +169,34 @@ public final class Vertrag implements Protocol {
 			}
 		}
 		
-		//TODO Erklärung zusammenstellen, hashen, hash signieren (elGamal) und senden
-		
-		//TODO Bobs Erklärung empfangen und prüfen
+		// Alice
+		// Erklärung
+		byte[] myState;
+		MessageDigest myMD;
+		BigInteger myHashS;
+		BigInteger partnerHashS;
+		try {
+			// Erklärung zusammenstellen
+			BigInteger[] myStateContractT = Erklaerung.createStateContract(
+					"A", "Bob", vertrag, ssn.intValue(), symbolCount);
+			myState = Erklaerung.changeBigsToByte(myStateContractT);
+			// Erklärung hashen
+			myMD = MessageDigest.getInstance(digestType);
+			myMD.update(myState);
+			byte[] myHash = myMD.digest();
+			BigInteger myHashBig = Erklaerung.changeBytesToBig(myHash);
+			// A Erklärunghash signieren (elGamal)
+			myHashS = Grundlagen.elGamalSign(myHashBig, 
+					myGamalP, myGamalG, myY, myX);
+			// A Erklärung senden
+			Com.sendTo(1, myHashS.toString(RADIX_SEND_));
+			// A Erklärung Partner empfangen
+			partnerHashS = new BigInteger(Com.receive(),RADIX_SEND_);
+		} catch (NoSuchAlgorithmException e) {
+			System.err.println("Fehler bei Hashing.");
+			e.printStackTrace();
+			System.exit(1);
+		}
 			
 		// Alice sendet oblivious die Hälfte der aij
 		sendSecrets(1, ssa);
@@ -376,9 +404,34 @@ public final class Vertrag implements Protocol {
 			}
 		}
 
-		//TODO Alices Erklärung empfangen und prüfen
+		// Erklärung
+		byte[] myState;
+		MessageDigest myMD;
+		BigInteger myHashS;
+		BigInteger partnerHashS;
+		try {
+			// Erklärung zusammenstellen
+			BigInteger[] myStateContractT = Erklaerung.createStateContract(
+					"B", "Alice", vertrag, ssn.intValue(), symbolCount);
+			myState = Erklaerung.changeBigsToByte(myStateContractT);
+			// Erklärung hashen
+			myMD = MessageDigest.getInstance(digestType);
+			myMD.update(myState);
+			byte[] myHash = myMD.digest();
+			BigInteger myHashBig = Erklaerung.changeBytesToBig(myHash);
+			// Erklärunghash signieren (elGamal)
+			myHashS = Grundlagen.elGamalSign(myHashBig, 
+					myGamalP, myGamalG, myY, myX);
+			// Erklärung Partner empfangen
+			partnerHashS = new BigInteger(Com.receive(),RADIX_SEND_);
+			// Erklärung senden
+			Com.sendTo(1, myHashS.toString(RADIX_SEND_));
+		} catch (NoSuchAlgorithmException e) {
+			System.err.println("Fehler bei Hashing.");
+			e.printStackTrace();
+			System.exit(1);
+		}
 		
-		//TODO Erklärung zusammenstellen, hashen, hash signieren (elGamal) und senden
 		
 		// Bob empfängt oblivious die Hälfte der aij
 		BigInteger[][] ssa = receiveSecrets(0, ssn.intValue());
