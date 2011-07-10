@@ -39,7 +39,7 @@ public final class Vertrag implements Protocol {
 
 	static private int MinPlayer = 2;
 	static private int MaxPlayer = 2;
-	static private String NameOfTheGame = "ObliviousTransfer";
+	static private String NameOfTheGame = "Vertrag";
 
 	// ElGamal Eigene
 	private BigInteger myGamalP;
@@ -76,7 +76,7 @@ public final class Vertrag implements Protocol {
 
 		// (SS1) n und k für beide festlegen; k global: ssk; n global: ssn
 		ssn = BigIntegerUtil.randomSmallerThan((new BigInteger("10"))).add(ONE); // 1<=n<11
-		ssk = BigIntegerUtil.randomSmallerThan(new BigInteger("8")); // 0<=k<8
+		ssk = BigIntegerUtil.randomSmallerThan(new BigInteger("5")); // 0<=k<8
 		// (SS1) Berechnung der Berechnungsvorteile
 		setAdvantage(ssk);
 		// (SS1) Bob n und k senden
@@ -119,10 +119,10 @@ public final class Vertrag implements Protocol {
 		}
 		
 		//Für jedes aij berechne cij = myM ^ aij mod myP
-		BigInteger[][] ssc = new BigInteger[ssn.intValue()][2];
-		for (int i = 0; i<ssc.length;i++){
-			ssc[i][0] = myM.modPow(ssa[i][0],myP);
-			ssc[i][1] = myM.modPow(ssa[i][1],myP);
+		BigInteger[][] myC = new BigInteger[ssn.intValue()][2];
+		for (int i = 0; i<myC.length;i++){
+			myC[i][0] = myM.modPow(ssa[i][0],myP);
+			myC[i][1] = myM.modPow(ssa[i][1],myP);
 		}
 		
 		/*//Dieser Betrug ist jetzt sinnlos -> auskommentiert
@@ -133,20 +133,31 @@ public final class Vertrag implements Protocol {
 		
 		//if (DEBUG_SS) {
 			System.out.println("DDD| Generierte Cij:");
-			for (int i = 0; i < ssc.length; i++) {
+			for (int i = 0; i < myC.length; i++) {
 				System.out.print("DDD| \t ");
-				System.out.print(ssc[i][0].toString(RADIX_SEND_));
+				System.out.print(myC[i][0].toString(RADIX_SEND_));
 				System.out.print("\t und ");
-				System.out.print(ssc[i][1].toString(RADIX_SEND_));
+				System.out.print(myC[i][1].toString(RADIX_SEND_));
 				System.out.println();
 			}
 		//}
 			
-		//TODO Alice und Bob senden sich gegenseitig ihre kompletten ssc
-
-		// (SS3) Alice sendet Geheimnisse
+		//Alice und Bob senden sich gegenseitig ihre kompletten ssc
+		BigInteger[][] partnerC = new BigInteger[myC.length][2];
+		for (int i = 0; i<myC.length;i++){
+			Com.sendTo(1,myC[i][0].toString(RADIX_SEND_));
+			partnerC[i][0] = new BigInteger(Com.receive(),RADIX_SEND_);
+			Com.sendTo(1,myC[i][1].toString(RADIX_SEND_));
+			partnerC[i][1] = new BigInteger(Com.receive(),RADIX_SEND_);
+		}
+		
+		//TODO Erklärung zusammenstellen, hashen, hash signieren (elGamal) und senden
+		
+		//TODO Bobs Erklärung empfangen und prüfen
+			
+		// Alice sendet oblivious die Hälfte der aij
 		sendSecrets(1, ssa);
-		// (SS3) Alice empfängt Geheimnisse
+		// Alice empfängt oblivious die Hälfte der bij
 		BigInteger [][] ssb = receiveSecrets(1, ssn.intValue());
 		if (DEBUG_SS) {
 			System.out.println("DDD| (SS3) empfangene Geheimnisse: ");
@@ -162,6 +173,9 @@ public final class Vertrag implements Protocol {
 				System.out.println();
 			} 
 		}
+		//TODO überprüfe, ob die bij die Lösungen der entsprechenden M-Puzzles sind
+		//d.h. gilt partnerC[i][j] = yM ^ ssb[i][j] mod partnerP für die bekannten ssb[i][j]?
+		
 		
 		//Falls Alice cheatet, flipt sie in jedem Paar ein random bit
 		if (BETRUG_){
@@ -217,7 +231,7 @@ public final class Vertrag implements Protocol {
 		}
 		//nun sind nock anzMes nachrichten der Länge ssm übrig, von denen anzMes-1 ausgeschlossen werden müssen
 		sendM = ssm.intValue();
-		anzMes--;;
+		anzMes--;
 		int target = 1;
 		//Sende an Bob Indizes y, die aus den yListen entfernt werden können
 		sendPrefixIndizes(ssa, my_yListen, sendM, anzMes, target);
@@ -230,19 +244,11 @@ public final class Vertrag implements Protocol {
 		//show_yListen(my_yListen);
 		System.out.println("Bobs Geheimnisse sind: ");
 		show_yListen(their_yListen);
+		
+		//TODO überprüfe, ob nun zu jedem M-Puzzle die Lösung vorhanden ist
+		//d.h. gilt partnerC[i][j] = yM ^ ssb[i][j] mod partnerP ?
 	}
-
-	private BigInteger genKey(BigInteger myP) {
-		BigInteger e;
-		boolean isGGT1 = false;
-		do {
-			// e \in setN mit 1<e<phi(p) = p-1 = 2<=e<phi(p)
-			e = BigIntegerUtil.randomBetween(zwei, myP.subtract(zwei), new Random());
-			isGGT1 = (e.gcd(myP.subtract(ONE)).equals(ONE)); // ggT(e,p-1)=1
-		} while (!isGGT1);
-		return e;
-	}
-
+	
 	public void receiveFirst() {
 		String sReceive;
 
@@ -295,27 +301,37 @@ public final class Vertrag implements Protocol {
 		}
 		
 		//Für jedes bij berechne cij = M ^ bij mod myP
-		BigInteger[][] ssc = new BigInteger[ssn.intValue()][2];
-		for (int i = 0; i<ssc.length;i++){
-			ssc[i][0] = partnerM.modPow(ssb[i][0],myP);
-			ssc[i][1] = partnerM.modPow(ssb[i][1],myP);
+		BigInteger[][] myC = new BigInteger[ssn.intValue()][2];
+		for (int i = 0; i<myC.length;i++){
+			myC[i][0] = partnerM.modPow(ssb[i][0],myP);
+			myC[i][1] = partnerM.modPow(ssb[i][1],myP);
 		}
 		
 		//if (DEBUG_SS) {
 			System.out.println("DDD| Generierte Cij:");
-			for (int i = 0; i < ssc.length; i++) {
+			for (int i = 0; i < myC.length; i++) {
 				System.out.print("DDD| \t ");
-				System.out.print(ssc[i][0].toString(RADIX_SEND_));
+				System.out.print(myC[i][0].toString(RADIX_SEND_));
 				System.out.print("\t und ");
-				System.out.print(ssc[i][1].toString(RADIX_SEND_));
+				System.out.print(myC[i][1].toString(RADIX_SEND_));
 				System.out.println();
 			}
 		//}
 			
-		//TODO Alice und Bob senden sich gegenseitig ihre kompletten ssc
-		
+		// Alice und Bob senden sich gegenseitig ihre kompletten ssc
+		BigInteger[][] partnerC = new BigInteger[myC.length][2];
+		for (int i = 0; i<myC.length;i++){
+			partnerC[i][0] = new BigInteger(Com.receive(),RADIX_SEND_);
+			Com.sendTo(1,myC[i][0].toString(RADIX_SEND_));
+			partnerC[i][1] = new BigInteger(Com.receive(),RADIX_SEND_);
+			Com.sendTo(1,myC[i][1].toString(RADIX_SEND_));
+		}
 
-		// (SS3) Bob empfängt Nachrichten
+		//TODO Alices Erklärung empfangen und prüfen
+		
+		//TODO Erklärung zusammenstellen, hashen, hash signieren (elGamal) und senden
+		
+		// Bob empfängt oblivious die Hälfte der aij
 		BigInteger[][] ssa = receiveSecrets(0, ssn.intValue());
 		if (DEBUG_SS) {
 			System.out.println("DDD| (SS3) empfangene Geheimnisse: ");
@@ -331,9 +347,11 @@ public final class Vertrag implements Protocol {
 				System.out.println();
 			} 
 		}
+		//TODO überprüfe, ob die aij die Lösungen der entsprechenden M-Puzzles sind
+		//d.h. gilt partnerC[i][j] = partnerM ^ ssa[i][j] mod partnerP für die bekannten ssa[i][j]?
 		
 		
-		// (SS3) Bob sendet Nachrichten
+		// Bob sendet oblivious die Hälfte der bij
 		sendSecrets(0, ssb);
 		
 		//y-Listen generieren
@@ -444,7 +462,21 @@ public final class Vertrag implements Protocol {
 			
 			System.out.println("Alices Geheimnisse sind: ");
 			show_yListen(their_yListen);
+			
+			//TODO überprüfe, ob nun zu jedem M-Puzzle die Lösung vorhanden ist
+			//d.h. gilt partnerC[i][j] = yM ^ ssb[i][j] mod partnerP ?
 		}
+	}
+
+	private BigInteger genKey(BigInteger myP) {
+		BigInteger e;
+		boolean isGGT1 = false;
+		do {
+			// e \in setN mit 1<e<phi(p) = p-1 = 2<=e<phi(p)
+			e = BigIntegerUtil.randomBetween(zwei, myP.subtract(zwei), new Random());
+			isGGT1 = (e.gcd(myP.subtract(ONE)).equals(ONE)); // ggT(e,p-1)=1
+		} while (!isGGT1);
+		return e;
 	}
 
 	private void show_yListen(BigInteger[][][] my_yListen) {
