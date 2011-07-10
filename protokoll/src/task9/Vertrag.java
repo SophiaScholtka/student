@@ -191,27 +191,11 @@ public final class Vertrag implements Protocol {
 		//Überprüfe, ob die bij die Lösungen der entsprechenden M-Puzzles sind
 		//d.h. gilt partnerC[i][j] = yM ^ ssb[i][j] mod partnerP für die bekannten ssb[i][j]?
 		if(DEBUG_V) System.out.println("Prüfe bisher empfangene Schlüssel: ");
-		boolean keysOk = true;
-		for (int i = 0; i < ssb.length; i++) {
-			if(ssb[i][0] != null){
-				if(!partnerC[i][0].equals(PohligHellmann.encipher(myM,partnerP,ssb[i][0]))){
-					System.err.println("Fehlerhafter Schlüssel!");
-					keysOk = false;
-				} else {
-					if(DEBUG_V) System.out.println("DDD| ssb["+i+"][0]="+ssb[i][0]+" als Key für C["+i+"][0]="+partnerC[i][0].toString(RADIX_SEND_)+" bestätigt.");
-				}
-			}
-			if(ssb[i][1] != null){
-				if(!partnerC[i][1].equals(PohligHellmann.encipher(myM,partnerP,ssb[i][1]))){
-					System.err.println("Fehlerhafter Schlüssel!");
-					keysOk = false;
-				} else {
-					if(DEBUG_V) System.out.println("DDD| ssb["+i+"][1]="+ssb[i][1]+" als Key für C["+i+"][1]="+partnerC[i][1].toString(RADIX_SEND_)+" bestätigt.");
-				}
-			}
-		}
-		//TODO Abbruch falls keysOk = false
-		
+		boolean keysOk = checkPartialPuzzles(partnerP, myM, partnerC, ssb);
+		//Abbruch falls keysOk = false
+		if (!keysOk){
+			System.err.println("Cheater! Abbruch!");
+		} else {
 		//Falls Alice cheatet, flipt sie in jedem Paar ein random bit
 		if (BETRUG_){
 			for (int i = 0; i< ssa.length;i++){
@@ -280,8 +264,12 @@ public final class Vertrag implements Protocol {
 		System.out.println("Bobs Geheimnisse sind: ");
 		show_yListen(their_yListen);
 		
-		//TODO überprüfe, ob nun zu jedem M-Puzzle die Lösung vorhanden ist
+		//Überprüfe, ob nun zu jedem M-Puzzle die Lösung vorhanden ist
 		//d.h. gilt partnerC[i][j] = yM ^ ssb[i][j] mod partnerP ?
+		if(DEBUG_V) System.out.println("Prüfe, ob alle M-Puzzle eine Lösung haben: ");
+		boolean allPuzzles = checkPuzzles(partnerP, myM, partnerC, their_yListen);
+		if(allPuzzles) System.out.println("Alles ok. Verträge sind unterzeichnet.");
+		}
 	}
 	
 	public void receiveFirst() {
@@ -399,27 +387,11 @@ public final class Vertrag implements Protocol {
 		//Überprüfe, ob die aij die Lösungen der entsprechenden M-Puzzles sind
 		//d.h. gilt partnerC[i][j] = partnerM ^ ssa[i][j] mod partnerP für die bekannten ssa[i][j]?
 		if(DEBUG_V) System.out.println("Prüfe bisher empfangene Schlüssel: ");
-		boolean keysOk = true;
-		for (int i = 0; i < ssa.length; i++) {
-			if(ssa[i][0] != null){
-				if(!partnerC[i][0].equals(PohligHellmann.encipher(partnerM,partnerP,ssa[i][0]))){
-					System.err.println("Fehlerhafter Schlüssel!");
-					keysOk = false;
-				} else {
-					if(DEBUG_V) System.out.println("DDD| ssa["+i+"][0]="+ssa[i][0]+" als Key für C["+i+"][0]="+partnerC[i][0].toString(RADIX_SEND_)+" bestätigt.");
-				}
-			}
-			if(ssa[i][1] != null){
-				if(!partnerC[i][1].equals(PohligHellmann.encipher(partnerM,partnerP,ssa[i][1]))){
-					System.err.println("Fehlerhafter Schlüssel!");
-					keysOk = false;
-				} else {
-					if(DEBUG_V) System.out.println("DDD| ssa["+i+"][1]="+ssa[i][1]+" als Key für C["+i+"][1]="+partnerC[i][1].toString(RADIX_SEND_)+" bestätigt.");
-				}
-			}
-		}
-		//TODO Abbruch falls keysOk = false
-		
+		boolean keysOk = checkPartialPuzzles(partnerP, partnerM, partnerC, ssa);
+		// Abbruch falls keysOk = false
+		if (!keysOk){
+			System.err.println("Cheater! Abbruch!");
+		} else {
 		
 		// Bob sendet oblivious die Hälfte der bij
 		sendSecrets(0, ssb);
@@ -460,33 +432,7 @@ public final class Vertrag implements Protocol {
 			}
 			
 			//checken, ob Alice manipuliert
-			for(int i = 0; i<their_yListen.length; i++){
-				//für jedes Paar
-				boolean manipulate = true;
-				BigInteger known = ssa[i][0];
-				if (known == null) known = ssa[i][1];
-				//bilde das entsprechende Präfix von known
-				BigInteger modo = zwei.pow(sendM+1);
-				known = known.mod(modo);
-				for(int j = 0; j<their_yListen[i].length;j++){
-					for(int k =0; k<their_yListen[i][j].length;k++){
-						if(their_yListen[i][j][k] != null){
-							BigInteger temp = their_yListen[i][j][k].mod(modo);
-							if(temp.equals(known)) {
-								manipulate = false;
-								j=their_yListen[i].length;
-								break;
-							}
-						}
-					}
-				}
-				if (manipulate){
-					System.err.println("Alice manipuliert bits!");
-					cheater = true;
-					break;
-				}
-				
-			}
+			cheater = checkBitflipCheat(ssa, their_yListen, sendM, cheater);
 			
 			//System.out.println("Ich habe übrig: ");
 			//show_yListen(my_yListen);
@@ -504,6 +450,88 @@ public final class Vertrag implements Protocol {
 		receivePrefixIndizes(their_yListen,sendM, anzMes);
 		
 		//gucke, ob Alice nicht doch betrogen hat
+		cheater = checkSameCheat(their_yListen, cheater);
+		//nur weitermachen, falls Alice nicht cheatet
+		if(!cheater){		
+			int target = 0;
+			//Sende an Alice Indizes y, die aus den yListen entfernt werden können
+			sendPrefixIndizes(ssb, my_yListen, sendM, anzMes, target);
+			
+			//jetzt sollte noch genau 1 Wort pro yListe übrig sein, mal gucken
+			//System.out.println("Ich habe übrig: ");
+			//show_yListen(my_yListen);
+		
+			
+			System.out.println("Alices Geheimnisse sind: ");
+			show_yListen(their_yListen);
+			
+			//Überprüfe, ob nun zu jedem M-Puzzle die Lösung vorhanden ist
+			//d.h. gilt partnerC[i][j] = yM ^ ssb[i][j] mod partnerP ?
+			if(DEBUG_V) System.out.println("Prüfe, ob alle M-Puzzle eine Lösung haben: ");
+			boolean allPuzzles = checkPuzzles(partnerP, partnerM, partnerC, their_yListen);
+			if(allPuzzles) System.out.println("Alles ok. Verträge sind unterzeichnet.");
+			}
+		}
+	}
+
+	private boolean checkPartialPuzzles(BigInteger partnerP,
+			BigInteger partnerM, BigInteger[][] partnerC, BigInteger[][] ssa) {
+		boolean keysOk = true;
+		for (int i = 0; i < ssa.length; i++) {
+			if(ssa[i][0] != null){
+				if(!partnerC[i][0].equals(PohligHellmann.encipher(partnerM,partnerP,ssa[i][0]))){
+					System.err.println("Fehlerhafter Schlüssel!");
+					keysOk = false;
+				} else {
+					if(DEBUG_V) System.out.println("DDD| ssa["+i+"][0]="+ssa[i][0].toString(RADIX_SEND_)+" als Key für C["+i+"][0]="+partnerC[i][0].toString(RADIX_SEND_)+" bestätigt.");
+				}
+			}
+			if(ssa[i][1] != null){
+				if(!partnerC[i][1].equals(PohligHellmann.encipher(partnerM,partnerP,ssa[i][1]))){
+					System.err.println("Fehlerhafter Schlüssel!");
+					keysOk = false;
+				} else {
+					if(DEBUG_V) System.out.println("DDD| ssa["+i+"][1]="+ssa[i][1].toString(RADIX_SEND_)+" als Key für C["+i+"][1]="+partnerC[i][1].toString(RADIX_SEND_)+" bestätigt.");
+				}
+			}
+		}
+		return keysOk;
+	}
+
+	private boolean checkBitflipCheat(BigInteger[][] ssa,
+			BigInteger[][][] their_yListen, int sendM, boolean cheater) {
+		for(int i = 0; i<their_yListen.length; i++){
+			//für jedes Paar
+			boolean manipulate = true;
+			BigInteger known = ssa[i][0];
+			if (known == null) known = ssa[i][1];
+			//bilde das entsprechende Präfix von known
+			BigInteger modo = zwei.pow(sendM+1);
+			known = known.mod(modo);
+			for(int j = 0; j<their_yListen[i].length;j++){
+				for(int k =0; k<their_yListen[i][j].length;k++){
+					if(their_yListen[i][j][k] != null){
+						BigInteger temp = their_yListen[i][j][k].mod(modo);
+						if(temp.equals(known)) {
+							manipulate = false;
+							j=their_yListen[i].length;
+							break;
+						}
+					}
+				}
+			}
+			if (manipulate){
+				System.err.println("Alice manipuliert bits!");
+				cheater = true;
+				break;
+			}
+			
+		}
+		return cheater;
+	}
+
+	private boolean checkSameCheat(BigInteger[][][] their_yListen,
+			boolean cheater) {
 		for(int i=0; i<their_yListen.length && !cheater; i++){
 			for(int j=0; j<their_yListen[i][0].length && !cheater;j++){
 				for(int k=0; k<their_yListen[i][1].length && !cheater;k++){
@@ -519,23 +547,27 @@ public final class Vertrag implements Protocol {
 				}
 			}
 		}
-		//nur weitermachen, falls Alice nicht cheatet
-		if(!cheater){		
-			int target = 0;
-			//Sende an Alice Indizes y, die aus den yListen entfernt werden können
-			sendPrefixIndizes(ssb, my_yListen, sendM, anzMes, target);
-			
-			//jetzt sollte noch genau 1 Wort pro yListe übrig sein, mal gucken
-			//System.out.println("Ich habe übrig: ");
-			//show_yListen(my_yListen);
-		
-			
-			System.out.println("Alices Geheimnisse sind: ");
-			show_yListen(their_yListen);
-			
-			//TODO überprüfe, ob nun zu jedem M-Puzzle die Lösung vorhanden ist
-			//d.h. gilt partnerC[i][j] = yM ^ ssb[i][j] mod partnerP ?
+		return cheater;
+	}
+
+	private boolean checkPuzzles(BigInteger partnerP, BigInteger partnerM,
+			BigInteger[][] partnerC, BigInteger[][][] their_yListen) {
+		boolean allPuzzles = true;
+		for (int i = 0; i < partnerC.length; i++) {
+			for(int j = 0; j < partnerC[i].length; j++){
+				for(int k = 0; k < their_yListen[i][j].length; k++){
+					if(their_yListen[i][j][k] != null){
+						if(!partnerC[i][j].equals(PohligHellmann.encipher(partnerM,partnerP,their_yListen[i][j][k]))){
+							System.err.println("Fehlerhafter Schlüssel!");
+							allPuzzles = false;
+						} else {
+							if(DEBUG_V) System.out.println("DDD| ssa["+i+"]["+j+"]="+their_yListen[i][j][j].toString(RADIX_SEND_)+" als Key für C["+i+"]["+j+"]="+partnerC[i][j].toString(RADIX_SEND_)+" bestätigt.");
+						}
+					}
+				}
+			}
 		}
+		return allPuzzles;
 	}
 
 	private BigInteger genKey(BigInteger myP) {
@@ -554,7 +586,7 @@ public final class Vertrag implements Protocol {
 			for(int j=0;j<my_yListen[i].length;j++){
 				for(int k=0;k<my_yListen[i][j].length;k++){
 					if(my_yListen[i][j][k] != null){
-						System.out.println("yListen["+i+"]["+j+"]["+k+"] = "+my_yListen[i][j][k].toString(RADIX_SEND_));
+						System.out.println("Geheimnis["+i+"]["+j+"] = "+my_yListen[i][j][k].toString(RADIX_SEND_));
 					}
 				}
 			}
