@@ -121,8 +121,8 @@ public final class Vertrag implements Protocol {
 		//Für jedes aij berechne cij = myM ^ aij mod myP
 		BigInteger[][] myC = new BigInteger[ssn.intValue()][2];
 		for (int i = 0; i<myC.length;i++){
-			myC[i][0] = myM.modPow(ssa[i][0],myP);
-			myC[i][1] = myM.modPow(ssa[i][1],myP);
+			myC[i][0] = PohligHellmann.encipher(myM,myP,ssa[i][0]);
+			myC[i][1] = PohligHellmann.encipher(myM,myP,ssa[i][1]);
 		}
 		
 		/*//Dieser Betrug ist jetzt sinnlos -> auskommentiert
@@ -303,8 +303,8 @@ public final class Vertrag implements Protocol {
 		//Für jedes bij berechne cij = M ^ bij mod myP
 		BigInteger[][] myC = new BigInteger[ssn.intValue()][2];
 		for (int i = 0; i<myC.length;i++){
-			myC[i][0] = partnerM.modPow(ssb[i][0],myP);
-			myC[i][1] = partnerM.modPow(ssb[i][1],myP);
+			myC[i][0] = PohligHellmann.encipher(partnerM,myP,ssb[i][0]);
+			myC[i][1] = PohligHellmann.encipher(partnerM,myP,ssb[i][1]);
 		}
 		
 		//if (DEBUG_SS) {
