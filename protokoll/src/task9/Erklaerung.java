@@ -122,7 +122,6 @@ public class Erklaerung {
 			for (int i1 = 0; i1 < s.length(); i1++) {
 				sBig = sBig + s.charAt(i1);
 				if (sBig.length() == mod) {
-					System.out.println("neue Zahl: " + sBig);
 					BigInteger big = new BigInteger(sBig, 2);
 					bytes.add(big.byteValue());
 					sBig = "";
