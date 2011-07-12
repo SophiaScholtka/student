@@ -748,7 +748,7 @@ public final class Vertrag implements Protocol {
 										+ "]["
 										+ j
 										+ "]="
-										+ their_yListen[i][j][j]
+										+ their_yListen[i][j][k]
 												.toString(RADIX_SEND_)
 										+ " als Key für C[" + i + "][" + j
 										+ "]="
