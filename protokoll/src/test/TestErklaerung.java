@@ -3,6 +3,7 @@ package test;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import task9.Erklaerung;
 import chiffre.Grundlagen;
@@ -13,11 +14,12 @@ public class TestErklaerung {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		System.err.println("Test für die Zerlegung von BigInteger zu Byte");
 		BigInteger[] bigs = new BigInteger[1];
 		bigs[0] = new BigInteger("0110000010",2);
 		System.out.println("bigs to byte");
 		System.out.println(bigs[0].toString(2));
-		byte[] bytes = Erklaerung.changeBigsToByte(bigs);
+		byte[] bytes = Erklaerung.changeToBytes(bigs);
 		System.out.println(Arrays.toString(bytes));
 		
 		for (int i = 0; i < bytes.length; i++) {
@@ -25,42 +27,64 @@ public class TestErklaerung {
 		}
 		
 		
+		// TEST: Erklärung+Vertrag=Gesamt
 		System.out.println();System.out.println();
+		System.err.println("Test Erkärung+Vertrag");
+		// Parametervariablen
 		int amount = 1;
 		int n = 4;
 		String path = "../protokoll/vertrag.txt";
 		
-		BigInteger[] v = Grundlagen.readFile(path, amount);
-		String agreement = Erklaerung.generateStatement("A", "Bob", n);
-		System.out.println(agreement);
+		// Lese Erklärung
+		String statementS;
+		BigInteger[] statementBigs;
+		ArrayList<BigInteger> statementList;
+		statementS = Erklaerung.generateStatement("A", "Bob", n);
+		statementBigs = Erklaerung.changeToBigs(statementS, amount);
+		statementList = Erklaerung.changeToList(statementBigs);
+		String testS = Erklaerung.changeToString(statementBigs);
+		
+		// Lese Vertrag
+		String vertragS;
+		BigInteger[] vertragBigs;
+		ArrayList<BigInteger> vertragList;
+		vertragBigs = Grundlagen.readFile(path, amount);
+		vertragList = Erklaerung.changeToList(vertragBigs);
+		vertragS = Erklaerung.changeToString(vertragBigs);
+		
+		// Kombiniere
+		String combinedS;
+		BigInteger[] combinedBigs;
+		ArrayList<BigInteger> combinedList;
+		combinedBigs = Erklaerung.createStateContract(statementBigs, vertragBigs);
+		combinedList = Erklaerung.changeToList(combinedBigs);
+		combinedS = Erklaerung.changeToString(combinedBigs);
+
+		// Ausgaben
+		System.out.println(">>> Stringausgaben");
+		System.out.println("Erkärung (Text):");
+		System.out.println(statementS);
+		System.out.println("Vertrag (Text):");
+		System.out.println(vertragS);
+		System.out.println("Gesamt (Text):");
+		System.out.println(combinedS);
+		
 		System.out.println();
+		System.out.println(">>> Längenüberprüfung:");
+		System.out.println("Vertragslänge:  " + vertragBigs.length);
+		System.out.println("Agreementlänge: " + statementBigs.length);
 		
-		ArrayList<BigInteger> list = Erklaerung.changeStringToList(agreement, amount);
-		System.out.println("Vertragslänge:  " + v.length);
-		System.out.println("Agreementlänge: " + list.size());
-		
-		BigInteger[] contract = Erklaerung.createStateContract("A", "Bob", v,n,amount);
-		System.out.println("Gesamtlänge: " + contract.length);
-		System.out.println("Vertrag+Agreement = gesamt ist " + (v.length + list.size() == contract.length));
+		System.out.println("Gesamtlänge:    " + combinedBigs.length);
+		System.out.println("Vertrag+Agreement = kombiniert ist " + (vertragBigs.length + statementBigs.length == combinedBigs.length));
 		
 		System.out.println();
-		ArrayList<BigInteger> contractList = new ArrayList<BigInteger>();
-		for (int i = 0; i < contract.length; i++) {
-			contractList.add(contract[i]);
-		}
-		System.out.println("größe der Liste: " + contractList.size());
-		System.out.println("contractList:");
-		System.out.println(contractList);
-		
-		System.out.println();
-		BigInteger[] contract2 = Grundlagen.readFile(path, amount);
-		ArrayList<BigInteger> contractList2 = new ArrayList<BigInteger>();
-		for (int i = 0; i < contract2.length; i++) {
-			contractList2.add(contract2[i]);
-		}
-		System.out.println("größe der Liste2: " + contractList2.size());
-		System.out.println("contractList2:");
-		System.out.println(contractList2);
+		System.out.println(">>> Inhalte der BigInteger");
+		System.out.println("Erklärung: " + statementList.size());
+		System.out.println(statementList);
+		System.out.println("Vertrag: " + vertragList.size());
+		System.out.println(vertragList);
+		System.out.println("Gesamten Erklärung: " + combinedList.size());
+		System.out.println(combinedList);
 	}
 
 }

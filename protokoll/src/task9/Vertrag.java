@@ -21,12 +21,13 @@ public final class Vertrag implements Protocol {
 	private final boolean DEBUG_SS = true; // DEBUG für Task8 Elemente
 	private final boolean DEBUG_V = true; // DEBUG für Task9 Elemente
 	private final boolean TEST = true; // für Testwerte
-	
-	//hier true setzen, wenn Alice beim secretsharing betrügen soll, d.h. Bits manipulieren
-	private final boolean BETRUG_ = false;
-	//hier true setzen, wenn Alice beim oblivious cheaten soll d.h. 2 gleiche Geheimnisse
-	private boolean betrug_ = false; 
 
+	// hier true setzen, wenn Alice beim secretsharing betrügen soll, d.h. Bits
+	// manipulieren
+	private final boolean BETRUG_ = false;
+	// hier true setzen, wenn Alice beim oblivious cheaten soll d.h. 2 gleiche
+	// Geheimnisse
+	private boolean betrug_ = false;
 
 	private static final int RADIX_SEND_ = 36;
 	private static final int SCHLEIFE_ = 0;
@@ -59,12 +60,14 @@ public final class Vertrag implements Protocol {
 													// bits
 	private BigInteger ssChanceA; // Berechnungsvorteil A:B
 	private BigInteger ssChanceB; // Berechnungsvorteil A:B
-	
+
 	// Task9 Konstanten
 	private final int symbolCount = 1;
 	private final String digestType = "SHA";
+	private String path = "../protokoll/vertrag.txt";
 
 	private Communicator Com;
+
 	public void setCommunicator(Communicator com) {
 		Com = com;
 	}
@@ -90,54 +93,57 @@ public final class Vertrag implements Protocol {
 			System.out.println("DDD| \t n = " + ssn.toString(RADIX_SEND_));
 			System.out.println("DDD| \t k = " + ssk.toString(RADIX_SEND_));
 		}
-		
-		// Vertragstext-Datei einlesen
-//		int symbolCount = 2; // Anzahl der einzulesenden Zeichen
-		String path = "../protokoll/vertrag.txt"; // Pfad zu Vertrag
-		BigInteger[] vertrag = Grundlagen.readFile(path, symbolCount);
-		// p_A  Primzahl < 2^52 und M << p_A zufällig bestimmen
+
+		// p_A Primzahl < 2^52 und M << p_A zufällig bestimmen
 		BigInteger myP = PohligHellmann.generatePrime(51); // Primzahl < 2^52
-		//M << p_a jetzt als M <= p_a/16 umgesetzt
-		BigInteger myM = BigIntegerUtil.randomBetween(ZERO, myP.divide(zwei.pow(4)));
+		// M << p_a jetzt als M <= p_a/16 umgesetzt
+		BigInteger myM = BigIntegerUtil.randomBetween(ZERO,
+				myP.divide(zwei.pow(4)));
 		// p_A und M an Bob senden
-		Com.sendTo(1,myP.toString(RADIX_SEND_));
-		Com.sendTo(1,myM.toString(RADIX_SEND_));
-		if (DEBUG_V) System.out.println("DDD| myP = "+myP.toString(RADIX_SEND_));
-		if (DEBUG_V) System.out.println("DDD| myM = "+myM.toString(RADIX_SEND_));
-		
+		Com.sendTo(1, myP.toString(RADIX_SEND_));
+		Com.sendTo(1, myM.toString(RADIX_SEND_));
+		if (DEBUG_V)
+			System.out.println("DDD| myP = " + myP.toString(RADIX_SEND_));
+		if (DEBUG_V)
+			System.out.println("DDD| myM = " + myM.toString(RADIX_SEND_));
+
 		// p_B von Bob empfangen
-		BigInteger partnerP = new BigInteger(Com.receive(),RADIX_SEND_);
-		if (DEBUG_V) System.out.println("DDD| partnerP = "+partnerP.toString(RADIX_SEND_));
-		
+		BigInteger partnerP = new BigInteger(Com.receive(), RADIX_SEND_);
+		if (DEBUG_V)
+			System.out.println("DDD| partnerP = "
+					+ partnerP.toString(RADIX_SEND_));
+
 		// (SS2) aij mit i=1,...,n und j=1,2 erzeugen
 		// so dass ggT(aij,myP-1)=1 ist, d.h. die aij können als
 		// PohligHellmann Schlüssel verwendet werden
-		BigInteger[][] ssa = new BigInteger[ssn.intValue()][2]; 
-		for (int i = 0; i< ssa.length;i++){
+		BigInteger[][] ssa = new BigInteger[ssn.intValue()][2];
+		for (int i = 0; i < ssa.length; i++) {
 			boolean isold = false;
-			do{
+			do {
 				ssa[i][0] = genKey(myP);
 				ssa[i][1] = genKey(myP);
-				for(int j=0; j<i; j++){
-					if(ssa[i][0].equals(ssa[j][0])) isold = true;
-					if(ssa[i][1].equals(ssa[j][1])) isold = true;
+				for (int j = 0; j < i; j++) {
+					if (ssa[i][0].equals(ssa[j][0]))
+						isold = true;
+					if (ssa[i][1].equals(ssa[j][1]))
+						isold = true;
 				}
 			} while (isold);
 		}
-		
-		//Für jedes aij berechne cij = myM ^ aij mod myP
+
+		// Für jedes aij berechne cij = myM ^ aij mod myP
 		BigInteger[][] myC = new BigInteger[ssn.intValue()][2];
-		for (int i = 0; i<myC.length;i++){
-			myC[i][0] = PohligHellmann.encipher(myM,myP,ssa[i][0]);
-			myC[i][1] = PohligHellmann.encipher(myM,myP,ssa[i][1]);
+		for (int i = 0; i < myC.length; i++) {
+			myC[i][0] = PohligHellmann.encipher(myM, myP, ssa[i][0]);
+			myC[i][1] = PohligHellmann.encipher(myM, myP, ssa[i][1]);
 		}
-		
-		/*//Dieser Betrug ist jetzt sinnlos -> auskommentiert
-		if(betrug_){
-			int randpair = ((int)(Math.random()*ssn.intValue()))%ssn.intValue();
-			ssc[randpair][1] = ssc[randpair][0];
-		}*/
-		
+
+		/*
+		 * //Dieser Betrug ist jetzt sinnlos -> auskommentiert if(betrug_){ int
+		 * randpair = ((int)(Math.random()*ssn.intValue()))%ssn.intValue();
+		 * ssc[randpair][1] = ssc[randpair][0]; }
+		 */
+
 		if (DEBUG_SS) {
 			System.out.println("DDD| Generierte aij:");
 			for (int i = 0; i < ssa.length; i++) {
@@ -148,16 +154,16 @@ public final class Vertrag implements Protocol {
 				System.out.println();
 			}
 		}
-			
-		//Alice und Bob senden sich gegenseitig ihre kompletten ssc
+
+		// Alice und Bob senden sich gegenseitig ihre kompletten ssc
 		BigInteger[][] partnerC = new BigInteger[myC.length][2];
-		for (int i = 0; i<myC.length;i++){
-			Com.sendTo(1,myC[i][0].toString(RADIX_SEND_));
-			partnerC[i][0] = new BigInteger(Com.receive(),RADIX_SEND_);
-			Com.sendTo(1,myC[i][1].toString(RADIX_SEND_));
-			partnerC[i][1] = new BigInteger(Com.receive(),RADIX_SEND_);
+		for (int i = 0; i < myC.length; i++) {
+			Com.sendTo(1, myC[i][0].toString(RADIX_SEND_));
+			partnerC[i][0] = new BigInteger(Com.receive(), RADIX_SEND_);
+			Com.sendTo(1, myC[i][1].toString(RADIX_SEND_));
+			partnerC[i][1] = new BigInteger(Com.receive(), RADIX_SEND_);
 		}
-		
+
 		if (DEBUG_SS) {
 			System.out.println("DDD| Empfangene Cij:");
 			for (int i = 0; i < myC.length; i++) {
@@ -168,138 +174,160 @@ public final class Vertrag implements Protocol {
 				System.out.println();
 			}
 		}
-		
-		// Alice
+
 		// Erklärung
-		byte[] myState;
-		MessageDigest myMD;
-		BigInteger myHashS;
-		BigInteger partnerHashS;
-		try {
-			// Erklärung zusammenstellen
-			BigInteger[] myStateContractT = Erklaerung.createStateContract(
-					"A", "Bob", vertrag, ssn.intValue(), symbolCount);
-			myState = Erklaerung.changeBigsToByte(myStateContractT);
-			// Erklärung hashen
-			myMD = MessageDigest.getInstance(digestType);
-			myMD.update(myState);
-			byte[] myHash = myMD.digest();
-			BigInteger myHashBig = Erklaerung.changeBytesToBig(myHash);
-			// A Erklärunghash signieren (elGamal)
-			myHashS = Grundlagen.elGamalSign(myHashBig, 
-					myGamalP, myGamalG, myY, myX);
+		// HERE A Erklärung
+		BigInteger myHashBig; // eigener Hash
+		BigInteger myHashS; // eigener Hash signiert
+		BigInteger partnerHashBig; // Partner Hash
+		BigInteger partnerHashS; // Partner Hash signiert
+		BigInteger[] statement; // Erklärung
+		BigInteger[] vertrag; // Vertrag
+		BigInteger[] contract; // Erklärung+Vertrag
+		{
+			BigInteger[][] agreementBigs = makeAgreement("", "", path,
+					symbolCount);
+			myHashBig = agreementBigs[0][0]; // BigInteger vom Hash
+			myHashS = agreementBigs[1][0]; // BigInteger von Signatur
+			statement = agreementBigs[2]; // BigInteger[] Erklärung
+			vertrag = agreementBigs[3]; // BigInteger[] Vertrag
+			contract = agreementBigs[4]; // BigInteger[] Erklärung+Vertrag
 			// A Erklärung senden
+			Com.sendTo(1, myHashBig.toString(RADIX_SEND_));
 			Com.sendTo(1, myHashS.toString(RADIX_SEND_));
 			// A Erklärung Partner empfangen
-			partnerHashS = new BigInteger(Com.receive(),RADIX_SEND_);
-		} catch (NoSuchAlgorithmException e) {
-			System.err.println("Fehler bei Hashing.");
-			e.printStackTrace();
-			System.exit(1);
+			partnerHashBig = new BigInteger(Com.receive(), RADIX_SEND_);
+			partnerHashS = new BigInteger(Com.receive(), RADIX_SEND_);
+
+			// Erklärung prüfe Hash
+			boolean isHashOK = checkHash(partnerHashBig, partnerHashS);
+			if (!isHashOK) {
+				System.err.println("Abbruch, da Hash vom Partner ungültig!");
+				System.exit(1);
+			}
 		}
-			
+
 		// Alice sendet oblivious die Hälfte der aij
 		sendSecrets(1, ssa);
 		// Alice empfängt oblivious die Hälfte der bij
-		BigInteger [][] ssb = receiveSecrets(1, ssn.intValue());
+		BigInteger[][] ssb = receiveSecrets(1, ssn.intValue());
 		if (DEBUG_SS) {
 			System.out.println("DDD| (SS3) empfangene Geheimnisse: ");
 			for (int i = 0; i < ssa.length; i++) {
 				System.out.print("DDD| \t ");
-				if(ssb[i][0] != null){
-				System.out.print(ssb[i][0].toString(RADIX_SEND_));
-				} else{System.out.print("null");}
+				if (ssb[i][0] != null) {
+					System.out.print(ssb[i][0].toString(RADIX_SEND_));
+				} else {
+					System.out.print("null");
+				}
 				System.out.print("\t und ");
-				if(ssb[i][1] != null){
-				System.out.print(ssb[i][1].toString(RADIX_SEND_));
-				} else{System.out.print("null");}
+				if (ssb[i][1] != null) {
+					System.out.print(ssb[i][1].toString(RADIX_SEND_));
+				} else {
+					System.out.print("null");
+				}
 				System.out.println();
-			} 
+			}
 		}
-		//Überprüfe, ob die bij die Lösungen der entsprechenden M-Puzzles sind
-		//d.h. gilt partnerC[i][j] = yM ^ ssb[i][j] mod partnerP für die bekannten ssb[i][j]?
-		if(DEBUG_V) System.out.println("Prüfe bisher empfangene Schlüssel: ");
+		// Überprüfe, ob die bij die Lösungen der entsprechenden M-Puzzles sind
+		// d.h. gilt partnerC[i][j] = yM ^ ssb[i][j] mod partnerP für die
+		// bekannten ssb[i][j]?
+		if (DEBUG_V)
+			System.out.println("Prüfe bisher empfangene Schlüssel: ");
 		boolean keysOk = checkPartialPuzzles(partnerP, myM, partnerC, ssb);
-		//Abbruch falls keysOk = false
-		if (!keysOk){
+		// Abbruch falls keysOk = false
+		if (!keysOk) {
 			System.err.println("Cheater! Abbruch!");
 		} else {
-		//Falls Alice cheatet, flipt sie in jedem Paar ein random bit
-		if (BETRUG_){
-			for (int i = 0; i< ssa.length;i++){
-				int randindex = ((int)(Math.random()*100))%2;
-				int randbit = ((int)(Math.random()*ssm.intValue()))%ssm.intValue();
-				ssa[i][randindex] = ssa[i][randindex].flipBit(randbit);
+			// Falls Alice cheatet, flipt sie in jedem Paar ein random bit
+			if (BETRUG_) {
+				for (int i = 0; i < ssa.length; i++) {
+					int randindex = ((int) (Math.random() * 100)) % 2;
+					int randbit = ((int) (Math.random() * ssm.intValue()))
+							% ssm.intValue();
+					ssa[i][randindex] = ssa[i][randindex].flipBit(randbit);
+				}
 			}
-		}
-		
 
-		//y-Listen generieren
-		BigInteger anzY = zwei.pow(ssk.intValue()+1);
-		BigInteger [][][] my_yListen = new BigInteger[ssn.intValue()][2][anzY.intValue()];
-		BigInteger [][][] their_yListen = new BigInteger[ssn.intValue()][2][anzY.intValue()];
-		fillyListen(my_yListen);
-		fillyListen(their_yListen);
-		
-		// (SS3) Tausche y aus
-		// Solange weniger als m bits gesendet
-		int sendM = ssk.intValue()+1; // Anzahl der im ersten Schrit versendeten
-									// Bits
-		int whileEnde = ssm.intValue();
-		if ((SCHLEIFE_ > 0) && ((sendM + SCHLEIFE_) < whileEnde))
-			whileEnde = sendM + SCHLEIFE_;
-		
-		// es werden 2^{k} verschiedene y ausgetauscht
-		int anzMes = (zwei.pow(ssk.intValue())).intValue(); 
-		
-		while (sendM <= whileEnde) {
-			int target = 1;
-			//Sende an Bob Indizes y, die aus den yListen entfernt werden können
-			sendPrefixIndizes(ssa, my_yListen, sendM, anzMes, target);
-			
-			//Empfange von Bob Indizes y die aus den yListen entfernt werden können
-			receivePrefixIndizes(their_yListen,sendM, anzMes);
-			
-			if(sendM != whileEnde){//im letzten Durchlauf nix mehr anhängen
-				//my_yListen aufräumen und mit 0 und 1 ergänzen
-				clean_yListen(my_yListen, sendM, anzMes);
-				
-				//their_yListen aufräumen und mit 0 und 1 ergänzen
-				clean_yListen(their_yListen, sendM, anzMes);	
+			// y-Listen generieren
+			BigInteger anzY = zwei.pow(ssk.intValue() + 1);
+			BigInteger[][][] my_yListen = new BigInteger[ssn.intValue()][2][anzY
+					.intValue()];
+			BigInteger[][][] their_yListen = new BigInteger[ssn.intValue()][2][anzY
+					.intValue()];
+			fillyListen(my_yListen);
+			fillyListen(their_yListen);
+
+			// (SS3) Tausche y aus
+			// Solange weniger als m bits gesendet
+			int sendM = ssk.intValue() + 1; // Anzahl der im ersten Schrit
+											// versendeten
+											// Bits
+			int whileEnde = ssm.intValue();
+			if ((SCHLEIFE_ > 0) && ((sendM + SCHLEIFE_) < whileEnde))
+				whileEnde = sendM + SCHLEIFE_;
+
+			// es werden 2^{k} verschiedene y ausgetauscht
+			int anzMes = (zwei.pow(ssk.intValue())).intValue();
+
+			while (sendM <= whileEnde) {
+				int target = 1;
+				// Sende an Bob Indizes y, die aus den yListen entfernt werden
+				// können
+				sendPrefixIndizes(ssa, my_yListen, sendM, anzMes, target);
+
+				// Empfange von Bob Indizes y die aus den yListen entfernt
+				// werden können
+				receivePrefixIndizes(their_yListen, sendM, anzMes);
+
+				if (sendM != whileEnde) {// im letzten Durchlauf nix mehr
+											// anhängen
+					// my_yListen aufräumen und mit 0 und 1 ergänzen
+					clean_yListen(my_yListen, sendM, anzMes);
+
+					// their_yListen aufräumen und mit 0 und 1 ergänzen
+					clean_yListen(their_yListen, sendM, anzMes);
+				}
+
+				// System.out.println("Ich habe übrig: ");
+				// show_yListen(my_yListen);
+				// System.out.println("In Bobs Geheimnissen ist übrig: ");
+				// show_yListen(their_yListen);
+
+				// Nächste Runde
+				sendM = sendM + 1;
 			}
-			
-			//System.out.println("Ich habe übrig: ");
-			//show_yListen(my_yListen);
-			//System.out.println("In Bobs Geheimnissen ist übrig: ");
-			//show_yListen(their_yListen);
-		
-			// Nächste Runde
-			sendM = sendM + 1;
-		}
-		//nun sind nock anzMes nachrichten der Länge ssm übrig, von denen anzMes-1 ausgeschlossen werden müssen
-		sendM = ssm.intValue();
-		anzMes--;
-		int target = 1;
-		//Sende an Bob Indizes y, die aus den yListen entfernt werden können
-		sendPrefixIndizes(ssa, my_yListen, sendM, anzMes, target);
-		
-		//Empfange von Bob Indizes y die aus den yListen entfernt werden können
-		receivePrefixIndizes(their_yListen,sendM, anzMes);
-		
-		//Jetzt sollte noch genau 1 Wort pro Liste übrig sein, mal gucken
-		//System.out.println("Ich habe übrig: ");
-		//show_yListen(my_yListen);
-		System.out.println("Bobs Geheimnisse sind: ");
-		show_yListen(their_yListen);
-		
-		//Überprüfe, ob nun zu jedem M-Puzzle die Lösung vorhanden ist
-		//d.h. gilt partnerC[i][j] = yM ^ ssb[i][j] mod partnerP ?
-		if(DEBUG_V) System.out.println("Prüfe, ob alle M-Puzzle eine Lösung haben: ");
-		boolean allPuzzles = checkPuzzles(partnerP, myM, partnerC, their_yListen);
-		if(allPuzzles) System.out.println("Alles ok. Verträge sind unterzeichnet.");
+			// nun sind nock anzMes nachrichten der Länge ssm übrig, von denen
+			// anzMes-1 ausgeschlossen werden müssen
+			sendM = ssm.intValue();
+			anzMes--;
+			int target = 1;
+			// Sende an Bob Indizes y, die aus den yListen entfernt werden
+			// können
+			sendPrefixIndizes(ssa, my_yListen, sendM, anzMes, target);
+
+			// Empfange von Bob Indizes y die aus den yListen entfernt werden
+			// können
+			receivePrefixIndizes(their_yListen, sendM, anzMes);
+
+			// Jetzt sollte noch genau 1 Wort pro Liste übrig sein, mal gucken
+			// System.out.println("Ich habe übrig: ");
+			// show_yListen(my_yListen);
+			System.out.println("Bobs Geheimnisse sind: ");
+			show_yListen(their_yListen);
+
+			// Überprüfe, ob nun zu jedem M-Puzzle die Lösung vorhanden ist
+			// d.h. gilt partnerC[i][j] = yM ^ ssb[i][j] mod partnerP ?
+			if (DEBUG_V)
+				System.out
+						.println("Prüfe, ob alle M-Puzzle eine Lösung haben: ");
+			boolean allPuzzles = checkPuzzles(partnerP, myM, partnerC,
+					their_yListen);
+			if (allPuzzles)
+				System.out.println("Alles ok. Verträge sind unterzeichnet.");
 		}
 	}
-	
+
 	public void receiveFirst() {
 		String sReceive;
 
@@ -322,65 +350,68 @@ public final class Vertrag implements Protocol {
 			System.out.println("DDD| \t k = " + ssk.toString(RADIX_SEND_));
 		}
 
-		// Vertragstext-Datei einlesen
-		int symbolCount = 2; // Anzahl der einzulesenden Zeichen
-		String path = "../protokoll/vertrag.txt"; // Pfad zu Vertrag
-		BigInteger[] vertrag = Grundlagen.readFile(path, symbolCount);
 		// p_A und M_A von Alice empfangen
-		BigInteger partnerP = new BigInteger(Com.receive(),RADIX_SEND_);
-		BigInteger partnerM = new BigInteger(Com.receive(),RADIX_SEND_);
-		if (DEBUG_V) System.out.println("DDD| parterP = "+partnerP.toString(RADIX_SEND_));
-		if (DEBUG_V) System.out.println("DDD| parterM = "+partnerM.toString(RADIX_SEND_));
+		BigInteger partnerP = new BigInteger(Com.receive(), RADIX_SEND_);
+		BigInteger partnerM = new BigInteger(Com.receive(), RADIX_SEND_);
+		if (DEBUG_V)
+			System.out.println("DDD| parterP = "
+					+ partnerP.toString(RADIX_SEND_));
+		if (DEBUG_V)
+			System.out.println("DDD| parterM = "
+					+ partnerM.toString(RADIX_SEND_));
 		// p_B Primzahl zufällig bestimmen, mit M << p_B < 2^52
 		BigInteger myP = PohligHellmann.generatePrime(51); // Primzahl < 2^52
 		// es gilt automatisch M << partnerP, da M höchstens 48 bit hat
 		// p_B an Alice senden
-		Com.sendTo(0,myP.toString(RADIX_SEND_));
-		if (DEBUG_V) System.out.println("DDD| myP = "+myP.toString(RADIX_SEND_));
-		
+		Com.sendTo(0, myP.toString(RADIX_SEND_));
+		if (DEBUG_V)
+			System.out.println("DDD| myP = " + myP.toString(RADIX_SEND_));
+
 		// (SS2) bij mit i=1,...,n und j=1,2 erzeugen
 		// so dass ggT(bij,myP-1)=1 ist, d.h. die bij können als
 		// PohligHellmann Schlüssel verwendet werden
-		BigInteger[][] ssb = new BigInteger[ssn.intValue()][2]; 
-		for (int i = 0; i< ssb.length;i++){
+		BigInteger[][] ssb = new BigInteger[ssn.intValue()][2];
+		for (int i = 0; i < ssb.length; i++) {
 			boolean isold = false;
-			do{
+			do {
 				ssb[i][0] = genKey(myP);
 				ssb[i][1] = genKey(myP);
-				for(int j=0; j<i; j++){
-					if(ssb[i][0].equals(ssb[j][0])) isold = true;
-					if(ssb[i][1].equals(ssb[j][1])) isold = true;
+				for (int j = 0; j < i; j++) {
+					if (ssb[i][0].equals(ssb[j][0]))
+						isold = true;
+					if (ssb[i][1].equals(ssb[j][1]))
+						isold = true;
 				}
 			} while (isold);
 		}
-		
-		//Für jedes bij berechne cij = M ^ bij mod myP
+
+		// Für jedes bij berechne cij = M ^ bij mod myP
 		BigInteger[][] myC = new BigInteger[ssn.intValue()][2];
-		for (int i = 0; i<myC.length;i++){
-			myC[i][0] = PohligHellmann.encipher(partnerM,myP,ssb[i][0]);
-			myC[i][1] = PohligHellmann.encipher(partnerM,myP,ssb[i][1]);
+		for (int i = 0; i < myC.length; i++) {
+			myC[i][0] = PohligHellmann.encipher(partnerM, myP, ssb[i][0]);
+			myC[i][1] = PohligHellmann.encipher(partnerM, myP, ssb[i][1]);
 		}
-		
-		//if (DEBUG_SS) {
-			System.out.println("DDD| Generierte bij:");
-			for (int i = 0; i < ssb.length; i++) {
-				System.out.print("DDD| \t ");
-				System.out.print(ssb[i][0].toString(RADIX_SEND_));
-				System.out.print("\t und ");
-				System.out.print(ssb[i][1].toString(RADIX_SEND_));
-				System.out.println();
-			}
-		//}
-			
+
+		// if (DEBUG_SS) {
+		System.out.println("DDD| Generierte bij:");
+		for (int i = 0; i < ssb.length; i++) {
+			System.out.print("DDD| \t ");
+			System.out.print(ssb[i][0].toString(RADIX_SEND_));
+			System.out.print("\t und ");
+			System.out.print(ssb[i][1].toString(RADIX_SEND_));
+			System.out.println();
+		}
+		// }
+
 		// Alice und Bob senden sich gegenseitig ihre kompletten ssc
 		BigInteger[][] partnerC = new BigInteger[myC.length][2];
-		for (int i = 0; i<myC.length;i++){
-			partnerC[i][0] = new BigInteger(Com.receive(),RADIX_SEND_);
-			Com.sendTo(0,myC[i][0].toString(RADIX_SEND_));
-			partnerC[i][1] = new BigInteger(Com.receive(),RADIX_SEND_);
-			Com.sendTo(0,myC[i][1].toString(RADIX_SEND_));
+		for (int i = 0; i < myC.length; i++) {
+			partnerC[i][0] = new BigInteger(Com.receive(), RADIX_SEND_);
+			Com.sendTo(0, myC[i][0].toString(RADIX_SEND_));
+			partnerC[i][1] = new BigInteger(Com.receive(), RADIX_SEND_);
+			Com.sendTo(0, myC[i][1].toString(RADIX_SEND_));
 		}
-		
+
 		if (DEBUG_SS) {
 			System.out.println("DDD| Empfangene Cij:");
 			for (int i = 0; i < myC.length; i++) {
@@ -393,136 +424,160 @@ public final class Vertrag implements Protocol {
 		}
 
 		// Erklärung
-		byte[] myState;
-		MessageDigest myMD;
+		// HERE B Erklärung
+		BigInteger myHashBig;
 		BigInteger myHashS;
+		BigInteger partnerHashBig;
 		BigInteger partnerHashS;
-		try {
-			// Erklärung zusammenstellen
-			BigInteger[] myStateContractT = Erklaerung.createStateContract(
-					"B", "Alice", vertrag, ssn.intValue(), symbolCount);
-			myState = Erklaerung.changeBigsToByte(myStateContractT);
-			// Erklärung hashen
-			myMD = MessageDigest.getInstance(digestType);
-			myMD.update(myState);
-			byte[] myHash = myMD.digest();
-			BigInteger myHashBig = Erklaerung.changeBytesToBig(myHash);
-			// Erklärunghash signieren (elGamal)
-			myHashS = Grundlagen.elGamalSign(myHashBig, 
-					myGamalP, myGamalG, myY, myX);
-			// Erklärung Partner empfangen
-			partnerHashS = new BigInteger(Com.receive(),RADIX_SEND_);
-			// Erklärung senden
+		BigInteger[] statement; // BigInteger[] Erklärung
+		BigInteger[] vertrag; // BigInteger[] Vertrag
+		BigInteger[] contract; // BigInteger[] Erklärung+Vertrag
+		{
+			BigInteger[][] agreementBigs = makeAgreement("", "", path,
+					symbolCount);
+			myHashBig = agreementBigs[0][0]; // BigInteger vom Hash
+			myHashS = agreementBigs[1][0]; // BigInteger von Signatur
+			statement = agreementBigs[2]; // BigInteger[] Erklärung
+			vertrag = agreementBigs[3]; // BigInteger[] Vertrag
+			contract = agreementBigs[4]; // BigInteger[] Erklärung+Vertrag
+			// B Erklärung Partner empfangen
+			partnerHashBig = new BigInteger(Com.receive(), RADIX_SEND_);
+			partnerHashS = new BigInteger(Com.receive(), RADIX_SEND_);
+			// B Erklärung senden
+			Com.sendTo(1, myHashBig.toString(RADIX_SEND_));
 			Com.sendTo(1, myHashS.toString(RADIX_SEND_));
-		} catch (NoSuchAlgorithmException e) {
-			System.err.println("Fehler bei Hashing.");
-			e.printStackTrace();
-			System.exit(1);
+
+			// Erklärung prüfe Hash
+			boolean isHashOK = checkHash(partnerHashBig, partnerHashS);
+			if (!isHashOK) {
+				System.err.println("Abbruch, da Hash vom Partner ungültig!");
+				System.exit(1);
+			}
 		}
-		
-		
+
 		// Bob empfängt oblivious die Hälfte der aij
 		BigInteger[][] ssa = receiveSecrets(0, ssn.intValue());
 		if (DEBUG_SS) {
 			System.out.println("DDD| (SS3) empfangene Geheimnisse: ");
 			for (int i = 0; i < ssa.length; i++) {
 				System.out.print("DDD| \t ");
-				if(ssa[i][0] != null){
-				System.out.print(ssa[i][0].toString(RADIX_SEND_));
-				} else{System.out.print("null");}
+				if (ssa[i][0] != null) {
+					System.out.print(ssa[i][0].toString(RADIX_SEND_));
+				} else {
+					System.out.print("null");
+				}
 				System.out.print("\t und ");
-				if(ssa[i][1] != null){
-				System.out.print(ssa[i][1].toString(RADIX_SEND_));
-				} else{System.out.print("null");}
+				if (ssa[i][1] != null) {
+					System.out.print(ssa[i][1].toString(RADIX_SEND_));
+				} else {
+					System.out.print("null");
+				}
 				System.out.println();
-			} 
+			}
 		}
-		//Überprüfe, ob die aij die Lösungen der entsprechenden M-Puzzles sind
-		//d.h. gilt partnerC[i][j] = partnerM ^ ssa[i][j] mod partnerP für die bekannten ssa[i][j]?
-		if(DEBUG_V) System.out.println("Prüfe bisher empfangene Schlüssel: ");
+		// Überprüfe, ob die aij die Lösungen der entsprechenden M-Puzzles sind
+		// d.h. gilt partnerC[i][j] = partnerM ^ ssa[i][j] mod partnerP für die
+		// bekannten ssa[i][j]?
+		if (DEBUG_V)
+			System.out.println("Prüfe bisher empfangene Schlüssel: ");
 		boolean keysOk = checkPartialPuzzles(partnerP, partnerM, partnerC, ssa);
 		// Abbruch falls keysOk = false
-		if (!keysOk){
+		if (!keysOk) {
 			System.err.println("Cheater! Abbruch!");
 		} else {
-		
-		// Bob sendet oblivious die Hälfte der bij
-		sendSecrets(0, ssb);
-		
-		//y-Listen generieren
-		BigInteger anzY = zwei.pow(ssk.intValue()+1);
-		BigInteger [][][] my_yListen = new BigInteger[ssn.intValue()][2][anzY.intValue()];
-		BigInteger [][][] their_yListen = new BigInteger[ssn.intValue()][2][anzY.intValue()];
-		fillyListen(my_yListen);
-		fillyListen(their_yListen);
 
-		// (SS3) Tausche y aus
-		// Solange weniger als m bits gesendet
-		int sendM = ssk.intValue()+1; // Anzahl der im ersten Schrit versendeten
-									// Bits
-		int whileEnde = ssm.intValue();
-		if ((SCHLEIFE_ > 0) && ((sendM + SCHLEIFE_) < whileEnde))
-			whileEnde = sendM + SCHLEIFE_;
-		
-		// es werden 2^{k} verschiedene y ausgetauscht
-		int anzMes = (zwei.pow(ssk.intValue())).intValue(); 
-		boolean cheater = false;
-		while (sendM <= whileEnde  && !cheater) {
-			
-			//Empfange von Alice Indizes y die aus den yListen entfernt werden können
-			receivePrefixIndizes(their_yListen,sendM, anzMes);
-			
-			int target = 0;
-			//Sende an Alice Indizes y, die aus den yListen entfernt werden können
-			sendPrefixIndizes(ssb, my_yListen, sendM, anzMes, target);
-			
-			if(sendM != whileEnde){//im letzten Durchlauf nix mehr anhängen
-				//my_yListen aufräumen und mit 0 und 1 ergänzen
-				clean_yListen(my_yListen, sendM, anzMes);
-				
-				//their_yListen aufräumen und mit 0 und 1 ergänzen
-				clean_yListen(their_yListen, sendM, anzMes);	
+			// Bob sendet oblivious die Hälfte der bij
+			sendSecrets(0, ssb);
+
+			// y-Listen generieren
+			BigInteger anzY = zwei.pow(ssk.intValue() + 1);
+			BigInteger[][][] my_yListen = new BigInteger[ssn.intValue()][2][anzY
+					.intValue()];
+			BigInteger[][][] their_yListen = new BigInteger[ssn.intValue()][2][anzY
+					.intValue()];
+			fillyListen(my_yListen);
+			fillyListen(their_yListen);
+
+			// (SS3) Tausche y aus
+			// Solange weniger als m bits gesendet
+			int sendM = ssk.intValue() + 1; // Anzahl der im ersten Schrit
+											// versendeten
+											// Bits
+			int whileEnde = ssm.intValue();
+			if ((SCHLEIFE_ > 0) && ((sendM + SCHLEIFE_) < whileEnde))
+				whileEnde = sendM + SCHLEIFE_;
+
+			// es werden 2^{k} verschiedene y ausgetauscht
+			int anzMes = (zwei.pow(ssk.intValue())).intValue();
+			boolean cheater = false;
+			while (sendM <= whileEnde && !cheater) {
+
+				// Empfange von Alice Indizes y die aus den yListen entfernt
+				// werden können
+				receivePrefixIndizes(their_yListen, sendM, anzMes);
+
+				int target = 0;
+				// Sende an Alice Indizes y, die aus den yListen entfernt werden
+				// können
+				sendPrefixIndizes(ssb, my_yListen, sendM, anzMes, target);
+
+				if (sendM != whileEnde) {// im letzten Durchlauf nix mehr
+											// anhängen
+					// my_yListen aufräumen und mit 0 und 1 ergänzen
+					clean_yListen(my_yListen, sendM, anzMes);
+
+					// their_yListen aufräumen und mit 0 und 1 ergänzen
+					clean_yListen(their_yListen, sendM, anzMes);
+				}
+
+				// checken, ob Alice manipuliert
+				cheater = checkBitflipCheat(ssa, their_yListen, sendM, cheater);
+
+				// System.out.println("Ich habe übrig: ");
+				// show_yListen(my_yListen);
+				// System.out.println("In Alices Geheimnissen ist übrig: ");
+				// show_yListen(their_yListen);
+
+				// Nächste Runde
+				sendM = sendM + 1;
 			}
-			
-			//checken, ob Alice manipuliert
-			cheater = checkBitflipCheat(ssa, their_yListen, sendM, cheater);
-			
-			//System.out.println("Ich habe übrig: ");
-			//show_yListen(my_yListen);
-			//System.out.println("In Alices Geheimnissen ist übrig: ");
-			//show_yListen(their_yListen);
-		
-			// Nächste Runde
-			sendM = sendM + 1;
-		}
-		
-		//nun sind nock anzMes nachrichten der Länge ssm übrig, von denen anzMes-1 ausgeschlossen werden müssen
-		sendM = ssm.intValue();
-		anzMes--;;
-		//Empfange von Alice Indizes y die aus den yListen entfernt werden können
-		receivePrefixIndizes(their_yListen,sendM, anzMes);
-		
-		//gucke, ob Alice nicht doch betrogen hat
-		cheater = checkSameCheat(their_yListen, cheater);
-		//nur weitermachen, falls Alice nicht cheatet
-		if(!cheater){		
-			int target = 0;
-			//Sende an Alice Indizes y, die aus den yListen entfernt werden können
-			sendPrefixIndizes(ssb, my_yListen, sendM, anzMes, target);
-			
-			//jetzt sollte noch genau 1 Wort pro yListe übrig sein, mal gucken
-			//System.out.println("Ich habe übrig: ");
-			//show_yListen(my_yListen);
-		
-			
-			System.out.println("Alices Geheimnisse sind: ");
-			show_yListen(their_yListen);
-			
-			//Überprüfe, ob nun zu jedem M-Puzzle die Lösung vorhanden ist
-			//d.h. gilt partnerC[i][j] = yM ^ ssb[i][j] mod partnerP ?
-			if(DEBUG_V) System.out.println("Prüfe, ob alle M-Puzzle eine Lösung haben: ");
-			boolean allPuzzles = checkPuzzles(partnerP, partnerM, partnerC, their_yListen);
-			if(allPuzzles) System.out.println("Alles ok. Verträge sind unterzeichnet.");
+
+			// nun sind nock anzMes nachrichten der Länge ssm übrig, von denen
+			// anzMes-1 ausgeschlossen werden müssen
+			sendM = ssm.intValue();
+			anzMes--;
+			;
+			// Empfange von Alice Indizes y die aus den yListen entfernt werden
+			// können
+			receivePrefixIndizes(their_yListen, sendM, anzMes);
+
+			// gucke, ob Alice nicht doch betrogen hat
+			cheater = checkSameCheat(their_yListen, cheater);
+			// nur weitermachen, falls Alice nicht cheatet
+			if (!cheater) {
+				int target = 0;
+				// Sende an Alice Indizes y, die aus den yListen entfernt werden
+				// können
+				sendPrefixIndizes(ssb, my_yListen, sendM, anzMes, target);
+
+				// jetzt sollte noch genau 1 Wort pro yListe übrig sein, mal
+				// gucken
+				// System.out.println("Ich habe übrig: ");
+				// show_yListen(my_yListen);
+
+				System.out.println("Alices Geheimnisse sind: ");
+				show_yListen(their_yListen);
+
+				// Überprüfe, ob nun zu jedem M-Puzzle die Lösung vorhanden ist
+				// d.h. gilt partnerC[i][j] = yM ^ ssb[i][j] mod partnerP ?
+				if (DEBUG_V)
+					System.out
+							.println("Prüfe, ob alle M-Puzzle eine Lösung haben: ");
+				boolean allPuzzles = checkPuzzles(partnerP, partnerM, partnerC,
+						their_yListen);
+				if (allPuzzles)
+					System.out
+							.println("Alles ok. Verträge sind unterzeichnet.");
 			}
 		}
 	}
@@ -531,20 +586,32 @@ public final class Vertrag implements Protocol {
 			BigInteger partnerM, BigInteger[][] partnerC, BigInteger[][] ssa) {
 		boolean keysOk = true;
 		for (int i = 0; i < ssa.length; i++) {
-			if(ssa[i][0] != null){
-				if(!partnerC[i][0].equals(PohligHellmann.encipher(partnerM,partnerP,ssa[i][0]))){
+			if (ssa[i][0] != null) {
+				if (!partnerC[i][0].equals(PohligHellmann.encipher(partnerM,
+						partnerP, ssa[i][0]))) {
 					System.err.println("Fehlerhafter Schlüssel!");
 					keysOk = false;
 				} else {
-					if(DEBUG_V) System.out.println("DDD| ssa["+i+"][0]="+ssa[i][0].toString(RADIX_SEND_)+" als Key für C["+i+"][0]="+partnerC[i][0].toString(RADIX_SEND_)+" bestätigt.");
+					if (DEBUG_V)
+						System.out.println("DDD| ssa[" + i + "][0]="
+								+ ssa[i][0].toString(RADIX_SEND_)
+								+ " als Key für C[" + i + "][0]="
+								+ partnerC[i][0].toString(RADIX_SEND_)
+								+ " bestätigt.");
 				}
 			}
-			if(ssa[i][1] != null){
-				if(!partnerC[i][1].equals(PohligHellmann.encipher(partnerM,partnerP,ssa[i][1]))){
+			if (ssa[i][1] != null) {
+				if (!partnerC[i][1].equals(PohligHellmann.encipher(partnerM,
+						partnerP, ssa[i][1]))) {
 					System.err.println("Fehlerhafter Schlüssel!");
 					keysOk = false;
 				} else {
-					if(DEBUG_V) System.out.println("DDD| ssa["+i+"][1]="+ssa[i][1].toString(RADIX_SEND_)+" als Key für C["+i+"][1]="+partnerC[i][1].toString(RADIX_SEND_)+" bestätigt.");
+					if (DEBUG_V)
+						System.out.println("DDD| ssa[" + i + "][1]="
+								+ ssa[i][1].toString(RADIX_SEND_)
+								+ " als Key für C[" + i + "][1]="
+								+ partnerC[i][1].toString(RADIX_SEND_)
+								+ " bestätigt.");
 				}
 			}
 		}
@@ -553,45 +620,48 @@ public final class Vertrag implements Protocol {
 
 	private boolean checkBitflipCheat(BigInteger[][] ssa,
 			BigInteger[][][] their_yListen, int sendM, boolean cheater) {
-		for(int i = 0; i<their_yListen.length; i++){
-			//für jedes Paar
+		for (int i = 0; i < their_yListen.length; i++) {
+			// für jedes Paar
 			boolean manipulate = true;
 			BigInteger known = ssa[i][0];
-			if (known == null) known = ssa[i][1];
-			//bilde das entsprechende Präfix von known
-			BigInteger modo = zwei.pow(sendM+1);
+			if (known == null)
+				known = ssa[i][1];
+			// bilde das entsprechende Präfix von known
+			BigInteger modo = zwei.pow(sendM + 1);
 			known = known.mod(modo);
-			for(int j = 0; j<their_yListen[i].length;j++){
-				for(int k =0; k<their_yListen[i][j].length;k++){
-					if(their_yListen[i][j][k] != null){
+			for (int j = 0; j < their_yListen[i].length; j++) {
+				for (int k = 0; k < their_yListen[i][j].length; k++) {
+					if (their_yListen[i][j][k] != null) {
 						BigInteger temp = their_yListen[i][j][k].mod(modo);
-						if(temp.equals(known)) {
+						if (temp.equals(known)) {
 							manipulate = false;
-							j=their_yListen[i].length;
+							j = their_yListen[i].length;
 							break;
 						}
 					}
 				}
 			}
-			if (manipulate){
+			if (manipulate) {
 				System.err.println("Alice manipuliert bits!");
 				cheater = true;
 				break;
 			}
-			
+
 		}
 		return cheater;
 	}
 
 	private boolean checkSameCheat(BigInteger[][][] their_yListen,
 			boolean cheater) {
-		for(int i=0; i<their_yListen.length && !cheater; i++){
-			for(int j=0; j<their_yListen[i][0].length && !cheater;j++){
-				for(int k=0; k<their_yListen[i][1].length && !cheater;k++){
-					if(their_yListen[i][0][j] != null){
-						if(their_yListen[i][1][k] != null){
-							if(their_yListen[i][0][j].equals(their_yListen[i][1][k])){
-								System.err.println("Alice hat zwei gleiche Geheimnisse eingegeben. Betrug!");
+		for (int i = 0; i < their_yListen.length && !cheater; i++) {
+			for (int j = 0; j < their_yListen[i][0].length && !cheater; j++) {
+				for (int k = 0; k < their_yListen[i][1].length && !cheater; k++) {
+					if (their_yListen[i][0][j] != null) {
+						if (their_yListen[i][1][k] != null) {
+							if (their_yListen[i][0][j]
+									.equals(their_yListen[i][1][k])) {
+								System.err
+										.println("Alice hat zwei gleiche Geheimnisse eingegeben. Betrug!");
 								cheater = true;
 								break;
 							}
@@ -607,14 +677,26 @@ public final class Vertrag implements Protocol {
 			BigInteger[][] partnerC, BigInteger[][][] their_yListen) {
 		boolean allPuzzles = true;
 		for (int i = 0; i < partnerC.length; i++) {
-			for(int j = 0; j < partnerC[i].length; j++){
-				for(int k = 0; k < their_yListen[i][j].length; k++){
-					if(their_yListen[i][j][k] != null){
-						if(!partnerC[i][j].equals(PohligHellmann.encipher(partnerM,partnerP,their_yListen[i][j][k]))){
+			for (int j = 0; j < partnerC[i].length; j++) {
+				for (int k = 0; k < their_yListen[i][j].length; k++) {
+					if (their_yListen[i][j][k] != null) {
+						if (!partnerC[i][j].equals(PohligHellmann.encipher(
+								partnerM, partnerP, their_yListen[i][j][k]))) {
 							System.err.println("Fehlerhafter Schlüssel!");
 							allPuzzles = false;
 						} else {
-							if(DEBUG_V) System.out.println("DDD| ssa["+i+"]["+j+"]="+their_yListen[i][j][j].toString(RADIX_SEND_)+" als Key für C["+i+"]["+j+"]="+partnerC[i][j].toString(RADIX_SEND_)+" bestätigt.");
+							if (DEBUG_V)
+								System.out.println("DDD| ssa["
+										+ i
+										+ "]["
+										+ j
+										+ "]="
+										+ their_yListen[i][j][j]
+												.toString(RADIX_SEND_)
+										+ " als Key für C[" + i + "][" + j
+										+ "]="
+										+ partnerC[i][j].toString(RADIX_SEND_)
+										+ " bestätigt.");
 						}
 					}
 				}
@@ -628,18 +710,20 @@ public final class Vertrag implements Protocol {
 		boolean isGGT1 = false;
 		do {
 			// e \in setN mit 1<e<phi(p) = p-1 = 2<=e<phi(p)
-			e = BigIntegerUtil.randomBetween(zwei, myP.subtract(zwei), new Random());
+			e = BigIntegerUtil.randomBetween(zwei, myP.subtract(zwei),
+					new Random());
 			isGGT1 = (e.gcd(myP.subtract(ONE)).equals(ONE)); // ggT(e,p-1)=1
 		} while (!isGGT1);
 		return e;
 	}
 
 	private void show_yListen(BigInteger[][][] my_yListen) {
-		for(int i=0;i<my_yListen.length;i++){
-			for(int j=0;j<my_yListen[i].length;j++){
-				for(int k=0;k<my_yListen[i][j].length;k++){
-					if(my_yListen[i][j][k] != null){
-						System.out.println("Geheimnis["+i+"]["+j+"] = "+my_yListen[i][j][k].toString(RADIX_SEND_));
+		for (int i = 0; i < my_yListen.length; i++) {
+			for (int j = 0; j < my_yListen[i].length; j++) {
+				for (int k = 0; k < my_yListen[i][j].length; k++) {
+					if (my_yListen[i][j][k] != null) {
+						System.out.println("Geheimnis[" + i + "][" + j + "] = "
+								+ my_yListen[i][j][k].toString(RADIX_SEND_));
 					}
 				}
 			}
@@ -648,28 +732,30 @@ public final class Vertrag implements Protocol {
 
 	private void sendPrefixIndizes(BigInteger[][] ssa,
 			BigInteger[][][] my_yListen, int sendM, int anzMes, int target) {
-		//System.err.println(">>>entered sendPrefixIndizes");
-		//für jedes Geheimnispaar
-		for (int i = 0; i < my_yListen.length; i++){
-			for (int j = 0; j < my_yListen[i].length;j++){
+		// System.err.println(">>>entered sendPrefixIndizes");
+		// für jedes Geheimnispaar
+		for (int i = 0; i < my_yListen.length; i++) {
+			for (int j = 0; j < my_yListen[i].length; j++) {
 				int tobesent = anzMes;
-				//anzMes mal ein y senden und dann null setzen
-				while (tobesent > 0){
-					//Index y auswürfeln
-					int y = (int)(Math.random()*(my_yListen[i][j].length));
-					if (y >= my_yListen[i][j].length) y =0;
-					//check ob da überhaupt noch was drin steht
-					if (my_yListen[i][j][y] != null){
-						//check ob es kein Präfix ist
+				// anzMes mal ein y senden und dann null setzen
+				while (tobesent > 0) {
+					// Index y auswürfeln
+					int y = (int) (Math.random() * (my_yListen[i][j].length));
+					if (y >= my_yListen[i][j].length)
+						y = 0;
+					// check ob da überhaupt noch was drin steht
+					if (my_yListen[i][j][y] != null) {
+						// check ob es kein Präfix ist
 						BigInteger modo = zwei.pow(sendM);
 						BigInteger prae = ssa[i][j].mod(modo);
-						if(!prae.equals(my_yListen[i][j][y])){
-							//im Erfolgsfall schicke Index y und lösche den Eintrag
-							Com.sendTo(target, ""+y);
+						if (!prae.equals(my_yListen[i][j][y])) {
+							// im Erfolgsfall schicke Index y und lösche den
+							// Eintrag
+							Com.sendTo(target, "" + y);
 							tobesent--;
 							my_yListen[i][j][y] = null;
 						}
-					}								
+					}
 				}
 			}
 		}
@@ -677,17 +763,17 @@ public final class Vertrag implements Protocol {
 
 	private void receivePrefixIndizes(BigInteger[][][] their_yListen,
 			int sendM, int anzMes) {
-		//System.err.println(">>>entered receivePrefixIndizes");
-		//für jedes Geheimnispaar
-		for (int i = 0; i < their_yListen.length; i++){
-			for (int j = 0; j < their_yListen[i].length;j++){
+		// System.err.println(">>>entered receivePrefixIndizes");
+		// für jedes Geheimnispaar
+		for (int i = 0; i < their_yListen.length; i++) {
+			for (int j = 0; j < their_yListen[i].length; j++) {
 				int tobesent = anzMes;
-				//anzMes mal ein y senden und dann null setzen
-				while (tobesent > 0){
-					//Index y empfangen
+				// anzMes mal ein y senden und dann null setzen
+				while (tobesent > 0) {
+					// Index y empfangen
 					String sy = Com.receive();
 					BigInteger y = new BigInteger(sy, 10);
-					//Eintrag bei Index y löschen
+					// Eintrag bei Index y löschen
 					their_yListen[i][j][y.intValue()] = null;
 					tobesent--;
 				}
@@ -698,31 +784,33 @@ public final class Vertrag implements Protocol {
 	private void clean_yListen(BigInteger[][][] my_yListen, int sendM,
 			int anzMes) {
 		BigInteger modo = zwei.pow(sendM);
-		for (int i = 0; i < my_yListen.length; i++){
-			for (int j = 0; j < my_yListen[i].length;j++){
-				//es sind noch anzMes Einträge != null, die werden nach vorn verschoben (und implizit 0 angehängt)
+		for (int i = 0; i < my_yListen.length; i++) {
+			for (int j = 0; j < my_yListen[i].length; j++) {
+				// es sind noch anzMes Einträge != null, die werden nach vorn
+				// verschoben (und implizit 0 angehängt)
 				int index = 0;
 				int lauf = 0;
-				while (index < anzMes){
-					if(my_yListen[i][j][lauf] != null){
+				while (index < anzMes) {
+					if (my_yListen[i][j][lauf] != null) {
 						my_yListen[i][j][index] = my_yListen[i][j][lauf];
 						index++;
 					}
 					lauf++;
 				}
-				//danach alle Einträge noch mal kopieren aber 1 anhängen
-				for (int k = anzMes; k < my_yListen[i][j].length; k++){
-					my_yListen[i][j][k] = my_yListen[i][j][k-anzMes].add(modo);
+				// danach alle Einträge noch mal kopieren aber 1 anhängen
+				for (int k = anzMes; k < my_yListen[i][j].length; k++) {
+					my_yListen[i][j][k] = my_yListen[i][j][k - anzMes]
+							.add(modo);
 				}
 			}
 		}
 	}
 
 	private void fillyListen(BigInteger[][][] my_yListen) {
-		for (int i = 0; i < my_yListen.length; i++){
-			for (int j = 0; j < my_yListen[i].length; j++){
-				for (int k = 0; k < my_yListen[i][j].length; k++){
-					my_yListen[i][j][k] = new BigInteger(""+k, 10);
+		for (int i = 0; i < my_yListen.length; i++) {
+			for (int j = 0; j < my_yListen[i].length; j++) {
+				for (int k = 0; k < my_yListen[i][j].length; k++) {
+					my_yListen[i][j][k] = new BigInteger("" + k, 10);
 				}
 			}
 		}
@@ -906,8 +994,10 @@ public final class Vertrag implements Protocol {
 		if (DEBUG_OB) {
 			System.out.println("DDD| (3)d-f Berechnete Werte");
 			System.out.println("DDD| \t s = " + sbig);
-			System.out.println("DDD| \t send0 = " + send0.toString(RADIX_SEND_));
-			System.out.println("DDD| \t send1 = " + send1.toString(RADIX_SEND_));
+			System.out
+					.println("DDD| \t send0 = " + send0.toString(RADIX_SEND_));
+			System.out
+					.println("DDD| \t send1 = " + send1.toString(RADIX_SEND_));
 		}
 
 		// (4) nichts tun
@@ -968,8 +1058,10 @@ public final class Vertrag implements Protocol {
 		BigInteger s = new BigInteger(sReceive, RADIX_SEND_);
 		if (DEBUG_OB) {
 			System.out.println("DDD| (3)d Bob hat empfangen");
-			System.out.println("DDD| \t rec0 (send0) = " + rec0.toString(RADIX_SEND_));
-			System.out.println("DDD| \t rec1 (send1) = " + rec1.toString(RADIX_SEND_));
+			System.out.println("DDD| \t rec0 (send0) = "
+					+ rec0.toString(RADIX_SEND_));
+			System.out.println("DDD| \t rec1 (send1) = "
+					+ rec1.toString(RADIX_SEND_));
 			System.out.println("DDD| \t s = " + s.toString(RADIX_SEND_));
 		}
 
@@ -1091,7 +1183,7 @@ public final class Vertrag implements Protocol {
 		BigInteger[][] ssa = new BigInteger[n][2];
 		for (int i = 0; i < n; i++) {
 			BigInteger[] rec = receiveAndCheckOblivious(target);
-			if(rec == null){
+			if (rec == null) {
 				System.err.println("Alice betrügt!");
 				return null;
 			}
@@ -1101,5 +1193,71 @@ public final class Vertrag implements Protocol {
 		return ssa;
 	}
 
-	
+	/**
+	 * 
+	 * @param myName
+	 * @param partnerName
+	 * @param path
+	 * @param symbolCount
+	 * @return Doppel-Array, der beinhaltet: [0][0] = eigenen Hash [1][0] =
+	 *         eigenen Hash Signiert [2] = Erklärung als BigInteger[] [3] =
+	 *         Vertrag als BigInteger[] [4] = Erklärung+Vertrag als BigInteger[]
+	 */
+	private BigInteger[][] makeAgreement(String myName, String partnerName,
+			String path, int symbolCount) {
+		int loc_n = ssn.intValue();
+		// Vertragstext-Datei einlesen
+		BigInteger[] vertragBigs;
+		vertragBigs = Grundlagen.readFile(path, symbolCount);
+		// Erkärung generieren
+		String stateS;
+		stateS = Erklaerung.generateStatement(myName, partnerName, loc_n);
+		BigInteger[] stateBigs = Erklaerung.changeToBigs(stateS, symbolCount);
+
+		// Erklärung (Erkärung+Vertrag) zusammenstellen
+		BigInteger[] combinedBigs = Erklaerung.createStateContract(stateBigs,
+				vertragBigs);
+
+		try {
+			// Erklärung hashen
+			MessageDigest myMD;
+			myMD = MessageDigest.getInstance(digestType);
+			byte[] myStateBytes = Erklaerung.changeToBytes(combinedBigs);
+			myMD.update(myStateBytes);
+			byte[] myHash = myMD.digest();
+			BigInteger myHashBig = Erklaerung.changeToBig(myHash);
+			// Erklärunghash signieren (elGamal)
+			BigInteger myHashS = Grundlagen.elGamalSign(myHashBig, myGamalP,
+					myGamalG, myY, myX);
+
+			// Return
+			BigInteger[][] back = new BigInteger[5][1];
+			back[0][0] = myHashBig;
+			back[1][0] = myHashS;
+			back[2] = stateBigs;
+			back[3] = vertragBigs;
+			back[4] = combinedBigs;
+
+			return back;
+		} catch (NoSuchAlgorithmException e) {
+			String errS = "Algorithmus " + digestType;
+			errS = errS + " für das Hashen wurde nicht gefunden!";
+			System.err.println(errS);
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param partnerHashBig
+	 * @param partnerHashS
+	 */
+	private boolean checkHash(BigInteger partnerHashBig, BigInteger partnerHashS) {
+		boolean ok;
+		ok = Grundlagen.elGamalVerify(partnerHashBig, partnerHashS,
+				partnerGamalP, partnerGamalG, partnerY);
+
+		return ok;
+	}
 }
