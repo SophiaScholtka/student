@@ -177,28 +177,55 @@ public final class Vertrag implements Protocol {
 
 		// Erklärung
 		// HERE A Erklärung
-		BigInteger myHashBig; // eigener Hash
-		BigInteger myHashS; // eigener Hash signiert
-		BigInteger partnerHashBig; // Partner Hash
-		BigInteger partnerHashS; // Partner Hash signiert
 		BigInteger[] statement; // Erklärung
 		BigInteger[] vertrag; // Vertrag
 		BigInteger[] contract; // Erklärung+Vertrag
+		BigInteger[] partnerStatement; // Erklärung des Partners
 		{
-			BigInteger[][] agreementBigs = makeAgreement("", "", path,
+			BigInteger myHashBig; // eigener Hash
+			BigInteger myHashS; // eigener Hash signiert
+			BigInteger partnerHashBig; // Partner Hash
+			BigInteger partnerHashS; // Partner Hash signiert
+			
+			BigInteger[][] agreementBigs = makeAgreement("A", "Bob", path,
 					symbolCount);
-			myHashBig = agreementBigs[0][0]; // BigInteger vom Hash
-			myHashS = agreementBigs[1][0]; // BigInteger von Signatur
-			statement = agreementBigs[2]; // BigInteger[] Erklärung
-			vertrag = agreementBigs[3]; // BigInteger[] Vertrag
-			contract = agreementBigs[4]; // BigInteger[] Erklärung+Vertrag
+			myHashBig = agreementBigs[0][0];
+			myHashS = agreementBigs[1][0];
+			statement = agreementBigs[2];
+			vertrag = agreementBigs[3];
+			contract = agreementBigs[4];
 			// A Erklärung senden
+			Com.sendTo(1, Erklaerung.changeToString(statement));
 			Com.sendTo(1, myHashBig.toString(RADIX_SEND_));
 			Com.sendTo(1, myHashS.toString(RADIX_SEND_));
 			// A Erklärung Partner empfangen
+			partnerStatement = Erklaerung.changeToBigs(Com.receive(),symbolCount);
 			partnerHashBig = new BigInteger(Com.receive(), RADIX_SEND_);
 			partnerHashS = new BigInteger(Com.receive(), RADIX_SEND_);
 
+			if(DEBUG_V) {
+				String dState, dVertrag, dComplete;
+				dState = Erklaerung.changeToString(statement);
+				dVertrag = Erklaerung.changeToString(vertrag);
+				dComplete = Erklaerung.changeToString(contract);
+				System.out.println("DDD| Eigener Gesamtvertrag:");
+				System.out.println("DDD| \t Erklärung:     " + dState);
+				System.out.println("DDD| \t Vertrag:       " + dVertrag);
+				System.out.println("DDD| \t Gesamtvertrag: " + dComplete);
+				
+				String pState, pVertrag, pComplete;
+				pState = Erklaerung.changeToString(partnerStatement);
+				pVertrag = Erklaerung.changeToString(vertrag);
+				BigInteger[] partnerComplete = Erklaerung.createStateContract(partnerStatement, vertrag);
+				pComplete = Erklaerung.changeToString(partnerComplete);
+				boolean hashOk = checkHash(partnerHashBig, partnerHashS);
+				System.out.println("DDD| Partner Gesamtvertrag:");
+				System.out.println("DDD| \t Erklärung:     " + pState);
+				System.out.println("DDD| \t Vertrag:       " + pVertrag);
+				System.out.println("DDD| \t Gesamtvertrag: " + pComplete);
+				System.out.println("DDD| \t Hash verify:   " + hashOk);
+			}
+			
 			// Erklärung prüfe Hash
 			boolean isHashOK = checkHash(partnerHashBig, partnerHashS);
 			if (!isHashOK) {
@@ -425,28 +452,55 @@ public final class Vertrag implements Protocol {
 
 		// Erklärung
 		// HERE B Erklärung
-		BigInteger myHashBig;
-		BigInteger myHashS;
-		BigInteger partnerHashBig;
-		BigInteger partnerHashS;
-		BigInteger[] statement; // BigInteger[] Erklärung
-		BigInteger[] vertrag; // BigInteger[] Vertrag
-		BigInteger[] contract; // BigInteger[] Erklärung+Vertrag
+		BigInteger[] statement; // Erklärung
+		BigInteger[] vertrag; // Vertrag
+		BigInteger[] contract; // Erklärung+Vertrag
+		BigInteger[] partnerStatement; // Erklärung des Partners
 		{
-			BigInteger[][] agreementBigs = makeAgreement("", "", path,
+			BigInteger myHashBig; // eigener Hash
+			BigInteger myHashS; // eigener Hash signiert
+			BigInteger partnerHashBig; // Partner Hash
+			BigInteger partnerHashS; // Partner Hash signiert
+			
+			BigInteger[][] agreementBigs = makeAgreement("B", "Alice", path,
 					symbolCount);
-			myHashBig = agreementBigs[0][0]; // BigInteger vom Hash
-			myHashS = agreementBigs[1][0]; // BigInteger von Signatur
-			statement = agreementBigs[2]; // BigInteger[] Erklärung
-			vertrag = agreementBigs[3]; // BigInteger[] Vertrag
-			contract = agreementBigs[4]; // BigInteger[] Erklärung+Vertrag
+			myHashBig = agreementBigs[0][0];
+			myHashS = agreementBigs[1][0];
+			statement = agreementBigs[2];
+			vertrag = agreementBigs[3];
+			contract = agreementBigs[4];
 			// B Erklärung Partner empfangen
+			partnerStatement = Erklaerung.changeToBigs(Com.receive(),symbolCount);
 			partnerHashBig = new BigInteger(Com.receive(), RADIX_SEND_);
 			partnerHashS = new BigInteger(Com.receive(), RADIX_SEND_);
 			// B Erklärung senden
+			Com.sendTo(1, Erklaerung.changeToString(statement));
 			Com.sendTo(1, myHashBig.toString(RADIX_SEND_));
 			Com.sendTo(1, myHashS.toString(RADIX_SEND_));
 
+			if(DEBUG_V) {
+				String dState, dVertrag, dComplete;
+				dState = Erklaerung.changeToString(statement);
+				dVertrag = Erklaerung.changeToString(vertrag);
+				dComplete = Erklaerung.changeToString(contract);
+				System.out.println("DDD| Eigener Gesamtvertrag:");
+				System.out.println("DDD| \t Erklärung:     " + dState);
+				System.out.println("DDD| \t Vertrag:       " + dVertrag);
+				System.out.println("DDD| \t Gesamtvertrag: " + dComplete);
+				
+				String pState, pVertrag, pComplete;
+				pState = Erklaerung.changeToString(partnerStatement);
+				pVertrag = Erklaerung.changeToString(vertrag);
+				BigInteger[] partnerComplete = Erklaerung.createStateContract(partnerStatement, vertrag);
+				pComplete = Erklaerung.changeToString(partnerComplete);
+				boolean hashOk = checkHash(partnerHashBig, partnerHashS);
+				System.out.println("DDD| Partner Gesamtvertrag:");
+				System.out.println("DDD| \t Erklärung:     " + pState);
+				System.out.println("DDD| \t Vertrag:       " + pVertrag);
+				System.out.println("DDD| \t Gesamtvertrag: " + pComplete);
+				System.out.println("DDD| \t Hash verify:   " + hashOk);
+			}
+			
 			// Erklärung prüfe Hash
 			boolean isHashOK = checkHash(partnerHashBig, partnerHashS);
 			if (!isHashOK) {
