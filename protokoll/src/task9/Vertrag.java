@@ -65,6 +65,7 @@ public final class Vertrag implements Protocol {
 	private final int symbolCount = 1;
 	private final String digestType = "SHA";
 	private String path = "../protokoll/vertrag.txt";
+	int target;
 
 	private Communicator Com;
 
@@ -73,6 +74,7 @@ public final class Vertrag implements Protocol {
 	}
 
 	public void sendFirst() {
+		target = 1;
 		// (0)a Alice erzeugt sich einen ElGamal Key
 		makeElGamal();
 		// (0)b Alice sendet ihren PublicKey an Bob
@@ -195,9 +197,9 @@ public final class Vertrag implements Protocol {
 			vertrag = agreementBigs[3];
 			contract = agreementBigs[4];
 			// A Erklärung senden
-			Com.sendTo(1, Erklaerung.changeToString(statement));
-			Com.sendTo(1, myHashBig.toString(RADIX_SEND_));
-			Com.sendTo(1, myHashS.toString(RADIX_SEND_));
+			Com.sendTo(target, Erklaerung.changeToString(statement));
+			Com.sendTo(target, myHashBig.toString(RADIX_SEND_));
+			Com.sendTo(target, myHashS.toString(RADIX_SEND_));
 			// A Erklärung Partner empfangen
 			partnerStatement = Erklaerung.changeToBigs(Com.receive(),symbolCount);
 			partnerHashBig = new BigInteger(Com.receive(), RADIX_SEND_);
@@ -356,6 +358,7 @@ public final class Vertrag implements Protocol {
 	}
 
 	public void receiveFirst() {
+		target = 0;
 		String sReceive;
 
 		// (0) Bob empfängt den Public-Key von Alice
@@ -474,9 +477,9 @@ public final class Vertrag implements Protocol {
 			partnerHashBig = new BigInteger(Com.receive(), RADIX_SEND_);
 			partnerHashS = new BigInteger(Com.receive(), RADIX_SEND_);
 			// B Erklärung senden
-			Com.sendTo(1, Erklaerung.changeToString(statement));
-			Com.sendTo(1, myHashBig.toString(RADIX_SEND_));
-			Com.sendTo(1, myHashS.toString(RADIX_SEND_));
+			Com.sendTo(target, Erklaerung.changeToString(statement));
+			Com.sendTo(target, myHashBig.toString(RADIX_SEND_));
+			Com.sendTo(target, myHashS.toString(RADIX_SEND_));
 
 			if(DEBUG_V) {
 				String dState, dVertrag, dComplete;
