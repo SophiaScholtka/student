@@ -382,7 +382,9 @@ public final class Vertrag implements Protocol {
 
 		// p_A und M_A von Alice empfangen
 		BigInteger partnerP = new BigInteger(Com.receive(), RADIX_SEND_);
+		//TODO teste ob p_A Primzahl < 2^52 ist
 		BigInteger partnerM = new BigInteger(Com.receive(), RADIX_SEND_);
+		//TODO teste ob M < p_A
 		if (DEBUG_V)
 			System.out.println("DDD| parterP = "
 					+ partnerP.toString(RADIX_SEND_));
@@ -1314,6 +1316,7 @@ public final class Vertrag implements Protocol {
 		boolean ok;
 		ok = Grundlagen.elGamalVerify(partnerHashBig, partnerHashS,
 				partnerGamalP, partnerGamalG, partnerY);
+		//TODO Vertrag mit hash vergleichen
 
 		return ok;
 	}

@@ -19,7 +19,7 @@ public final class SecretSharing implements Protocol {
 	private final boolean TEST = true; // für Testwerte
 	
 	//hier true setzen, wenn Alice beim secretsharing betrügen soll, d.h. Bits manipulieren
-	private final boolean BETRUG_ = false;
+	private final boolean BETRUG_ = true;
 	//hier true setzen, wenn Alice beim oblivious cheaten soll d.h. 2 gleiche Geheimnisse
 	private boolean betrug_ = false; 
 
